@@ -1,37 +1,30 @@
 local metadata = {
 "## Interface:FS17 1.0.0.0",
 "## Title: AdjustableMirrors (R)",
-"## Notes: Mouse adjustableMirror (registration)",
+"## Notes: Mouse adjustableMirrors (registration)",
 "## Author: Marhu - Converted to FS17 by StjerneIdioten",
 "## Version: 1.0.2",
 "## Date: 24.07.2017",
 "## Web: http://marhu.net - https://github.com/StjerneIdioten"
 }
 
-adjustableMirror_Register = {};
+SpecializationUtil.registerSpecialization('adjustableMirrors', 'AdjustableMirrors', g_currentModDirectory .. 'core.lua')
 
-if SpecializationUtil.specializations['adjustableMirror'] == nil then
-    SpecializationUtil.registerSpecialization('adjustableMirror', 'adjustableMirror', g_currentModDirectory .. 'core.lua')
-end
+adjustableMirrors_Register = {};
 
-function adjustableMirror_Register:loadMap(name)
-
-	print("Adjustable Mirrors will now be added to vehicles")
-
+function adjustableMirrors_Register:loadMap(name)
 	local numVehicleTypes = 0;
 	for k, v in pairs(VehicleTypeUtil.vehicleTypes) do
 		if SpecializationUtil.hasSpecialization(Steerable, v.specializations)then 
 			if not SpecializationUtil.hasSpecialization(adjustableMirror, v.specializations) then
-				table.insert(v.specializations, SpecializationUtil.getSpecialization("adjustableMirror"));
+				table.insert(v.specializations, SpecializationUtil.getSpecialization("adjustableMirrors"));
 				numVehicleTypes = numVehicleTypes + 1;
 			end
 		end;
 	end;
 
-	--[[
-
-	--]]
-	g_i18n.globalI18N.texts["adjustableMirror_ADJUSTMIRROR"] = g_i18n:getText("adjustableMirror_ADJUSTMIRROR");
+	--g_i18n.globalI18N.texts["adjustableMirrors_ADJUSTMIRRORS"] = g_i18n:getText("adjustableMirrors_ADJUSTMIRRORS");
+	
 	--- Log Info ---
 	local function autor() for i=1,table.getn(metadata) do local _,n=string.find(metadata[i],"## Author: ");if n then return (string.sub (metadata[i], n+1)); end;end;end;
 	local function name() for i=1,table.getn(metadata) do local _,n=string.find(metadata[i],"## Title: ");if n then return (string.sub (metadata[i], n+1)); end;end;end;
@@ -41,17 +34,17 @@ function adjustableMirror_Register:loadMap(name)
 	
 end;
 
-function adjustableMirror_Register:ValueChanged()
+function adjustableMirrors_Register:ValueChanged()
 end;
-function adjustableMirror_Register:deleteMap()
+function adjustableMirrors_Register:deleteMap()
 end;
-function adjustableMirror_Register:mouseEvent(posX, posY, isDown, isUp, button)
+function adjustableMirrors_Register:mouseEvent(posX, posY, isDown, isUp, button)
 end;
-function adjustableMirror_Register:keyEvent(unicode, sym, modifier, isDown)
+function adjustableMirrors_Register:keyEvent(unicode, sym, modifier, isDown)
 end;
-function adjustableMirror_Register:update(dt)
+function adjustableMirrors_Register:update(dt)
 end;
-function adjustableMirror_Register:draw()
+function adjustableMirrors_Register:draw()
 end;
 
-addModEventListener(adjustableMirror_Register);
+addModEventListener(adjustableMirrors_Register);

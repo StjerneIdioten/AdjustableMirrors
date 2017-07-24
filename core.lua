@@ -1,22 +1,22 @@
 local metadata = {
-"## Interface:FS15 1.1.0.0 RC12",
-"## Title: adjustableMirror (C)",
+"## Interface:FS17 1.0.0.0",
+"## Title: AdjustableMirrors (C)",
 "## Notes: Mouse adjustable Mirrors (Core)",
-"## Author: Marhu",
+"## Author: Marhu - Converted to FS17 by StjerneIdioten",
 "## Version: 1.1.5",
-"## Date: 13.11.2014",
-"## Web: http://marhu.net"
+"## Date: 24.07.2017",
+"## Web: http://marhu.net - https://github.com/StjerneIdioten"
 }
  
-adjustableMirror = {};
-adjustableMirror.dir = g_currentModDirectory;
+AdjustableMirrors = {};
+AdjustableMirrors.dir = g_currentModDirectory;
 
-function adjustableMirror.prerequisitesPresent(specializations)
+function AdjustableMirrors.prerequisitesPresent(specializations)
     return true
 end;
 
-function adjustableMirror:load(xmlFile)
-	
+function AdjustableMirrors:load(xmlFile)
+
 	--[[
 
 	for i, camera in ipairs(self.cameras) do
@@ -82,10 +82,11 @@ function adjustableMirror:load(xmlFile)
 
 end;
 
-function adjustableMirror:delete()
+function AdjustableMirrors:delete()
+	
 end;
 
-function adjustableMirror:mouseEvent(posX, posY, isDown, isUp, button)
+function AdjustableMirrors:mouseEvent(posX, posY, isDown, isUp, button)
 	
 
 
@@ -153,22 +154,22 @@ function adjustableMirror:mouseEvent(posX, posY, isDown, isUp, button)
 --]]
 end;
 
-function adjustableMirror:keyEvent(unicode, sym, modifier, isDown)
+function AdjustableMirrors:keyEvent(unicode, sym, modifier, isDown)
 end;
 
-function adjustableMirror:readUpdateStream(streamId, timestamp, connection)
+function AdjustableMirrors:readUpdateStream(streamId, timestamp, connection)
     if not connection:getIsServer() then
 		
 	end;
 end;
  
-function adjustableMirror:writeUpdateStream(streamId, connection, dirtyMask)
+function AdjustableMirrors:writeUpdateStream(streamId, connection, dirtyMask)
     if connection:getIsServer() then
       
     end;
 end;
  
-function adjustableMirror:getSaveAttributesAndNodes(nodeIdent)
+function AdjustableMirrors:getSaveAttributesAndNodes(nodeIdent)
 
 --[[
 
@@ -186,7 +187,7 @@ function adjustableMirror:getSaveAttributesAndNodes(nodeIdent)
 
 end
 
-function adjustableMirror:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
+function AdjustableMirrors:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 
 --[[
 	if not resetVehicles then
@@ -207,12 +208,13 @@ function adjustableMirror:loadFromAttributesAndNodes(xmlFile, key, resetVehicles
 
 end
 
-function adjustableMirror:update(dt)
+function AdjustableMirrors:update(dt)
+
 
 --[[
 
 	if self.isEntered and self.isClient and self:getIsActiveForInput(false) and self.cameras[self.camIndex].isInside then
-		if InputBinding.hasEvent(InputBinding.adjustableMirror_ADJUSTMIRROR) then
+		if InputBinding.hasEvent(InputBinding.AdjustableMirrors_ADJUSTMIRROR) then
 			if self.mirrors and self.mirrors[1] then
 				self.MirrorAdjustable = not self.MirrorAdjustable;
 				InputBinding.MirrorAdjustable = self.MirrorAdjustable;
@@ -228,18 +230,18 @@ function adjustableMirror:update(dt)
 
 end;
 
-function adjustableMirror:updateTick(dt)	
+function AdjustableMirrors:updateTick(dt)	
+
 end;
 
-function adjustableMirror:draw()
-	
+function AdjustableMirrors:draw()
+
 	--if self.MirrorAdjustable then
-		g_currentMission:addHelpButtonText(g_i18n:getText("adjustableMirror_ADJUSTMIRROR"), InputBinding.adjustableMirror_ADJUSTMIRROR);
+	g_currentMission:addHelpButtonText(g_i18n:getText("adjustableMirrors_ADJUSTMIRRORS"), InputBinding.adjustableMirrors_ADJUSTMIRRORS, nil, GS_PRIO_VERY_HIGH);
 	--end
 end;
 
-function adjustableMirror:onEnter()
-	
+function AdjustableMirrors:onEnter()
 	--[[
 	
 	self.MirrorAdjustable = false;
@@ -253,7 +255,7 @@ function adjustableMirror:onEnter()
 
 end;
 
-function adjustableMirror:onLeave()
+function AdjustableMirrors:onLeave()
 
 	--[[
 
@@ -268,11 +270,13 @@ function adjustableMirror:onLeave()
 
 end;
 
+--[[
 local org_InputBinding_isAxisZero = InputBinding.isAxisZero
 InputBinding.isAxisZero = function(v)
 	if InputBinding.MirrorAdjustable then v = nil end;
 	return v == nil or math.abs(v) < 0.0001;
 end
+--]]
 
 --- Log Info ---
 local function autor() for i=1,table.getn(metadata) do local _,n=string.find(metadata[i],"## Author: ");if n then return (string.sub (metadata[i], n+1)); end;end;end;
