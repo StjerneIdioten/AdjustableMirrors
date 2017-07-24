@@ -17,8 +17,6 @@ end;
 
 function AdjustableMirrors:load(xmlFile)
 
-	--[[
-
 	for i, camera in ipairs(self.cameras) do
 		if camera.isInside then
 			camera.Mirror_org_mouseEvent = camera.mouseEvent;
@@ -29,7 +27,7 @@ function AdjustableMirrors:load(xmlFile)
 			end
 		end;
     end;
-	
+
 	self.MirrorAdjustable = false
 	self.MirrorAdjust = false;
 	self.maxRot = math.rad(20);
@@ -67,18 +65,21 @@ function AdjustableMirrors:load(xmlFile)
 	
 	if self.mirrors and self.mirrors[1] then
 		for i = 1, table.getn(self.mirrors) do
-			local numChildren = getNumOfChildren(self.mirrors[i]);
+
+			print("Checking: ")
+			--print(string.format("\t%s",(self.mirrors[i].node)))
+		
+			local numChildren = getNumOfChildren(self.mirrors[i].node);
 			if numChildren > 0 then
 				for j=numChildren,1,-1 do
-					addMirror(getChildAt(self.mirrors[i], j-1));
+					addMirror(getChildAt(self.mirrors[i].node, j-1));
 				end
 			else
-				addMirror(self.mirrors[i]);
+				addMirror(self.mirrors[i].node);
 			end;
+
 		end;
 	end;
-	
-	--]]
 
 end;
 
@@ -88,9 +89,7 @@ end;
 
 function AdjustableMirrors:mouseEvent(posX, posY, isDown, isUp, button)
 	
-
-
-	--[[
+	---[[
 
 	if self.MirrorAdjustable == true then
 	
@@ -151,11 +150,15 @@ function AdjustableMirrors:mouseEvent(posX, posY, isDown, isUp, button)
 	else
 		self.cameras[self.camIndex].MirrorAdjust = false
 	end
---]]
+
+	--]]
+
 end;
 
 function AdjustableMirrors:keyEvent(unicode, sym, modifier, isDown)
 end;
+
+---[[
 
 function AdjustableMirrors:readUpdateStream(streamId, timestamp, connection)
     if not connection:getIsServer() then
@@ -171,8 +174,6 @@ end;
  
 function AdjustableMirrors:getSaveAttributesAndNodes(nodeIdent)
 
---[[
-
 	local attributes = "";
     local nodes = "";
 			  
@@ -183,13 +184,12 @@ function AdjustableMirrors:getSaveAttributesAndNodes(nodeIdent)
 		
     return attributes,nodes;
 
---]]
-
 end
 
 function AdjustableMirrors:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 
---[[
+	
+
 	if not resetVehicles then
 		for i=1, table.getn(self.adjustMirror) do
 			local mirrorKey = key..".mirror"..i;
@@ -204,14 +204,15 @@ function AdjustableMirrors:loadFromAttributesAndNodes(xmlFile, key, resetVehicle
 		
 	return BaseMission.VEHICLE_LOAD_OK;
 
---]]
+	
 
 end
 
+--]]
+
 function AdjustableMirrors:update(dt)
 
-
---[[
+	---[[
 
 	if self.isEntered and self.isClient and self:getIsActiveForInput(false) and self.cameras[self.camIndex].isInside then
 		if InputBinding.hasEvent(InputBinding.AdjustableMirrors_ADJUSTMIRROR) then
@@ -226,7 +227,7 @@ function AdjustableMirrors:update(dt)
 		InputBinding.MirrorAdjustable = false;
 	end
 	
---]]
+	--]]
 
 end;
 
@@ -236,13 +237,14 @@ end;
 
 function AdjustableMirrors:draw()
 
-	--if self.MirrorAdjustable then
+	if self.MirrorAdjustable then
 	g_currentMission:addHelpButtonText(g_i18n:getText("adjustableMirrors_ADJUSTMIRRORS"), InputBinding.adjustableMirrors_ADJUSTMIRRORS, nil, GS_PRIO_VERY_HIGH);
-	--end
+	end
 end;
 
+---[[
+
 function AdjustableMirrors:onEnter()
-	--[[
 	
 	self.MirrorAdjustable = false;
 	self.MirrorAdjust = false;
@@ -251,13 +253,10 @@ function AdjustableMirrors:onEnter()
 		self.cameras[i].MirrorAdjust = nil
 	end
 
-	--]]
-
 end;
 
-function AdjustableMirrors:onLeave()
 
-	--[[
+function AdjustableMirrors:onLeave()
 
 	self.MirrorAdjustable = false;
 	self.MirrorAdjust = false;
@@ -266,16 +265,16 @@ function AdjustableMirrors:onLeave()
 		self.cameras[i].MirrorAdjust = nil
 	end
 
-	--]]
-
 end;
 
---[[
+
+
 local org_InputBinding_isAxisZero = InputBinding.isAxisZero
 InputBinding.isAxisZero = function(v)
 	if InputBinding.MirrorAdjustable then v = nil end;
 	return v == nil or math.abs(v) < 0.0001;
 end
+
 --]]
 
 --- Log Info ---
