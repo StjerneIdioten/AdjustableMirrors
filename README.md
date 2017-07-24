@@ -1,2 +1,2 @@
 # FS17_AdjustableMirrors
-Adjustable mirrors mod for Farming Simulator 2017
+My attempt at converting the Adjustable mirrors mod from FS 2015 to FS 2017
