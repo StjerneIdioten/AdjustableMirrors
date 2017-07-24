@@ -1,11 +1,11 @@
 local metadata = {
-"## Interface:FS15 1.1.0.0 RC12",
-"## Title: adjustableMirror (R)",
+"## Interface:FS17 1.0.0.0",
+"## Title: AdjustableMirrors (R)",
 "## Notes: Mouse adjustableMirror (registration)",
-"## Author: Marhu",
+"## Author: Marhu - Converted to FS17 by StjerneIdioten",
 "## Version: 1.0.2",
-"## Date: 11.11.2014",
-"## Web: http://marhu.net"
+"## Date: 24.07.2017",
+"## Web: http://marhu.net - https://github.com/StjerneIdioten"
 }
 
 adjustableMirror_Register = {};
