@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <l10n>
     <texts>
-        <text name="adjustableMirrors_ADJUSTMIRRORS" text="Mirror adjustable" />
+        <text name="adjustableMirrors_ADJUSTMIRRORS" text="Adjust Mirrors" />
+        <text name="adjustableMirrors_ADJUSTMIRRORS_Off" text="Stop Adjusting Mirrors" />
     </texts>
 </l10n>
