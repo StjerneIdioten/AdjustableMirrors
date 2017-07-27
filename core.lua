@@ -15,7 +15,7 @@ function AdjustableMirrors.prerequisitesPresent(specializations)
     return true
 end;
 
-function AdjustableMirrors:load(xmlFile)
+function AdjustableMirrors:load(savegame)
 
 	for i, camera in ipairs(self.cameras) do
 		if camera.isInside then
@@ -76,45 +76,24 @@ function AdjustableMirrors:load(xmlFile)
 		end;
 	end;
 
-	--[[
-	if savegame ~= nil and not savegame.resetVehicles then
-        local distance = getXMLFloat(savegame.xmlFile, savegame.key .. ".followMe#backDist")
-        if distance ~= nil then
-            FollowMe.changeDistance(self, { distance }, true ); -- Absolute change
-        end
-        local offset = getXMLFloat(savegame.xmlFile, savegame.key .. ".followMe#sideOffs")
-        if offset ~= nil then
-            FollowMe.changeXOffset(self, { offset }, true ); -- Absolute change
-        end
-    end
-	--]]
-
-end;
-
-function AdjustableMirrors:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
-
 	print("Loading in mirror settings")
 
-	if not resetVehicles then
+	if savegame ~= nil and not savegame.resetVehicles then
 		for i=1, table.getn(self.adjustMirror) do
-			local mirrorKey = key..".mirror"..i;
-			self.adjustMirror[i].x0 = Utils.getNoNil(getXMLFloat(xmlFile, mirrorKey .. "#rotx"), self.adjustMirror[i].x0);
-			self.adjustMirror[i].y0 = Utils.getNoNil(getXMLFloat(xmlFile, mirrorKey .. "#roty"), self.adjustMirror[i].y0);
+			local mirrorKey = savegame.key..".mirror"..i;
+			self.adjustMirror[i].x0 = Utils.getNoNil(getXMLFloat(savegame.xmlFile, mirrorKey .. "#rotx"), self.adjustMirror[i].x0);
+			self.adjustMirror[i].y0 = Utils.getNoNil(getXMLFloat(savegame.xmlFile, mirrorKey .. "#roty"), self.adjustMirror[i].y0);
 			setRotation(self.adjustMirror[i].x1,math.min(0,self.adjustMirror[i].x0),0,0);
 			setRotation(self.adjustMirror[i].x2,math.max(0,self.adjustMirror[i].x0),0,0);
 			setRotation(self.adjustMirror[i].y1,0,0,math.max(0,self.adjustMirror[i].y0));
 			setRotation(self.adjustMirror[i].y2,0,0,math.min(0,self.adjustMirror[i].y0));
 		end;
-	end;
-		
-	return BaseMission.VEHICLE_LOAD_OK;
-end
+	end
+end;
 
 function AdjustableMirrors:delete()
 	
 end;
-
-local mouseCount = 1;
 
 function AdjustableMirrors:mouseEvent(posX, posY, isDown, isUp, button)
 	
@@ -202,8 +181,6 @@ function AdjustableMirrors:writeUpdateStream(streamId, connection, dirtyMask)
 end;
  
 function AdjustableMirrors:getSaveAttributesAndNodes(nodeIdent)
-
-	print("Saving mirror settings")
 
 	local attributes = "";
     local nodes = "";
@@ -294,7 +271,6 @@ function AdjustableMirrors:onLeave()
 	--]]
 
 end;
-
 
 --[[
 local org_InputBinding_isAxisZero = InputBinding.isAxisZero
