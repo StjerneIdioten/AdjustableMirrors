@@ -358,6 +358,11 @@ end;
 
 function AdjustableMirrors:onEnter()
 
+	if g_server == nil then
+		print("Leaving vehicle, sending event from client")
+		AMUpdateEvent.sendEvent(false);
+	end
+
 	--[[
 
 	self.MirrorAdjustable = false;
@@ -373,6 +378,11 @@ end;
 
 
 function AdjustableMirrors:onLeave()
+
+	if g_server == nil then
+		print("Leaving vehicle, sending event from client")
+		AMUpdateEvent.sendEvent(true);
+	end
 
 	--[[
 	self.MirrorAdjustable = false;
@@ -392,6 +402,90 @@ InputBinding.isAxisZero = function(v)
 	return v == nil or math.abs(v) < 0.0001;
 end
 --]]
+
+---
+---
+---
+
+AMUpdateEvent = {};
+AMUpdateEvent_mt = Class(AMUpdateEvent, Event);
+InitEventClass(AMUpdateEvent, "AMUpdateEvent");
+
+function AMUpdateEvent:emptyNew()
+    local self = Event:new(AMUpdateEvent_mt);
+    self.className = "AMUpdateEvent";
+    return self;
+end;
+
+function AMUpdateEvent:new(checkValue)
+    local self = AMUpdateEvent:emptyNew()
+    self.checkValue = checkValue
+	--Insert some code which inits some values
+
+    --self.distance   = Utils.getNoNil(vehicle.modFM.FollowKeepBack, 0)
+    --self.offset     = Utils.getNoNil(vehicle.modFM.FollowXOffset, 0)
+    return self;
+end;
+
+function AMUpdateEvent:writeStream(streamId, connection)
+
+	if g_server == nil then
+		streamWriteBool(streamId, self.checkValue)
+		print("Writing stream of event from client")
+	else
+		print("Would have written from the server")
+	end
+end;
+
+function AMUpdateEvent:readStream(streamId, connection)
+
+	if g_server ~= nil then
+		print("Reading stream of event on server")
+    	
+		self.checkValue = streamReadBool(streamId)
+
+		print(self.checkValue)
+
+		--printTableRecursively(self.vehichle, '-', 0, 1)
+	else
+		print("Would have been reading on the client")
+	end
+
+	-- if not connection:getIsServer() then
+	-- 	g_server:broadcastEvent(AMUpdateEvent:new(self.vehichle))
+	-- end;
+
+	
+
+    -- if self.vehicle ~= nil then
+    --     if     self.cmdId == FollowMe.COMMAND_START then
+    --         FollowMe.startFollowMe(self.vehicle, connection)
+    --     elseif self.cmdId == FollowMe.COMMAND_STOP then
+    --         FollowMe.stopFollowMe(self.vehicle, self.reason)
+    --     elseif self.cmdId == FollowMe.COMMAND_WAITRESUME then
+    --         FollowMe.waitResumeFollowMe(self.vehicle, self.reason)
+    --     else
+    --         FollowMe.changeDistance(self.vehicle, { self.distance } )
+    --         FollowMe.changeXOffset( self.vehicle, { self.offset } )
+    --     end
+    -- end;
+end;
+
+function AMUpdateEvent.sendEvent(checkValue)
+
+	if g_server ~= nil then
+		print("Server broadcasting event")
+		g_server:broadcastEvent(AMUpdateEvent:new(checkValue), nil, nil, self);
+	else
+		print("Client requesting event")
+		g_client:getServerConnection():sendEvent(AMUpdateEvent:new(checkValue));
+	end;
+
+end;
+
+---
+---
+---
 
 --- Log Info ---
 local function autor() for i=1,table.getn(metadata) do local _,n=string.find(metadata[i],"## Author: ");if n then return (string.sub (metadata[i], n+1)); end;end;end;
