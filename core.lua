@@ -9,6 +9,7 @@ local metadata = {
 }
  
 AdjustableMirrors = {};
+AdjustableMirrors.sendNumBits = 7;
 AdjustableMirrors.dir = g_currentModDirectory;
 
 function AdjustableMirrors.prerequisitesPresent(specializations)
@@ -76,9 +77,11 @@ function AdjustableMirrors:load(savegame)
 		end;
 	end;
 
-	print("Loading in mirror settings")
+	print(string.format("vehicle has %s mirrors",(num - 1)))
+	--DebugUtil.printTableRecursively(self.mirrors,"-",0,2);
 
 	if savegame ~= nil and not savegame.resetVehicles then
+		print("Loading in mirror settings")
 		for i=1, table.getn(self.adjustMirror) do
 			local mirrorKey = savegame.key..".mirror"..i;
 			self.adjustMirror[i].x0 = Utils.getNoNil(getXMLFloat(savegame.xmlFile, mirrorKey .. "#rotx"), self.adjustMirror[i].x0);
@@ -89,6 +92,12 @@ function AdjustableMirrors:load(savegame)
 			setRotation(self.adjustMirror[i].y2,0,0,math.min(0,self.adjustMirror[i].y0));
 		end;
 	end
+end;
+
+function AdjustableMirrors:postLoad(savegame)
+	--print(string.format("vehicle has %s mirrors",(table.getn(self.mirrors))))
+	print("This is what mirrors consists of: ")
+	DebugUtil.printTableRecursively(self.mirrors,"-",0,2);
 end;
 
 function AdjustableMirrors:delete()
@@ -167,6 +176,84 @@ function AdjustableMirrors:keyEvent(unicode, sym, modifier, isDown)
 end;
 
 ---[[
+
+function AdjustableMirrors:readStream(streamId, connection)
+
+	print("Receiving mirror stream:")
+
+	local hasMirrorSettings = streamReadBool(streamId)
+
+	if hasMirrorSettings then 
+		print("\tHas mirror settings")
+	else
+		print("\tDoes not have mirror settings")
+	end;
+
+	--[[
+
+	for i=1, table.getn(self.adjustMirror) do
+
+			print(string.format("\tmirror%s",(i)))
+
+			local rotx = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
+			local roty = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
+
+			print(string.format("\t\trotx:%f\n\t\troty:%f",(rotx),(roty)))
+
+			self.adjustMirror[i].x0 = rotx;
+			self.adjustMirror[i].y0 = roty;
+			setRotation(self.adjustMirror[i].x1,math.min(0,self.adjustMirror[i].x0),0,0);
+			setRotation(self.adjustMirror[i].x2,math.max(0,self.adjustMirror[i].x0),0,0);
+			setRotation(self.adjustMirror[i].y1,0,0,math.max(0,self.adjustMirror[i].y0));
+			setRotation(self.adjustMirror[i].y2,0,0,math.min(0,self.adjustMirror[i].y0));
+
+			print("\t\tMirror loaded!")
+
+		end;
+
+	--]]
+
+	print("\tDone width mirror stream:")
+
+end;
+
+function AdjustableMirrors:writeStream(streamId, connection)
+
+	print("Writing mirror stream:")
+
+	local hasMirrorSettings = false
+
+	streamWriteBool(streamId, hasMirrorSettings)
+
+	--[[
+
+	if table.getn(self.adjustMirror) > 0 then
+
+		print("Should not get here on a no mirror vehicle")
+
+		for i=1,table.getn(self.adjustMirror) do
+
+			print(string.format("\tmirror%s",(i)))
+
+			streamWriteUIntN(streamId, self.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
+			streamWriteUIntN(streamId, self.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
+
+			print(string.format("\t\trotx:%f\n\t\troty:%f",(self.adjustMirror[i].x0),(self.adjustMirror[i].y0)))
+
+		end
+
+	else
+
+		print("No mirrors on this vehicle")
+		print(string.format("adjustMirror: %s",(table.getn(self.adjustMirror))))
+		DebugUtil.printTableRecursively(self.adjustMirror,"-",0,2);
+	end
+
+	--]]
+
+	print("\tDone writing mirror stream")
+
+end;
 
 function AdjustableMirrors:readUpdateStream(streamId, timestamp, connection)
     if not connection:getIsServer() then
