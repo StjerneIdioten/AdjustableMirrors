@@ -77,27 +77,54 @@ function AdjustableMirrors:load(savegame)
 		end;
 	end;
 
-	print(string.format("vehicle has %s mirrors",(num - 1)))
-	--DebugUtil.printTableRecursively(self.mirrors,"-",0,2);
-
 	if savegame ~= nil and not savegame.resetVehicles then
-		print("Loading in mirror settings")
-		for i=1, table.getn(self.adjustMirror) do
-			local mirrorKey = savegame.key..".mirror"..i;
-			self.adjustMirror[i].x0 = Utils.getNoNil(getXMLFloat(savegame.xmlFile, mirrorKey .. "#rotx"), self.adjustMirror[i].x0);
-			self.adjustMirror[i].y0 = Utils.getNoNil(getXMLFloat(savegame.xmlFile, mirrorKey .. "#roty"), self.adjustMirror[i].y0);
-			setRotation(self.adjustMirror[i].x1,math.min(0,self.adjustMirror[i].x0),0,0);
-			setRotation(self.adjustMirror[i].x2,math.max(0,self.adjustMirror[i].x0),0,0);
-			setRotation(self.adjustMirror[i].y1,0,0,math.max(0,self.adjustMirror[i].y0));
-			setRotation(self.adjustMirror[i].y2,0,0,math.min(0,self.adjustMirror[i].y0));
-		end;
-	end
-end;
+		print("Loading in mirror settings");
 
-function AdjustableMirrors:postLoad(savegame)
-	--print(string.format("vehicle has %s mirrors",(table.getn(self.mirrors))))
-	print("This is what mirrors consists of: ")
-	DebugUtil.printTableRecursively(self.mirrors,"-",0,2);
+		--Need to check whether this is a multiplayer game or not due to mirrors not being present on dedicated server vehichles
+		if g_currentMission.missionDynamicInfo.isMultiplayer then
+			print("\tThis is a multiplayer session");
+
+			--If this is a multiplayer game we need to know if this is the server or a client
+			if self.isServer then
+				--This is the server, so we load in the mirror data from the xml file, if it exists, and create the proper file structures
+				print("\t\tThis is the server")
+
+				local i = 1
+				local mirrorKey = savegame.key..".mirror"
+				while hasXMLProperty(savegame.xmlFile, mirrorKey..i) do
+					self.adjustMirror[i] = {}
+					self.adjustMirror[i].x0 = getXMLFloat(savegame.xmlFile, mirrorKey.. i .. "#rotx");
+					self.adjustMirror[i].y0 = getXMLFloat(savegame.xmlFile, mirrorKey.. i .. "#roty");
+
+					print("\t\tMirror"..i)
+					print(string.format("\t\t\trotx: %s\n\t\t\troty: %s",(self.adjustMirror[i].x0),(self.adjustMirror[i].y0)))
+
+					i = i + 1;
+				end;
+			else
+				print("\tThis is a client")
+			end;	
+		else
+			print("\tThis is not a multiplayer session")
+			--If this it not a multiplayer game, then just load in settings from the vehichle xml. And set the mirrors accordingly.
+			for i=1, table.getn(self.adjustMirror) do
+				local mirrorKey = savegame.key..".mirror"..i;
+				self.adjustMirror[i].x0 = Utils.getNoNil(getXMLFloat(savegame.xmlFile, mirrorKey .. "#rotx"), self.adjustMirror[i].x0);
+				self.adjustMirror[i].y0 = Utils.getNoNil(getXMLFloat(savegame.xmlFile, mirrorKey .. "#roty"), self.adjustMirror[i].y0);
+				setRotation(self.adjustMirror[i].x1,math.min(0,self.adjustMirror[i].x0),0,0);
+				setRotation(self.adjustMirror[i].x2,math.max(0,self.adjustMirror[i].x0),0,0);
+				setRotation(self.adjustMirror[i].y1,0,0,math.max(0,self.adjustMirror[i].y0));
+				setRotation(self.adjustMirror[i].y2,0,0,math.min(0,self.adjustMirror[i].y0));
+
+				print("\t\tMirror"..i)
+				print(string.format("\t\t\trotx: %s\n\t\t\troty: %s",(self.adjustMirror[i].x0),(self.adjustMirror[i].y0)))
+
+			end;
+		end;
+
+		print("\tDone")
+
+	end;
 end;
 
 function AdjustableMirrors:delete()
@@ -220,6 +247,8 @@ end;
 function AdjustableMirrors:writeStream(streamId, connection)
 
 	print("Writing mirror stream:")
+
+	--if connection:getIsServer() then
 
 	local hasMirrorSettings = false
 
