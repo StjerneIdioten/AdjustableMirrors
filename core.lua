@@ -64,6 +64,7 @@ function AdjustableMirrors:load(savegame)
 		num = num + 1
 	end
 	
+	--This bit could perhaps be moved since it probably wont happen on the server side(Due to mirrors not being present on a dedicated server)
 	if self.mirrors and self.mirrors[1] then
 		for i = 1, table.getn(self.mirrors) do
 			local numChildren = getNumOfChildren(self.mirrors[i].node);
@@ -207,7 +208,7 @@ end;
 
 function AdjustableMirrors:readStream(streamId, connection)
 
-	print("Receiving mirror stream:")
+	print("Receiving mirror stream on connect:")
 	if connection:getIsServer() then
 		--Check if the server has mirror settings stored for the vehicle
 		if streamReadBool(streamId) then 
@@ -358,11 +359,6 @@ end;
 
 function AdjustableMirrors:onEnter()
 
-	if g_server == nil then
-		print("Leaving vehicle, sending event from client")
-		AMUpdateEvent.sendEvent(false);
-	end
-
 	--[[
 
 	self.MirrorAdjustable = false;
@@ -381,7 +377,7 @@ function AdjustableMirrors:onLeave()
 
 	if g_server == nil then
 		print("Leaving vehicle, sending event from client")
-		AMUpdateEvent.sendEvent(true);
+		g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
 	end
 
 	--[[
@@ -394,6 +390,12 @@ function AdjustableMirrors:onLeave()
 	--]]
 
 end;
+
+function AdjustableMirrors.save(self)
+	print("Saving")
+	print("This is the known mirrors of this vehicle")
+	DebugUtil.printTableRecursively(self.adjustMirror, "-", 0, 2)
+end
 
 --[[
 local org_InputBinding_isAxisZero = InputBinding.isAxisZero
@@ -412,75 +414,67 @@ AMUpdateEvent_mt = Class(AMUpdateEvent, Event);
 InitEventClass(AMUpdateEvent, "AMUpdateEvent");
 
 function AMUpdateEvent:emptyNew()
+	print("New empty event")
     local self = Event:new(AMUpdateEvent_mt);
-    self.className = "AMUpdateEvent";
+	self.className = "AMUpdateEvent"
     return self;
 end;
 
-function AMUpdateEvent:new(checkValue)
+function AMUpdateEvent:new(vehicle)
+	print("New event")
     local self = AMUpdateEvent:emptyNew()
-    self.checkValue = checkValue
-	--Insert some code which inits some values
-
-    --self.distance   = Utils.getNoNil(vehicle.modFM.FollowKeepBack, 0)
-    --self.offset     = Utils.getNoNil(vehicle.modFM.FollowXOffset, 0)
+    self.vehicle = vehicle
     return self;
-end;
-
-function AMUpdateEvent:writeStream(streamId, connection)
-
-	if g_server == nil then
-		streamWriteBool(streamId, self.checkValue)
-		print("Writing stream of event from client")
-	else
-		print("Would have written from the server")
-	end
 end;
 
 function AMUpdateEvent:readStream(streamId, connection)
 
-	if g_server ~= nil then
-		print("Reading stream of event on server")
-    	
-		self.checkValue = streamReadBool(streamId)
+	print("Reading stream")
 
-		print(self.checkValue)
+	self.vehicle = readNetworkNodeObject(streamId);
 
-		--printTableRecursively(self.vehichle, '-', 0, 1)
-	else
-		print("Would have been reading on the client")
-	end
+	if self.vehicle ~= nil then
+		print("Vehicle was not nil")
+		local numberOfMirrors = streamReadInt8(streamId)
+		print("Number of mirrors")
+		print(numberOfMirrors)
 
-	-- if not connection:getIsServer() then
-	-- 	g_server:broadcastEvent(AMUpdateEvent:new(self.vehichle))
-	-- end;
+		for i=1, numberOfMirrors do
 
+				print(string.format("\t\tmirror%s",(i)))
+
+				self.vehicle.adjustMirror[i] = {}
+				self.vehicle.adjustMirror[i].x0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
+				self.vehicle.adjustMirror[i].y0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
+
+				print(string.format("\t\t\trotx:%f\n\t\t\troty:%f",(self.vehicle.adjustMirror[i].x0),(self.vehicle.adjustMirror[i].y0)))
+
+				print("\t\t\tMirror loaded!")
+
+			end;
+	end;
 	
-
-    -- if self.vehicle ~= nil then
-    --     if     self.cmdId == FollowMe.COMMAND_START then
-    --         FollowMe.startFollowMe(self.vehicle, connection)
-    --     elseif self.cmdId == FollowMe.COMMAND_STOP then
-    --         FollowMe.stopFollowMe(self.vehicle, self.reason)
-    --     elseif self.cmdId == FollowMe.COMMAND_WAITRESUME then
-    --         FollowMe.waitResumeFollowMe(self.vehicle, self.reason)
-    --     else
-    --         FollowMe.changeDistance(self.vehicle, { self.distance } )
-    --         FollowMe.changeXOffset( self.vehicle, { self.offset } )
-    --     end
-    -- end;
 end;
 
-function AMUpdateEvent.sendEvent(checkValue)
+function AMUpdateEvent:writeStream(streamId, connection)
+	print("Writing stream")
+	writeNetworkNodeObject(streamId, self.vehicle);
 
-	if g_server ~= nil then
-		print("Server broadcasting event")
-		g_server:broadcastEvent(AMUpdateEvent:new(checkValue), nil, nil, self);
-	else
-		print("Client requesting event")
-		g_client:getServerConnection():sendEvent(AMUpdateEvent:new(checkValue));
-	end;
+	--Sending the number of mirrors so the server can prepare
+	print("Number of mirrors: ")
+	print(table.getn(self.vehicle.adjustMirror))
+	streamWriteInt8(streamId, table.getn(self.vehicle.adjustMirror))
 
+	--For each mirror send the settings
+	for i=1,table.getn(self.vehicle.adjustMirror) do
+		print(string.format("\t\tmirror%s",(i)))
+
+		streamWriteUIntN(streamId, self.vehicle.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
+		streamWriteUIntN(streamId, self.vehicle.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
+
+		print(string.format("\t\t\trotx:%f\n\t\t\troty:%f",(self.vehicle.adjustMirror[i].x0),(self.vehicle.adjustMirror[i].y0)))
+	end
+	
 end;
 
 ---
