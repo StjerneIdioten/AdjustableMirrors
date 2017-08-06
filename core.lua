@@ -218,8 +218,11 @@ function AdjustableMirrors:readStream(streamId, connection)
 
 				print(string.format("\t\tmirror%s",(i)))
 
-				self.adjustMirror[i].x0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
-				self.adjustMirror[i].y0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
+				--self.adjustMirror[i].x0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
+				--self.adjustMirror[i].y0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
+
+				self.adjustMirror[i].x0 = streamReadFloat32(streamId);
+				self.adjustMirror[i].y0 = streamReadFloat32(streamId);
 
 				print(string.format("\t\t\trotx:%f\n\t\t\troty:%f",(self.adjustMirror[i].x0),(self.adjustMirror[i].y0)))
 
@@ -261,8 +264,10 @@ function AdjustableMirrors:writeStream(streamId, connection)
 
 				print(string.format("\t\tmirror%s",(i)))
 
-				streamWriteUIntN(streamId, self.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
-				streamWriteUIntN(streamId, self.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
+				--streamWriteIntN(streamId, self.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
+				--streamWriteIntN(streamId, self.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
+				streamWriteFloat32(streamId, self.adjustMirror[i].x0)
+				streamWriteFloat32(streamId, self.adjustMirror[i].y0)
 
 				print(string.format("\t\t\trotx:%f\n\t\t\troty:%f",(self.adjustMirror[i].x0),(self.adjustMirror[i].y0)))
 
@@ -444,8 +449,11 @@ function AMUpdateEvent:readStream(streamId, connection)
 				print(string.format("\t\tmirror%s",(i)))
 
 				self.vehicle.adjustMirror[i] = {}
-				self.vehicle.adjustMirror[i].x0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
-				self.vehicle.adjustMirror[i].y0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
+				self.vehicle.adjustMirror[i].x0 = streamReadFloat32(streamId);
+				self.vehicle.adjustMirror[i].y0 = streamReadFloat32(streamId);
+
+				--self.vehicle.adjustMirror[i].x0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
+				--self.vehicle.adjustMirror[i].y0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
 
 				print(string.format("\t\t\trotx:%f\n\t\t\troty:%f",(self.vehicle.adjustMirror[i].x0),(self.vehicle.adjustMirror[i].y0)))
 
@@ -469,8 +477,11 @@ function AMUpdateEvent:writeStream(streamId, connection)
 	for i=1,table.getn(self.vehicle.adjustMirror) do
 		print(string.format("\t\tmirror%s",(i)))
 
-		streamWriteUIntN(streamId, self.vehicle.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
-		streamWriteUIntN(streamId, self.vehicle.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
+		local newX = self.vehicle.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1)
+		local newY = self.vehicle.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1)
+
+		streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].x0)
+		streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].y0)
 
 		print(string.format("\t\t\trotx:%f\n\t\t\troty:%f",(self.vehicle.adjustMirror[i].x0),(self.vehicle.adjustMirror[i].y0)))
 	end
