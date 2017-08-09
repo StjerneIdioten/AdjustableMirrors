@@ -12,12 +12,24 @@ AdjustableMirrors = {};
 AdjustableMirrors.sendNumBits = 7;
 AdjustableMirrors.dir = g_currentModDirectory;
 
+-- For debugging
+local function log(...)
+    if true then
+        local txt = ""
+        for idx = 1,select("#", ...) do
+            txt = txt .. tostring(select(idx, ...))
+        end
+        print(string.format("%7ums AM.LUA ", (g_currentMission ~= nil and g_currentMission.time or 0)) .. txt);
+    end
+end;
+
 function AdjustableMirrors.prerequisitesPresent(specializations)
     return true
 end;
 
 function AdjustableMirrors:load(savegame)
 
+	--I think this disables mouse controls(for other functionality) if we are inside and adjusting mirrors.
 	for i, camera in ipairs(self.cameras) do
 		if camera.isInside then
 			camera.Mirror_org_mouseEvent = camera.mouseEvent;
@@ -80,16 +92,16 @@ function AdjustableMirrors:load(savegame)
 
 	--Checks for the savegame files, which means that clients on a multiplayer game probably wont get any further that here.
 	if savegame ~= nil and not savegame.resetVehicles then
-		print("Loading in mirror settings");
+		log("Loading in mirror settings from savegame");
 
 		--Need to check whether this is a multiplayer game or not due to mirrors not being present on dedicated server vehichles
 		if g_currentMission.missionDynamicInfo.isMultiplayer then
-			print("\tThis is a multiplayer session");
+			log("This is a multiplayer session");
 
 			--If this is a multiplayer game we need to know if this is the server or a client
 			if self.isServer then
 				--This is the server, so we load in the mirror data from the xml file, if it exists, and create the proper file structures
-				print("\t\tThis is the server")
+				log("This is the server")
 
 				local i = 1
 				local mirrorKey = savegame.key..".mirror"
@@ -98,16 +110,20 @@ function AdjustableMirrors:load(savegame)
 					self.adjustMirror[i].x0 = getXMLFloat(savegame.xmlFile, mirrorKey.. i .. "#rotx");
 					self.adjustMirror[i].y0 = getXMLFloat(savegame.xmlFile, mirrorKey.. i .. "#roty");
 
-					print("\t\tMirror"..i)
-					print(string.format("\t\t\trotx: %s\n\t\t\troty: %s",(self.adjustMirror[i].x0),(self.adjustMirror[i].y0)))
+					log("Mirror"..i)
+					log(string.format("rotx: %s",(self.adjustMirror[i].x0)))
+					log(string.format("roty: %s",(self.adjustMirror[i].y0)))
 
 					i = i + 1;
 				end;
+
+				--Need to check if the server is also a client, because then the mirrors should also be adjusted
+
 			else
-				print("\tThis is a client")
+				log("This is a client")
 			end;	
 		else
-			print("\tThis is not a multiplayer session")
+			log("This is not a multiplayer session")
 			--If this it not a multiplayer game, then just load in settings from the vehichle xml. And set the mirrors accordingly.
 			for i=1, table.getn(self.adjustMirror) do
 				local mirrorKey = savegame.key..".mirror"..i;
@@ -118,13 +134,14 @@ function AdjustableMirrors:load(savegame)
 				setRotation(self.adjustMirror[i].y1,0,0,math.max(0,self.adjustMirror[i].y0));
 				setRotation(self.adjustMirror[i].y2,0,0,math.min(0,self.adjustMirror[i].y0));
 
-				print("\t\tMirror"..i)
-				print(string.format("\t\t\trotx: %s\n\t\t\troty: %s",(self.adjustMirror[i].x0),(self.adjustMirror[i].y0)))
+				log("Mirror"..i)
+				log(string.format("rotx: %s",(self.adjustMirror[i].x0)))
+				log(string.format("roty: %s",(self.adjustMirror[i].y0)))
 
 			end;
 		end;
 
-		print("\tDone")
+		log("Done loading in mirror data")
 
 	end;
 end;
@@ -208,15 +225,15 @@ end;
 
 function AdjustableMirrors:readStream(streamId, connection)
 
-	print("Receiving mirror stream on connect:")
+	log("Receiving mirror stream on connect:")
 	if connection:getIsServer() then
 		--Check if the server has mirror settings stored for the vehicle
 		if streamReadBool(streamId) then 
-			print("\tServer has mirror settings")
+			log("Server has mirror settings")
 
 			for i=1, table.getn(self.adjustMirror) do
 
-				print(string.format("\t\tmirror%s",(i)))
+				log(string.format("mirror%s",(i)))
 
 				--self.adjustMirror[i].x0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
 				--self.adjustMirror[i].y0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
@@ -224,14 +241,15 @@ function AdjustableMirrors:readStream(streamId, connection)
 				self.adjustMirror[i].x0 = streamReadFloat32(streamId);
 				self.adjustMirror[i].y0 = streamReadFloat32(streamId);
 
-				print(string.format("\t\t\trotx:%f\n\t\t\troty:%f",(self.adjustMirror[i].x0),(self.adjustMirror[i].y0)))
+				log(string.format("rotx: %s",(self.adjustMirror[i].x0)))
+				log(string.format("roty: %s",(self.adjustMirror[i].y0)))
 
-				print("\t\t\tMirror loaded!")
+				log("Mirror loaded!")
 
 			end;
 
 		else
-			print("\tServer does not have mirror settings")
+			log("Server does not have mirror settings")
 		end;
 
 		--Set the rotation of the mirrors, either to defaults or the loaded values.
@@ -242,16 +260,16 @@ function AdjustableMirrors:readStream(streamId, connection)
 			setRotation(self.adjustMirror[i].y2,0,0,math.min(0,self.adjustMirror[i].y0));
 		end;
 	end;
-	print("\tDone width mirror stream:")
+	log("Done width mirror stream:")
 
 end;
 
 function AdjustableMirrors:writeStream(streamId, connection)
 
-	print("Writing mirror stream:")
+	log("Writing mirror stream:")
 
 	if not connection:getIsServer() then
-		print("\tServer:")
+		log("Server:")
 
 		---[[
 
@@ -262,28 +280,29 @@ function AdjustableMirrors:writeStream(streamId, connection)
 
 			for i=1,table.getn(self.adjustMirror) do
 
-				print(string.format("\t\tmirror%s",(i)))
+				log(string.format("mirror%s",(i)))
 
 				--streamWriteIntN(streamId, self.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
 				--streamWriteIntN(streamId, self.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
 				streamWriteFloat32(streamId, self.adjustMirror[i].x0)
 				streamWriteFloat32(streamId, self.adjustMirror[i].y0)
 
-				print(string.format("\t\t\trotx:%f\n\t\t\troty:%f",(self.adjustMirror[i].x0),(self.adjustMirror[i].y0)))
+				log(string.format("rotx: %s",(self.adjustMirror[i].x0)))
+				log(string.format("roty: %s",(self.adjustMirror[i].y0)))
 
 			end
 
 		else
 			--No mirror settings stored for this vehicle
 			streamWriteBool(streamId, false)
-			print("\tNo mirror settings stored for this vehicle")
+			log("No mirror settings stored for this vehicle")
 		end
 
 		--]]
 
 	end;
 
-	print("\tDone writing mirror stream")
+	log("Done writing mirror stream")
 
 end;
 
@@ -381,7 +400,7 @@ end;
 function AdjustableMirrors:onLeave()
 
 	if g_server == nil then
-		print("Leaving vehicle, sending event from client")
+		log("Leaving vehicle, sending event from client")
 		g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
 	end
 
@@ -396,10 +415,14 @@ function AdjustableMirrors:onLeave()
 
 end;
 
-function AdjustableMirrors.save(self)
-	print("Saving")
-	print("This is the known mirrors of this vehicle")
-	DebugUtil.printTableRecursively(self.adjustMirror, "-", 0, 2)
+function AdjustableMirrors.updateMirror(self)
+	log("Updating mirror")
+	for i=1, table.getn(self.adjustMirror) do
+		setRotation(self.adjustMirror[i].x1,math.min(0,self.adjustMirror[i].x0),0,0);
+		setRotation(self.adjustMirror[i].x2,math.max(0,self.adjustMirror[i].x0),0,0);
+		setRotation(self.adjustMirror[i].y1,0,0,math.max(0,self.adjustMirror[i].y0));
+		setRotation(self.adjustMirror[i].y2,0,0,math.min(0,self.adjustMirror[i].y0));
+	end;
 end
 
 --[[
@@ -419,34 +442,33 @@ AMUpdateEvent_mt = Class(AMUpdateEvent, Event);
 InitEventClass(AMUpdateEvent, "AMUpdateEvent");
 
 function AMUpdateEvent:emptyNew()
-	print("New empty event")
+	log("New empty event")
     local self = Event:new(AMUpdateEvent_mt);
 	self.className = "AMUpdateEvent"
     return self;
 end;
 
 function AMUpdateEvent:new(vehicle)
-	print("New event")
+	log("New event")
     local self = AMUpdateEvent:emptyNew()
     self.vehicle = vehicle
     return self;
 end;
 
 function AMUpdateEvent:readStream(streamId, connection)
-
-	print("Reading stream")
-
+	log("Reading stream")
 	self.vehicle = readNetworkNodeObject(streamId);
 
 	if self.vehicle ~= nil then
-		print("Vehicle was not nil")
-		local numberOfMirrors = streamReadInt8(streamId)
-		print("Number of mirrors")
-		print(numberOfMirrors)
+		log("Vehicle was not nil")
+		if g_server ~= nil then
+			log("This is the server reading stream")
+			local numberOfMirrors = streamReadInt8(streamId)
+			log("Number of mirrors: "..numberOfMirrors)
 
-		for i=1, numberOfMirrors do
+			for i=1, numberOfMirrors do
 
-				print(string.format("\t\tmirror%s",(i)))
+				log(string.format("mirror%s",(i)))
 
 				self.vehicle.adjustMirror[i] = {}
 				self.vehicle.adjustMirror[i].x0 = streamReadFloat32(streamId);
@@ -455,37 +477,81 @@ function AMUpdateEvent:readStream(streamId, connection)
 				--self.vehicle.adjustMirror[i].x0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
 				--self.vehicle.adjustMirror[i].y0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
 
-				print(string.format("\t\t\trotx:%f\n\t\t\troty:%f",(self.vehicle.adjustMirror[i].x0),(self.vehicle.adjustMirror[i].y0)))
-
-				print("\t\t\tMirror loaded!")
-
+				log(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
+				log(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
+				log("Mirror loaded!")
 			end;
+
+			log("Server broadcasting event")
+
+			g_server:broadcastEvent(AMUpdateEvent:new(self.vehicle), nil, nil, self.vehicle);
+
+		elseif g_client ~= nil then
+			log("This is a client reading stream")
+
+			--For each mirror send the settings
+			for i=1,table.getn(self.vehicle.adjustMirror) do
+				log(string.format("mirror%s",(i)))
+
+				--local newX = self.vehicle.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1)
+				--local newY = self.vehicle.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1)
+
+				self.vehicle.adjustMirror[i].x0 = streamReadFloat32(streamId);
+				self.vehicle.adjustMirror[i].y0 = streamReadFloat32(streamId);
+
+				log(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
+				log(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
+			end
+
+			log("Updating mirrors")
+			AdjustableMirrors.updateMirror(self.vehicle)
+		end;
 	end;
-	
+	log("Done reading stream")
 end;
 
 function AMUpdateEvent:writeStream(streamId, connection)
-	print("Writing stream")
+	log("Writing stream")
 	writeNetworkNodeObject(streamId, self.vehicle);
 
-	--Sending the number of mirrors so the server can prepare
-	print("Number of mirrors: ")
-	print(table.getn(self.vehicle.adjustMirror))
-	streamWriteInt8(streamId, table.getn(self.vehicle.adjustMirror))
+	if g_client ~= nil then
+		log("This is a client writing stream:")
+		--Sending the number of mirrors so the server can prepare
+		log("Number of mirrors: "..table.getn(self.vehicle.adjustMirror))
+		streamWriteInt8(streamId, table.getn(self.vehicle.adjustMirror))
 
-	--For each mirror send the settings
-	for i=1,table.getn(self.vehicle.adjustMirror) do
-		print(string.format("\t\tmirror%s",(i)))
+		--For each mirror send the settings
+		for i=1,table.getn(self.vehicle.adjustMirror) do
+			log(string.format("mirror%s",(i)))
 
-		local newX = self.vehicle.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1)
-		local newY = self.vehicle.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1)
+			--local newX = self.vehicle.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1)
+			--local newY = self.vehicle.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1)
 
-		streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].x0)
-		streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].y0)
+			streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].x0)
+			streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].y0)
 
-		print(string.format("\t\t\trotx:%f\n\t\t\troty:%f",(self.vehicle.adjustMirror[i].x0),(self.vehicle.adjustMirror[i].y0)))
+			log(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
+			log(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
+		end
+	elseif g_server ~= nil then
+		log("This is a server writing stream:")
+
+		--For each mirror send the settings
+		for i=1,table.getn(self.vehicle.adjustMirror) do
+			log(string.format("mirror%s",(i)))
+
+			--local newX = self.vehicle.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1)
+			--local newY = self.vehicle.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1)
+
+			streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].x0)
+			streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].y0)
+
+			log(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
+			log(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
+		end
 	end
-	
+
+	log("Done writing stream")
 end;
 
 ---
