@@ -400,8 +400,19 @@ end;
 function AdjustableMirrors:onLeave()
 
 	if g_server == nil then
-		log("Leaving vehicle, sending event from client")
-		g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
+		for a=1, table.getn(g_currentMission.users) do
+			local user = g_currentMission.users[a];
+			if user.userId == g_currentMission.playerUserId then
+				log("This is "..user.nickname.." registering exit event:")
+				if user.nickname == "Stjerne!d!oten" then
+					log("Leaving vehicle, sending event from client"..user.nickname)
+					g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
+				end;
+				break;
+			end;
+		end;
+
+		
 	end
 
 	--[[
@@ -463,6 +474,11 @@ function AMUpdateEvent:readStream(streamId, connection)
 		log("Vehicle was not nil")
 		if g_server ~= nil then
 			log("This is the server reading stream")
+
+			local clientName = streamReadString(streamId)
+
+			log("Client is "..clientName)
+
 			local numberOfMirrors = streamReadInt8(streamId)
 			log("Number of mirrors: "..numberOfMirrors)
 
@@ -487,7 +503,13 @@ function AMUpdateEvent:readStream(streamId, connection)
 			g_server:broadcastEvent(AMUpdateEvent:new(self.vehicle), nil, nil, self.vehicle);
 
 		elseif g_client ~= nil then
-			log("This is a client reading stream")
+			for a=1, table.getn(g_currentMission.users) do
+				local user = g_currentMission.users[a];
+				if user.userId == g_currentMission.playerUserId then
+					log("This is "..user.nickname.." reading a client stream:")
+					break;
+				end;
+			end;
 
 			--For each mirror send the settings
 			for i=1,table.getn(self.vehicle.adjustMirror) do
@@ -513,9 +535,19 @@ end;
 function AMUpdateEvent:writeStream(streamId, connection)
 	log("Writing stream")
 	writeNetworkNodeObject(streamId, self.vehicle);
+	if g_server == nil then
 
-	if g_client ~= nil then
-		log("This is a client writing stream:")
+		for a=1, table.getn(g_currentMission.users) do
+			local user = g_currentMission.users[a];
+			if user.userId == g_currentMission.playerUserId then
+				log("This is "..user.nickname.." writing a client stream:")
+				streamWriteString(streamId, user.nickname)
+				break;
+			end;
+		end;
+
+		
+
 		--Sending the number of mirrors so the server can prepare
 		log("Number of mirrors: "..table.getn(self.vehicle.adjustMirror))
 		streamWriteInt8(streamId, table.getn(self.vehicle.adjustMirror))
