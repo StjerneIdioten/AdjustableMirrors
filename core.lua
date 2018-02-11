@@ -384,6 +384,24 @@ end;
 function AdjustableMirrors:onEnter()
 
 	--[[
+	log("Enter event triggered at "..self.controllerName)
+	if g_server == nil then
+		for a=1, table.getn(g_currentMission.users) do
+			local user = g_currentMission.users[a];
+			if user.userId == g_currentMission.playerUserId then
+				if user.nickname == self.controllerName then
+					log(user.nickname.." entered vehicle:")
+				end;
+				break;
+			end;
+		end;
+	end;
+
+	--]]
+
+	--DebugUtil.printTableRecursively(self,"-",0,2)
+
+	--[[
 
 	self.MirrorAdjustable = false;
 	self.MirrorAdjust = false;
@@ -398,21 +416,18 @@ end;
 
 
 function AdjustableMirrors:onLeave()
-
 	if g_server == nil then
 		for a=1, table.getn(g_currentMission.users) do
 			local user = g_currentMission.users[a];
 			if user.userId == g_currentMission.playerUserId then
 				log("This is "..user.nickname.." registering exit event:")
-				if user.nickname == "Stjerne!d!oten" then
-					log("Leaving vehicle, sending event from client"..user.nickname)
+				if user.nickname == self.controllerName then
+					log("Leaving vehicle, sending event from client "..user.nickname)
 					g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
 				end;
 				break;
 			end;
 		end;
-
-		
 	end
 
 	--[[
