@@ -422,7 +422,7 @@ function AdjustableMirrors:onLeave()
 			if user.userId == g_currentMission.playerUserId then
 				log("This is "..user.nickname.." registering exit event:")
 				log("I have the controller name as "..self.controllerName)
-				if user.nickname == self.controllerName then
+				if user.nickname == self.controllerName or user.nickname == self.controllerName.." (1)" then
 					log("Leaving vehicle, sending event from client "..user.nickname)
 					g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
 				end;
