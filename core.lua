@@ -42,6 +42,7 @@ function AdjustableMirrors:load(savegame)
     end;
 
 	self.MirrorAdjustable = false
+	self.MirrorHasBeenAdjusted = false
 	self.MirrorAdjust = false;
 	self.maxRot = math.rad(20);
 	
@@ -343,6 +344,10 @@ function AdjustableMirrors:update(dt)
 		if InputBinding.hasEvent(InputBinding.adjustableMirrors_ADJUSTMIRRORS) then
 			if self.mirrors and self.mirrors[1] then
 				self.MirrorAdjustable = not self.MirrorAdjustable;
+
+				--Should perhaps be moved to where the mouse events are registered. So you can toggle the button without sending a server event.
+				self.MirrorHasBeenAdjusted = true
+
 				InputBinding.MirrorAdjustable = self.MirrorAdjustable;
 			end;
 		end;
@@ -414,22 +419,45 @@ function AdjustableMirrors:onEnter()
 
 end;
 
-
+--Runs when a player exits the vehicle
 function AdjustableMirrors:onLeave()
-	if g_server == nil then
-		for a=1, table.getn(g_currentMission.users) do
-			local user = g_currentMission.users[a];
-			if user.userId == g_currentMission.playerUserId then
-				log("This is "..user.nickname.." registering exit event:")
-				log("I have the controller name as "..self.controllerName)
-				if user.nickname == self.controllerName or user.nickname == self.controllerName.." (1)" then
-					log("Leaving vehicle, sending event from client "..user.nickname)
-					g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
+	--Check if this is a multiplayer session
+	if g_currentMission.missionDynamicInfo.isMultiplayer then
+		log("This is a multiplayer session");
+		--Check if this is the server. The server registers the event, but does not have the mirrors to do anything with it.
+		if g_server == nil then
+			--Go through the list of players to find on which client this event is happening.
+			for a=1, table.getn(g_currentMission.users) do
+				local user = g_currentMission.users[a];
+				--If the ID's match then whe have found the current player.
+				if user.userId == g_currentMission.playerUserId then
+					log("This is "..user.nickname.." registering exit event:")
+					log("I have the controller name as "..self.controllerName)
+					--If this user is also the user that is currently the controller of the vehicle
+					if user.nickname == self.controllerName or user.nickname == self.controllerName.." (1)" then
+
+						--Check if the mirrors have actually been adjusted
+						if self.MirrorHasBeenAdjusted then
+							log("Leaving vehicle, sending event from client "..user.nickname)
+							g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
+						else
+							log("Mirrors have not been adjusted, not sending an event from client "..user.nickname)
+						end;
+						
+					end;
+					break;
 				end;
-				break;
 			end;
 		end;
-	end
+	else
+		--Just a debug output for now, nothing needs to happen specifially in a singleplayer session
+		log("This is a singleplayer session");
+	end;
+
+	--Things that are common for both multiplayer and singleplayer
+	self.showMirrorPrompt = false
+	self.MirrorAdjustable = false
+	self.MirrorHasBeenAdjusted = false
 
 	--[[
 	self.MirrorAdjustable = false;
