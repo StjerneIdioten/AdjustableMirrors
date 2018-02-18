@@ -421,37 +421,36 @@ end;
 
 --Runs when a player exits the vehicle
 function AdjustableMirrors:onLeave()
+	--Check if the mirrors have actually been adjusted
+	if self.MirrorHasBeenAdjusted then
+		log("Mirrors have been adjusted");
 	--Check if this is a multiplayer session
-	if g_currentMission.missionDynamicInfo.isMultiplayer then
-		log("This is a multiplayer session");
-		--Check if this is the server. The server registers the event, but does not have the mirrors to do anything with it.
-		if g_server == nil then
-			--Go through the list of players to find on which client this event is happening.
-			for a=1, table.getn(g_currentMission.users) do
-				local user = g_currentMission.users[a];
-				--If the ID's match then whe have found the current player.
-				if user.userId == g_currentMission.playerUserId then
-					log("This is "..user.nickname.." registering exit event:")
-					log("I have the controller name as "..self.controllerName)
-					--If this user is also the user that is currently the controller of the vehicle
-					if user.nickname == self.controllerName or user.nickname == self.controllerName.." (1)" then
-
-						--Check if the mirrors have actually been adjusted
-						if self.MirrorHasBeenAdjusted then
-							log("Leaving vehicle, sending event from client "..user.nickname)
-							g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
-						else
-							log("Mirrors have not been adjusted, not sending an event from client "..user.nickname)
+		if g_currentMission.missionDynamicInfo.isMultiplayer then
+			log("This is a multiplayer session");
+			--Check if this is the server. The server registers the event, but does not have the mirrors to do anything with it.
+			if g_server == nil then
+				--Go through the list of players to find on which client this event is happening.
+				for a=1, table.getn(g_currentMission.users) do
+					local user = g_currentMission.users[a];
+					--If the ID's match then whe have found the current player.
+					if user.userId == g_currentMission.playerUserId then
+						log("This is "..user.nickname.." registering exit event:")
+						log("I have the controller name as "..self.controllerName)
+						--If this user is also the user that is currently the controller of the vehicle
+						if user.nickname == self.controllerName or user.nickname == self.controllerName.." (1)" then
+								log("Leaving vehicle, sending event from client "..user.nickname)
+								g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
 						end;
-						
+						break;
 					end;
-					break;
 				end;
 			end;
+		else
+			--Just a debug output for now, nothing needs to happen specifially in a singleplayer session
+			log("This is a singleplayer session");
 		end;
 	else
-		--Just a debug output for now, nothing needs to happen specifially in a singleplayer session
-		log("This is a singleplayer session");
+		log("Mirrors have not been adjusted");
 	end;
 
 	--Things that are common for both multiplayer and singleplayer
