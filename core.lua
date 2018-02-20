@@ -12,15 +12,33 @@ AdjustableMirrors = {};
 AdjustableMirrors.sendNumBits = 7;
 AdjustableMirrors.dir = g_currentModDirectory;
 
+
 -- For debugging
-local function log(...)
-    if true then
+MIN_LOG_LEVEL = 0
+local function _log(loglevel,...)
+    if  MIN_LOG_LEVEL >= 0 and loglevel >= MIN_LOG_LEVEL then
         local txt = ""
         for idx = 1,select("#", ...) do
             txt = txt .. tostring(select(idx, ...))
         end
         print(string.format("%7ums AM.LUA ", (g_currentMission ~= nil and g_currentMission.time or 0)) .. txt);
     end
+end;
+
+local function logDebug(...)
+	_log(0, ...)
+end;
+
+local function logInfo(...)
+	_log(1, ...)
+end;
+
+local function logWarning(...)
+	_log(2, ...)
+end;
+
+local function logError(...)
+	_log(3, ...)
 end;
 
 function AdjustableMirrors.prerequisitesPresent(specializations)
@@ -93,16 +111,16 @@ function AdjustableMirrors:load(savegame)
 
 	--Checks for the savegame files, which means that clients on a multiplayer game probably wont get any further that here.
 	if savegame ~= nil and not savegame.resetVehicles then
-		log("Loading in mirror settings from savegame");
+		logInfo("Loading in mirror settings from savegame");
 
 		--Need to check whether this is a multiplayer game or not due to mirrors not being present on dedicated server vehichles
 		if g_currentMission.missionDynamicInfo.isMultiplayer then
-			log("This is a multiplayer session");
+			logDebug("This is a multiplayer session");
 
 			--If this is a multiplayer game we need to know if this is the server or a client
 			if self.isServer then
 				--This is the server, so we load in the mirror data from the xml file, if it exists, and create the proper file structures
-				log("This is the server")
+				logDebug("This is the server")
 
 				local i = 1
 				local mirrorKey = savegame.key..".mirror"
@@ -111,9 +129,9 @@ function AdjustableMirrors:load(savegame)
 					self.adjustMirror[i].x0 = getXMLFloat(savegame.xmlFile, mirrorKey.. i .. "#rotx");
 					self.adjustMirror[i].y0 = getXMLFloat(savegame.xmlFile, mirrorKey.. i .. "#roty");
 
-					log("Mirror"..i)
-					log(string.format("rotx: %s",(self.adjustMirror[i].x0)))
-					log(string.format("roty: %s",(self.adjustMirror[i].y0)))
+					logDebug("Mirror"..i)
+					logDebug(string.format("rotx: %s",(self.adjustMirror[i].x0)))
+					logDebug(string.format("roty: %s",(self.adjustMirror[i].y0)))
 
 					i = i + 1;
 				end;
@@ -121,10 +139,10 @@ function AdjustableMirrors:load(savegame)
 				--Need to check if the server is also a client, because then the mirrors should also be adjusted
 
 			else
-				log("This is a client")
+				logDebug("This is a client")
 			end;	
 		else
-			log("This is not a multiplayer session")
+			logDebug("This is not a multiplayer session")
 			--If this it not a multiplayer game, then just load in settings from the vehichle xml. And set the mirrors accordingly.
 			for i=1, table.getn(self.adjustMirror) do
 				local mirrorKey = savegame.key..".mirror"..i;
@@ -135,14 +153,14 @@ function AdjustableMirrors:load(savegame)
 				setRotation(self.adjustMirror[i].y1,0,0,math.max(0,self.adjustMirror[i].y0));
 				setRotation(self.adjustMirror[i].y2,0,0,math.min(0,self.adjustMirror[i].y0));
 
-				log("Mirror"..i)
-				log(string.format("rotx: %s",(self.adjustMirror[i].x0)))
-				log(string.format("roty: %s",(self.adjustMirror[i].y0)))
+				logDebug("Mirror"..i)
+				logDebug(string.format("rotx: %s",(self.adjustMirror[i].x0)))
+				logDebug(string.format("roty: %s",(self.adjustMirror[i].y0)))
 
 			end;
 		end;
 
-		log("Done loading in mirror data")
+		logInfo("Done loading in mirror data")
 
 	end;
 end;
@@ -226,15 +244,15 @@ end;
 
 function AdjustableMirrors:readStream(streamId, connection)
 
-	log("Receiving mirror stream on connect:")
+	logDebug("Receiving mirror stream on connect:")
 	if connection:getIsServer() then
 		--Check if the server has mirror settings stored for the vehicle
 		if streamReadBool(streamId) then 
-			log("Server has mirror settings")
+			logDebug("Server has mirror settings")
 
 			for i=1, table.getn(self.adjustMirror) do
 
-				log(string.format("mirror%s",(i)))
+				logDebug(string.format("mirror%s",(i)))
 
 				--self.adjustMirror[i].x0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
 				--self.adjustMirror[i].y0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
@@ -242,15 +260,15 @@ function AdjustableMirrors:readStream(streamId, connection)
 				self.adjustMirror[i].x0 = streamReadFloat32(streamId);
 				self.adjustMirror[i].y0 = streamReadFloat32(streamId);
 
-				log(string.format("rotx: %s",(self.adjustMirror[i].x0)))
-				log(string.format("roty: %s",(self.adjustMirror[i].y0)))
+				logDebug(string.format("rotx: %s",(self.adjustMirror[i].x0)))
+				logDebug(string.format("roty: %s",(self.adjustMirror[i].y0)))
 
-				log("Mirror loaded!")
+				logDebug("Mirror loaded!")
 
 			end;
 
 		else
-			log("Server does not have mirror settings")
+			logDebug("Server does not have mirror settings")
 		end;
 
 		--Set the rotation of the mirrors, either to defaults or the loaded values.
@@ -261,16 +279,16 @@ function AdjustableMirrors:readStream(streamId, connection)
 			setRotation(self.adjustMirror[i].y2,0,0,math.min(0,self.adjustMirror[i].y0));
 		end;
 	end;
-	log("Done width mirror stream:")
+	logDebug("Done width mirror stream:")
 
 end;
 
 function AdjustableMirrors:writeStream(streamId, connection)
 
-	log("Writing mirror stream:")
+	logDebug("Writing mirror stream:")
 
 	if not connection:getIsServer() then
-		log("Server:")
+		logDebug("Server:")
 
 		---[[
 
@@ -281,29 +299,29 @@ function AdjustableMirrors:writeStream(streamId, connection)
 
 			for i=1,table.getn(self.adjustMirror) do
 
-				log(string.format("mirror%s",(i)))
+				logDebug(string.format("mirror%s",(i)))
 
 				--streamWriteIntN(streamId, self.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
 				--streamWriteIntN(streamId, self.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1), AdjustableMirrors.sendNumBits)
 				streamWriteFloat32(streamId, self.adjustMirror[i].x0)
 				streamWriteFloat32(streamId, self.adjustMirror[i].y0)
 
-				log(string.format("rotx: %s",(self.adjustMirror[i].x0)))
-				log(string.format("roty: %s",(self.adjustMirror[i].y0)))
+				logDebug(string.format("rotx: %s",(self.adjustMirror[i].x0)))
+				logDebug(string.format("roty: %s",(self.adjustMirror[i].y0)))
 
 			end
 
 		else
 			--No mirror settings stored for this vehicle
 			streamWriteBool(streamId, false)
-			log("No mirror settings stored for this vehicle")
+			logDebug("No mirror settings stored for this vehicle")
 		end
 
 		--]]
 
 	end;
 
-	log("Done writing mirror stream")
+	logDebug("Done writing mirror stream")
 
 end;
 
@@ -389,13 +407,13 @@ end;
 function AdjustableMirrors:onEnter()
 
 	--[[
-	log("Enter event triggered at "..self.controllerName)
+	logDebug("Enter event triggered at "..self.controllerName)
 	if g_server == nil then
 		for a=1, table.getn(g_currentMission.users) do
 			local user = g_currentMission.users[a];
 			if user.userId == g_currentMission.playerUserId then
 				if user.nickname == self.controllerName then
-					log(user.nickname.." entered vehicle:")
+					logDebug(user.nickname.." entered vehicle:")
 				end;
 				break;
 			end;
@@ -423,10 +441,10 @@ end;
 function AdjustableMirrors:onLeave()
 	--Check if the mirrors have actually been adjusted
 	if self.MirrorHasBeenAdjusted then
-		log("Mirrors have been adjusted");
+		logInfo("Mirrors have been adjusted");
 	--Check if this is a multiplayer session
 		if g_currentMission.missionDynamicInfo.isMultiplayer then
-			log("This is a multiplayer session");
+			logDebug("This is a multiplayer session");
 			--Check if this is the server. The server registers the event, but does not have the mirrors to do anything with it.
 			if g_server == nil then
 				--Go through the list of players to find on which client this event is happening.
@@ -434,11 +452,11 @@ function AdjustableMirrors:onLeave()
 					local user = g_currentMission.users[a];
 					--If the ID's match then whe have found the current player.
 					if user.userId == g_currentMission.playerUserId then
-						log("This is "..user.nickname.." registering exit event:")
-						log("I have the controller name as "..self.controllerName)
+						logDebug("This is "..user.nickname.." registering exit event:")
+						logDebug("I have the controller name as "..self.controllerName)
 						--If this user is also the user that is currently the controller of the vehicle
 						if user.nickname == self.controllerName or user.nickname == self.controllerName.." (1)" then
-								log("Leaving vehicle, sending event from client "..user.nickname)
+								logDebug("Leaving vehicle, sending event from client "..user.nickname)
 								g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
 						end;
 						break;
@@ -447,10 +465,10 @@ function AdjustableMirrors:onLeave()
 			end;
 		else
 			--Just a debug output for now, nothing needs to happen specifially in a singleplayer session
-			log("This is a singleplayer session");
+			logDebug("This is a singleplayer session");
 		end;
 	else
-		log("Mirrors have not been adjusted");
+		logDebug("Mirrors have not been adjusted");
 	end;
 
 	--Things that are common for both multiplayer and singleplayer
@@ -470,7 +488,7 @@ function AdjustableMirrors:onLeave()
 end;
 
 function AdjustableMirrors.updateMirror(self)
-	log("Updating mirror")
+	logDebug("Updating mirror")
 	for i=1, table.getn(self.adjustMirror) do
 		setRotation(self.adjustMirror[i].x1,math.min(0,self.adjustMirror[i].x0),0,0);
 		setRotation(self.adjustMirror[i].x2,math.max(0,self.adjustMirror[i].x0),0,0);
@@ -496,38 +514,38 @@ AMUpdateEvent_mt = Class(AMUpdateEvent, Event);
 InitEventClass(AMUpdateEvent, "AMUpdateEvent");
 
 function AMUpdateEvent:emptyNew()
-	log("New empty event")
+	logDebug("New empty event")
     local self = Event:new(AMUpdateEvent_mt);
 	self.className = "AMUpdateEvent"
     return self;
 end;
 
 function AMUpdateEvent:new(vehicle)
-	log("New event")
+	logDebug("New event")
     local self = AMUpdateEvent:emptyNew()
     self.vehicle = vehicle
     return self;
 end;
 
 function AMUpdateEvent:readStream(streamId, connection)
-	log("Reading stream")
+	logDebug("Reading stream")
 	self.vehicle = readNetworkNodeObject(streamId);
 
 	if self.vehicle ~= nil then
-		log("Vehicle was not nil")
+		logDebug("Vehicle was not nil")
 		if g_server ~= nil then
-			log("This is the server reading stream")
+			logDebug("This is the server reading stream")
 
 			local clientName = streamReadString(streamId)
 
-			log("Client is "..clientName)
+			logDebug("Client is "..clientName)
 
 			local numberOfMirrors = streamReadInt8(streamId)
-			log("Number of mirrors: "..numberOfMirrors)
+			logDebug("Number of mirrors: "..numberOfMirrors)
 
 			for i=1, numberOfMirrors do
 
-				log(string.format("mirror%s",(i)))
+				logDebug(string.format("mirror%s",(i)))
 
 				self.vehicle.adjustMirror[i] = {}
 				self.vehicle.adjustMirror[i].x0 = streamReadFloat32(streamId);
@@ -536,12 +554,12 @@ function AMUpdateEvent:readStream(streamId, connection)
 				--self.vehicle.adjustMirror[i].x0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
 				--self.vehicle.adjustMirror[i].y0 = streamReadUIntN(streamId, AdjustableMirrors.sendNumBits) / (2^AdjustableMirrors.sendNumBits - 1);
 
-				log(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
-				log(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
-				log("Mirror loaded!")
+				logDebug(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
+				logDebug(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
+				logDebug("Mirror loaded!")
 			end;
 
-			log("Server broadcasting event")
+			logDebug("Server broadcasting event")
 
 			g_server:broadcastEvent(AMUpdateEvent:new(self.vehicle), nil, nil, self.vehicle);
 
@@ -549,14 +567,14 @@ function AMUpdateEvent:readStream(streamId, connection)
 			for a=1, table.getn(g_currentMission.users) do
 				local user = g_currentMission.users[a];
 				if user.userId == g_currentMission.playerUserId then
-					log("This is "..user.nickname.." reading a client stream:")
+					logDebug("This is "..user.nickname.." reading a client stream:")
 					break;
 				end;
 			end;
 
 			--For each mirror send the settings
 			for i=1,table.getn(self.vehicle.adjustMirror) do
-				log(string.format("mirror%s",(i)))
+				logDebug(string.format("mirror%s",(i)))
 
 				--local newX = self.vehicle.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1)
 				--local newY = self.vehicle.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1)
@@ -564,26 +582,26 @@ function AMUpdateEvent:readStream(streamId, connection)
 				self.vehicle.adjustMirror[i].x0 = streamReadFloat32(streamId);
 				self.vehicle.adjustMirror[i].y0 = streamReadFloat32(streamId);
 
-				log(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
-				log(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
+				logDebug(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
+				logDebug(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
 			end
 
-			log("Updating mirrors")
+			logDebug("Updating mirrors")
 			AdjustableMirrors.updateMirror(self.vehicle)
 		end;
 	end;
-	log("Done reading stream")
+	logDebug("Done reading stream")
 end;
 
 function AMUpdateEvent:writeStream(streamId, connection)
-	log("Writing stream")
+	logDebug("Writing stream")
 	writeNetworkNodeObject(streamId, self.vehicle);
 	if g_server == nil then
 
 		for a=1, table.getn(g_currentMission.users) do
 			local user = g_currentMission.users[a];
 			if user.userId == g_currentMission.playerUserId then
-				log("This is "..user.nickname.." writing a client stream:")
+				logDebug("This is "..user.nickname.." writing a client stream:")
 				streamWriteString(streamId, user.nickname)
 				break;
 			end;
@@ -592,12 +610,12 @@ function AMUpdateEvent:writeStream(streamId, connection)
 		
 
 		--Sending the number of mirrors so the server can prepare
-		log("Number of mirrors: "..table.getn(self.vehicle.adjustMirror))
+		logDebug("Number of mirrors: "..table.getn(self.vehicle.adjustMirror))
 		streamWriteInt8(streamId, table.getn(self.vehicle.adjustMirror))
 
 		--For each mirror send the settings
 		for i=1,table.getn(self.vehicle.adjustMirror) do
-			log(string.format("mirror%s",(i)))
+			logDebug(string.format("mirror%s",(i)))
 
 			--local newX = self.vehicle.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1)
 			--local newY = self.vehicle.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1)
@@ -605,15 +623,15 @@ function AMUpdateEvent:writeStream(streamId, connection)
 			streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].x0)
 			streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].y0)
 
-			log(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
-			log(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
+			logDebug(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
+			logDebug(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
 		end
 	elseif g_server ~= nil then
-		log("This is a server writing stream:")
+		logDebug("This is a server writing stream:")
 
 		--For each mirror send the settings
 		for i=1,table.getn(self.vehicle.adjustMirror) do
-			log(string.format("mirror%s",(i)))
+			logDebug(string.format("mirror%s",(i)))
 
 			--local newX = self.vehicle.adjustMirror[i].x0 * (2^AdjustableMirrors.sendNumBits - 1)
 			--local newY = self.vehicle.adjustMirror[i].y0 * (2^AdjustableMirrors.sendNumBits - 1)
@@ -621,12 +639,12 @@ function AMUpdateEvent:writeStream(streamId, connection)
 			streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].x0)
 			streamWriteFloat32(streamId, self.vehicle.adjustMirror[i].y0)
 
-			log(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
-			log(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
+			logDebug(string.format("rotx: %s",(self.vehicle.adjustMirror[i].x0)))
+			logDebug(string.format("roty: %s",(self.vehicle.adjustMirror[i].y0)))
 		end
 	end
 
-	log("Done writing stream")
+	logDebug("Done writing stream")
 end;
 
 ---
