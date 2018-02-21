@@ -67,6 +67,7 @@ function AdjustableMirrors:load(savegame)
 	self.adjustMirror = {}
 	local num = 1
 	local function addMirror(mirror)
+		logDebug("Added mirror"..num)
 		self.adjustMirror[num] = {}
 		self.adjustMirror[num].node = mirror;
 		self.adjustMirror[num].OrgRot = {getRotation(self.adjustMirror[num].node)}
@@ -94,56 +95,52 @@ function AdjustableMirrors:load(savegame)
 		setRotation(self.adjustMirror[num].node,0,0,0)
 		num = num + 1
 	end
-	
-	--This bit could perhaps be moved since it probably wont happen on the server side(Due to mirrors not being present on a dedicated server)
-	if self.mirrors and self.mirrors[1] then
-		for i = 1, table.getn(self.mirrors) do
-			local numChildren = getNumOfChildren(self.mirrors[i].node);
-			if numChildren > 0 then
-				for j=numChildren,1,-1 do
-					addMirror(getChildAt(self.mirrors[i].node, j-1));
-				end
-			else
-				addMirror(self.mirrors[i].node);
-			end;
-		end;
-	end;
 
-	--Checks for the savegame files, which means that clients on a multiplayer game probably wont get any further that here.
+	--Checks for the savegame files, which means that clients on a multiplayer game probably wont get any further than here.
 	if savegame ~= nil and not savegame.resetVehicles then
 		logInfo("Loading in mirror settings from savegame");
 
 		--Need to check whether this is a multiplayer game or not due to mirrors not being present on dedicated server vehichles
-		if g_currentMission.missionDynamicInfo.isMultiplayer then
-			logDebug("This is a multiplayer session");
+		if not self.isClient then
+			logDebug("This is the server in a dedicated multiplayer session");
 
-			--If this is a multiplayer game we need to know if this is the server or a client
-			if self.isServer then
-				--This is the server, so we load in the mirror data from the xml file, if it exists, and create the proper file structures
-				logDebug("This is the server")
+			--This is the server, so we load in the mirror data from the xml file, if it exists, and create the proper file structures
+			local i = 1
+			local mirrorKey = savegame.key..".mirror"
+			while hasXMLProperty(savegame.xmlFile, mirrorKey..i) do
+				self.adjustMirror[i] = {}
+				self.adjustMirror[i].x0 = getXMLFloat(savegame.xmlFile, mirrorKey.. i .. "#rotx");
+				self.adjustMirror[i].y0 = getXMLFloat(savegame.xmlFile, mirrorKey.. i .. "#roty");
 
-				local i = 1
-				local mirrorKey = savegame.key..".mirror"
-				while hasXMLProperty(savegame.xmlFile, mirrorKey..i) do
-					self.adjustMirror[i] = {}
-					self.adjustMirror[i].x0 = getXMLFloat(savegame.xmlFile, mirrorKey.. i .. "#rotx");
-					self.adjustMirror[i].y0 = getXMLFloat(savegame.xmlFile, mirrorKey.. i .. "#roty");
+				logDebug("Mirror"..i)
+				logDebug(string.format("rotx: %s",(self.adjustMirror[i].x0)))
+				logDebug(string.format("roty: %s",(self.adjustMirror[i].y0)))
 
-					logDebug("Mirror"..i)
-					logDebug(string.format("rotx: %s",(self.adjustMirror[i].x0)))
-					logDebug(string.format("roty: %s",(self.adjustMirror[i].y0)))
-
-					i = i + 1;
-				end;
-
-				--Need to check if the server is also a client, because then the mirrors should also be adjusted
-
-			else
-				logDebug("This is a client")
-			end;	
+				i = i + 1;
+			end;
 		else
-			logDebug("This is not a multiplayer session")
-			--If this it not a multiplayer game, then just load in settings from the vehichle xml. And set the mirrors accordingly.
+			if g_currentMission.missionDynamicInfo.isMultiplayer then
+				logDebug("This is the host of a p2p session")
+			else
+				logDebug("This is a singleplayer session")
+			end;
+
+			--Create all of the mirror setup stuff
+			if self.mirrors and self.mirrors[1] then
+				logDebug("This vehicle has mirrors")
+				for i = 1, table.getn(self.mirrors) do
+					local numChildren = getNumOfChildren(self.mirrors[i].node);
+					if numChildren > 0 then
+						for j=numChildren,1,-1 do
+							addMirror(getChildAt(self.mirrors[i].node, j-1));
+						end
+					else
+						addMirror(self.mirrors[i].node);
+					end;
+				end;
+			end;
+
+			--If this is not the server of a dedicated multiplayer server, then just load in settings from the vehichle xml. And set the mirrors accordingly.
 			for i=1, table.getn(self.adjustMirror) do
 				local mirrorKey = savegame.key..".mirror"..i;
 				self.adjustMirror[i].x0 = Utils.getNoNil(getXMLFloat(savegame.xmlFile, mirrorKey .. "#rotx"), self.adjustMirror[i].x0);
@@ -156,7 +153,6 @@ function AdjustableMirrors:load(savegame)
 				logDebug("Mirror"..i)
 				logDebug(string.format("rotx: %s",(self.adjustMirror[i].x0)))
 				logDebug(string.format("roty: %s",(self.adjustMirror[i].y0)))
-
 			end;
 		end;
 
@@ -208,6 +204,7 @@ function AdjustableMirrors:mouseEvent(posX, posY, isDown, isUp, button)
 				movey = InputBinding.mouseMovementY
 			end;
 			local MirrorSelect 
+
 			for i=1,table.getn(self.adjustMirror) do
 				local x,y,z = getWorldTranslation(self.adjustMirror[i].base);
 				x,y,z = project(x,y,z);
@@ -339,6 +336,8 @@ end;
  
 function AdjustableMirrors:getSaveAttributesAndNodes(nodeIdent)
 
+	logDebug("Saving mirrors to vehicles.xml")
+
 	local attributes = "";
     local nodes = "";
 			  
@@ -455,6 +454,7 @@ function AdjustableMirrors:onLeave()
 						logDebug("This is "..user.nickname.." registering exit event:")
 						logDebug("I have the controller name as "..self.controllerName)
 						--If this user is also the user that is currently the controller of the vehicle
+						--There is also a little hacky fix to the fact that sometimes a mp client will have a name that gets (1) appended, which isn't reflected in the controllerName
 						if user.nickname == self.controllerName or user.nickname == self.controllerName.." (1)" then
 								logDebug("Leaving vehicle, sending event from client "..user.nickname)
 								g_client:getServerConnection():sendEvent(AMUpdateEvent:new(self, nil));
@@ -462,6 +462,8 @@ function AdjustableMirrors:onLeave()
 						break;
 					end;
 				end;
+			elseif self.isClient then
+				logDebug("This is the p2p host")
 			end;
 		else
 			--Just a debug output for now, nothing needs to happen specifially in a singleplayer session
