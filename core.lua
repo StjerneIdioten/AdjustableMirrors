@@ -2,10 +2,10 @@ local metadata = {
 "## Interface:FS17 1.0.0.0",
 "## Title: AdjustableMirrors (C)",
 "## Notes: Mouse adjustable Mirrors (Core)",
-"## Author: Marhu - Converted to FS17 by StjerneIdioten",
+"## Author: StjerneIdioten - Original 2015 Version by Marhu",
 "## Version: 1.1.5",
-"## Date: 24.07.2017",
-"## Web: http://marhu.net - https://github.com/StjerneIdioten"
+"## Date: 21.02.2018",
+"## Web: https://github.com/StjerneIdioten"
 }
  
 AdjustableMirrors = {};
