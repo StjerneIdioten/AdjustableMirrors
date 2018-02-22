@@ -96,12 +96,27 @@ function AdjustableMirrors:load(savegame)
 		num = num + 1
 	end
 
+	--Create all of the mirror setup stuff - I suspect this need to be here to setup the mirror structure for the clients as well
+	if self.mirrors and self.mirrors[1] then
+		logDebug("This vehicle has mirrors")
+		for i = 1, table.getn(self.mirrors) do
+			local numChildren = getNumOfChildren(self.mirrors[i].node);
+			if numChildren > 0 then
+				for j=numChildren,1,-1 do
+					addMirror(getChildAt(self.mirrors[i].node, j-1));
+				end
+			else
+				addMirror(self.mirrors[i].node);
+			end;
+		end;
+	end;
+
 	--Checks for the savegame files, which means that clients on a multiplayer game probably wont get any further than here.
 	if savegame ~= nil and not savegame.resetVehicles then
 		logInfo("Loading in mirror settings from savegame");
 
 		--Need to check whether this is a multiplayer game or not due to mirrors not being present on dedicated server vehichles
-		if not self.isClient then
+		if not g_currentMission.missionDynamicInfo.isClient then
 			logDebug("This is the server in a dedicated multiplayer session");
 
 			--This is the server, so we load in the mirror data from the xml file, if it exists, and create the proper file structures
@@ -123,21 +138,6 @@ function AdjustableMirrors:load(savegame)
 				logDebug("This is the host of a p2p session")
 			else
 				logDebug("This is a singleplayer session")
-			end;
-
-			--Create all of the mirror setup stuff
-			if self.mirrors and self.mirrors[1] then
-				logDebug("This vehicle has mirrors")
-				for i = 1, table.getn(self.mirrors) do
-					local numChildren = getNumOfChildren(self.mirrors[i].node);
-					if numChildren > 0 then
-						for j=numChildren,1,-1 do
-							addMirror(getChildAt(self.mirrors[i].node, j-1));
-						end
-					else
-						addMirror(self.mirrors[i].node);
-					end;
-				end;
 			end;
 
 			--If this is not the server of a dedicated multiplayer server, then just load in settings from the vehichle xml. And set the mirrors accordingly.
@@ -320,18 +320,6 @@ function AdjustableMirrors:writeStream(streamId, connection)
 
 	logDebug("Done writing mirror stream")
 
-end;
-
-function AdjustableMirrors:readUpdateStream(streamId, timestamp, connection)
-    if not connection:getIsServer() then
-		
-	end;
-end;
- 
-function AdjustableMirrors:writeUpdateStream(streamId, connection, dirtyMask)
-    if connection:getIsServer() then
-      
-    end;
 end;
  
 function AdjustableMirrors:getSaveAttributesAndNodes(nodeIdent)
