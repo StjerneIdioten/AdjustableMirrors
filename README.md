@@ -1,2 +1,4 @@
-# FS17_AdjustableMirrors
-My attempt at converting the Adjustable mirrors mod from FS 2015 to FS 2017
+# AdjustableMirrors
+Originally a conversion mod from fs 2015 to 2017.
+I have since added more features for multiplayer compatibility.
+Currently there are builds available for FS17 that enables singleplayer and dedicated server multiplayer.
