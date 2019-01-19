@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="39">
+<modDesc descVersion="42">
 	<author>StjerneIdioten - Original 2015 version by Marhu</author>
 	<version>1.0.0.0</version> 
 	<title>
@@ -9,10 +9,10 @@
         <en>Adjustable Mirrors</en>
  	</description>
     <multiplayer supported="true"/>   
-	<iconFilename>store.png</iconFilename>
+	<iconFilename>store.dds</iconFilename>
 
 	<extraSourceFiles>
-        <sourceFile filename="register.lua" />
+        <sourceFile filename="AdjustableMirrors_Register.lua" />
     </extraSourceFiles>  
 
 	<l10n filenamePrefix="modDesc_l10n" /> <!-- Load the corresponding modDesc_l10n_<language>.XML file, or revert to 'en'/'de'. -->
