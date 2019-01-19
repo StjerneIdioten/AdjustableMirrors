@@ -10,6 +10,7 @@ local metadata = {
 
 --source(Utils.getFileName("fs_debug.lua", g_currentModDirectory))
 source(Utils.getFilename("AdjustableMirrors.lua", g_currentModDirectory))
+source(Utils.getFilename("FS_Debug.lua", g_currentModDirectory))
 
 AdjustableMirrors_Register = {};
 AdjustableMirrors_Register.modDirectory = g_currentModDirectory;
@@ -21,9 +22,9 @@ AdjustableMirrors_Register.title = getXMLString(modDesc, "modDesc.title.en");
 
 if g_specializationManager:getSpecializationByName("AdjustableMirrors") == nil then
 	if AdjustableMirrors == nil then
-		print("ERROR: unable to add specialization 'AdjustableMirrors'")
+		FS_Debug.error("Unable to find specialization 'AdjustableMirrors'");
 	else
-		print("Registering 'AdjustableMirrors' in vehicles")
+		FS_Debug.debug("Found specialization 'AdjustableMirrors'");
 		for i, typeDef in pairs(g_vehicleTypeManager.vehicleTypes) do
 			if typeDef ~= nil and i ~= "locomotive" then
 				local isDrivable = false
@@ -39,7 +40,7 @@ if g_specializationManager:getSpecializationByName("AdjustableMirrors") == nil t
 					end
 				end
 				if isDrivable and isEnterable and hasMotor then
-					print("INFO: attached specialization 'AdjustableMirrors' to vehicleType '" .. tostring(i) .. "'")
+					FS_Debug.info("Attached specialization 'AdjustableMirrors' to vehicleType '" .. tostring(i) .. "'")
 					typeDef.specializationsByName["AdjustableMirrors"] = AdjustableMirrors
 					table.insert(typeDef.specializationNames, "AdjustableMirrors")
 					table.insert(typeDef.specializations, AdjustableMirrors)
@@ -52,10 +53,6 @@ end
 --#######################################################################################
 
 function AdjustableMirrors_Register:loadMap(name)
-	print("--> Stats <--")
-	print(self.title)
-	print(self.version)
-	print(self.author)
 	print("Loaded " .. self.title .. " version " .. self.version .. " made by " .. self.author);
 
 	--[[
