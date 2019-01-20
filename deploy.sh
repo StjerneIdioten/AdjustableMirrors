@@ -1,3 +1,6 @@
+#Check if FS_MOD_DIR is set, if not then exit. Without this check the script just wipes the current folder!
+[[ -z "$FS_MOD_DIR" ]] && { echo "FS_MOD_DIR is not set! Aborting!" ; exit 1; }
+
 #Save current mod root
 modDir=$(pwd)
 
