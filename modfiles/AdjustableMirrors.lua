@@ -52,5 +52,5 @@ function AdjustableMirrors:onEnterVehicle(streamId, connection)
 end
 
 function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
-	FS_Debug.info("On register action events")
+	FS_Debug.info("onRegisterActionEvents " .. tostring(isSelected) .. ", " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient))
 end

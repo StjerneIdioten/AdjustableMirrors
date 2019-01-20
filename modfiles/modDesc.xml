@@ -11,14 +11,24 @@
     <multiplayer supported="true"/>   
 	<iconFilename>store.dds</iconFilename>
 
+	<l10n filenamePrefix="modDesc_l10n"> 
+		<text name="input_AM_AdjustMirrors">
+			<en>AM: Adjust Mirrors on/off</en>
+		</text>
+	</l10n>
+
+	<actions>
+		<action name="AM_AdjustMirrors" category="VEHICLE"/>
+	</actions>
+
+	<inputBinding>
+		<actionBinding action="AM_AdjustMirrors">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_5" axisComponent="+" inputComponent="+" index="2"/>
+		</actionBinding>
+	</inputBinding>
+
 	<extraSourceFiles>
         <sourceFile filename="AdjustableMirrors_Register.lua" />
     </extraSourceFiles>  
-
-	<l10n filenamePrefix="modDesc_l10n" /> <!-- Load the corresponding modDesc_l10n_<language>.XML file, or revert to 'en'/'de'. -->
-
-	<inputBindings>
-		<input visible="true" name="adjustableMirrors_ADJUSTMIRRORS"  category="VEHICLE" key1="KEY_KP_5"  />
-	</inputBindings>
 
 </modDesc>
