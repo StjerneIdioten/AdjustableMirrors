@@ -36,6 +36,61 @@ end
 --#######################################################################################
 function AdjustableMirrors:onLoad(savegame)
 	FS_Debug.info("onLoad" .. FS_Debug.getIdentity(self))
+
+	--DebugUtil.printTableRecursively(self.spec_enterable.cameras, " - ", 0, 1)
+
+	self.mirror_is_adjustable = false
+	self.mirror_has_been_adjusted = false
+	self.mirror_adjusting = false
+	self.max_rotation = math.rad(20)
+
+	self.mirrors_adjusted = {}
+	local idx = 1
+	local function addMirror(mirror)
+		FS_Debug.info("Adding adjustable mirror #" .. idx .. FS_Debug.getIdentity(self))
+		self.mirrors_adjusted[idx] = {}
+		self.mirrors_adjusted[idx].node = mirror
+		self.mirrors_adjusted[idx].rotation_org = {getRotation(self.mirrors_adjusted[idx].node)}
+		self.mirrors_adjusted[idx].translation_org = {getTranslation(self.mirrors_adjusted[idx].node)}
+		self.mirrors_adjusted[idx].base = createTransformGroup("Base")
+		self.mirrors_adjusted[idx].x0 = 0
+		self.mirrors_adjusted[idx].y0 = 0
+		self.mirrors_adjusted[idx].x1 = createTransformGroup("x1")
+		self.mirrors_adjusted[idx].x2 = createTransformGroup("x2")
+		self.mirrors_adjusted[idx].y1 = createTransformGroup("y1")
+		self.mirrors_adjusted[idx].y2 = createTransformGroup("y2")
+		link(getParent(self.mirrors_adjusted[idx].node), self.mirrors_adjusted[idx].base)
+		link(self.mirrors_adjusted[idx].base, self.mirrors_adjusted[idx].x1)
+		link(self.mirrors_adjusted[idx].x1, self.mirrors_adjusted[idx].x2)
+		link(self.mirrors_adjusted[idx].x2, self.mirrors_adjusted[idx].y1)
+		link(self.mirrors_adjusted[idx].y1, self.mirrors_adjusted[idx].y2)
+		link(self.mirrors_adjusted[idx].y2, self.mirrors_adjusted[idx].node)
+		setTranslation(self.mirrors_adjusted[idx].base,unpack(self.mirrors_adjusted[idx].translation_org))
+		setRotation(self.mirrors_adjusted[idx].base,unpack(self.mirrors_adjusted[idx].rotation_org))
+		setTranslation(self.mirrors_adjusted[idx].x1,0,0,-0.25)
+		setTranslation(self.mirrors_adjusted[idx].x2,0,0,0.5)
+		setTranslation(self.mirrors_adjusted[idx].y1,-0.14,0,0)
+		setTranslation(self.mirrors_adjusted[idx].y2,0.28,0,0)
+		setTranslation(self.mirrors_adjusted[idx].node,-0.14,0,-0.25)
+		setRotation(self.mirrors_adjusted[idx].node,0,0,0)
+		DebugUtil.printTableRecursively(self.mirrors_adjusted[idx], " - ", 0, 1)
+		idx = idx + 1
+	end
+
+	if self.spec_enterable.mirrors and self.spec_enterable.mirrors[1] then
+		FS_Debug.info("This vehicle has mirrors" .. FS_Debug.getIdentity(self))
+		for i = 1, table.getn(self.spec_enterable.mirrors) do
+			local children_count = getNumOfChildren(self.spec_enterable.mirrors[i].node)
+			if children_count > 0 then
+				for j = children_count, 1, -1 do
+					addMirror(getChildAt(self.spec_enterable.mirrors[i].node, j-1))
+				end
+			else
+				addMirror(self.spec_enterable.mirrors[i].node)
+			end
+		end
+	end
+
 end
 
 --#######################################################################################
@@ -90,6 +145,8 @@ end
 --#######################################################################################
 function AdjustableMirrors:onEnterVehicle()
 	FS_Debug.info("onEnterVehicle" .. FS_Debug.getIdentity(self))
+	--DebugUtil.printTableRecursively(self.spec_enterable.mirrors, " - ", 0, 2)
+	--DebugUtil.printTableRecursively(self:getActiveCamera(), " - ", 0, 0)
 end
 
 --#######################################################################################
