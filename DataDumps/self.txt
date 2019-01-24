@@ -1,0 +1,614 @@
+spec_aiVehicle :: table: 0x02561aa2f000
+loadConsumerConfiguration :: function: 0x02560476c0b0
+getFormattedOperatingTime :: function: 0x0256076d1a98
+setAnimationTime :: function: 0x025604911c08
+getMotorType :: function: 0x025604a23e18
+updateWheelBase :: function: 0x0256073dde08
+sizeWidth :: 2.7000000476837
+getInputPowerTakeOffsByJointDescIndexAndName :: function: 0x025608839f10
+getPrice :: function: 0x025604dc4060
+getAIFruitProhibitions :: function: 0x025608aed958
+getAnimationTime :: function: 0x025604c773a0
+getFillUnitByIndex :: function: 0x025609bf5e88
+setInteriorLightsVisibility :: function: 0x025608cafaf8
+getIsControlled :: function: 0x025608ab9160
+updateDoubleJointPowerTakeOff :: function: 0x02560832c928
+getFillUnitLastValidFillType :: function: 0x025609c08588
+typeName :: tractor
+aiContinue :: function: 0x02560990c458
+actionEvents :: table: 0x02561aa2da88
+addAIDebugLine :: function: 0x0256098df900
+rootNode :: 86745
+setIsEasyControlActive :: function: 0x025608920650
+setDashboardsDirty :: function: 0x025608cbb518
+selectionObject :: table: 0x02561ab0dd18
+setComponentJointRotLimit :: function: 0x025605109390
+addFillUnitFillLevel :: function: 0x025609c30520
+loadFillUnitUnloadingFromXML :: function: 0x025609c3bd20
+spec_animatedVehicle :: table: 0x02561aa2e508
+validateWearableNode :: function: 0x025604e7b530
+getConsumerFillUnitIndex :: function: 0x025604cfdcd8
+vehicleNodes :: table: 0x02561ab016e8
+getPlayerModelIndex :: function: 0x025604ec63e0
+getIsActive :: function: 0x025604f6ce68
+updateAILights :: function: 0x025608cc2718
+spec_drivable :: table: 0x02561aa2ef28
+ownerFarmId :: 1
+unmountDynamic :: function: 0x025604cf5b70
+spec_aiImplement :: table: 0x02561aa2f0d8
+getAllowTireTracks :: function: 0x025608395f18
+addDirtAmount :: function: 0x025604b2ae08
+updateAttachedPowerTakeOffs :: function: 0x02560841ab60
+getDashboardValue :: function: 0x025608e80888
+raiseStateChange :: function: 0x02560801eb40
+getAIHasNoFullCoverageArea :: function: 0x025608949f38
+getAICollisionTriggers :: function: 0x025604682ce8
+loadCrawlerFromConfigFile :: function: 0x02560474f688
+setLoadingState :: function: 0x025604619ec8
+getAINeedsLowering :: function: 0x02560895cfe0
+addAITerrainDetailRequiredRange :: function: 0x025608a24cf8
+updateMotorProperties :: function: 0x025608eb8e90
+getSteeringDirection :: function: 0x025604ac66a0
+allowsInput :: true
+updateSelectableObjects :: function: 0x0256046a14c8
+getAlarmTriggerIsActive :: function: 0x025609c32a48
+getMotorLoadPercentage :: function: 0x025604ae63d0
+loadRotationBasedLimits :: function: 0x025608963e20
+getDeactivateOnLeave :: function: 0x02560537da20
+onDynamicMountJointBreak :: function: 0x0256045e9d38
+leaveVehicle :: function: 0x0256090d7828
+getAINeedsTrafficCollisionBox :: function: 0x02560992eef0
+unmount :: function: 0x02560450da18
+specializationNames :: table: 0x0256085970f8
+setWheelTireFrictionDirty :: function: 0x0256073dd9c8
+getFillUnitIndexFromNode :: function: 0x025609c3b330
+getFillUnitRootNode :: function: 0x025609c08678
+getAreSurfaceSoundsActive :: function: 0x0256073ddb98
+playDetachSound :: function: 0x025604db9728
+loadDashboardsFromXML :: function: 0x025608c91c98
+getAIDidNotMoveTimeout :: function: 0x0256099185c8
+getCompensationAngleScale :: function: 0x025604746af0
+spec_washable :: table: 0x02561aa2e280
+spec_AdjustableMirrors :: table: 0x02561aa2fa20
+setAnimationStopTime :: function: 0x025607f5a770
+spec_wheels :: table: 0x02561aa2e940
+addAllSubWashableNodes :: function: 0x0256050f0e20
+minRotTime :: -0.675
+slopeDetectionCallback :: function: 0x025604ce41b0
+getWearTotalAmount :: function: 0x025604b16ba8
+setOperatingTime :: function: 0x025607440558
+getDecelerationAxis :: function: 0x025604ae63a0
+spec_honk :: table: 0x02561aa2f6c0
+setNextLightsState :: function: 0x025608bfa0f0
+hardAttachImplement :: function: 0x0256045c1cd0
+loadSharedLight :: function: 0x025608cc26e8
+getAIIsTurning :: function: 0x02560990ff30
+updateDelayedTool :: function: 0x0256089174a8
+getIsMovingToolActive :: function: 0x025608741bf8
+setRealAnimationTime :: function: 0x025604cd7c18
+loadAttachmentsFromXMLFile :: function: 0x0256049142f0
+getIsPowerTakeOffActive :: function: 0x025608624638
+getAdditionalSchemaText :: function: 0x025604c2e450
+getWearMultiplier :: function: 0x025607878fa8
+updateMeasurementNodes :: function: 0x025609c44708
+updateExtraDependentParts :: function: 0x025608cbc650
+setMirrorVisible :: function: 0x025608af27d0
+getRequiresTipOcclusionArea :: function: 0x025604a293e0
+getIsAnimationPlaying :: function: 0x025605151220
+setRandomVehicleCharacter :: function: 0x0256076d19a8
+updateToolConnectionHose :: function: 0x025604b46de0
+isServer :: true
+removeActionEvents :: function: 0x025604d880e0
+requestActionEventUpdate :: function: 0x025608417138
+setWheelPositionDirty :: function: 0x0256073dd6b8
+resetAnimationValues :: function: 0x025604713be8
+setMovingToolDirty :: function: 0x025608963e50
+getDirtMultiplier :: function: 0x025604de0a78
+spec_powerTakeOffs :: table: 0x02561aa2f438
+getAIMinTurningRadius :: function: 0x025608748490
+loadCopyLocalDirectionParts :: function: 0x025608953e28
+getImplementByJointDescIndex :: function: 0x0256049dd920
+getCanByMounted :: function: 0x025607902d30
+spec_articulatedAxis :: table: 0x02561aa2f1b0
+getImplementIndexByJointDescIndex :: function: 0x025604e2fe38
+handleLowerImplementEvent :: function: 0x02560485add8
+postInitializeAnimationPart :: function: 0x025604875958
+getAcDecelerationAxis :: function: 0x0256082a5178
+setSuspensionNodeCharacter :: function: 0x025604d02de8
+validatePowerTakeOffAttachment :: function: 0x025607f164a0
+specializationsByName :: table: 0x025608592ae8
+getLastSpeed :: function: 0x0256083e0b18
+updateVehiclePhysics :: function: 0x025607c20698
+loadDependentParts :: function: 0x025608943f38
+stopMotor :: function: 0x0256076d9120
+loadDependentWheels :: function: 0x025608953438
+getIsConnectionTargetUsed :: function: 0x0256046dc248
+getIsSkipNodeAvailable :: function: 0x0256046a5a40
+setWorldPosition :: function: 0x025604e45770
+setJointMoveDown :: function: 0x025604aa9b18
+loadMovingToolFromXML :: function: 0x0256087b15e0
+setFillPlaneForcedFillType :: function: 0x025609c49f88
+deactivateAttachmentsLights :: function: 0x0256048c79c0
+getWorkDirtMultiplier :: function: 0x025604de0aa8
+aiImplementStartLine :: function: 0x025608243018
+allowLoadMovingToolStates :: function: 0x0256089644c0
+updateAttachedConnectionHoses :: function: 0x02560471a930
+getImplementByObject :: function: 0x025604b35180
+updateAlarmTriggers :: function: 0x025609c32148
+updateDependentAnimations :: function: 0x025608920710
+getAIVehicleReverserNode :: function: 0x025609932910
+loadVisibilityDashboardFromXML :: function: 0x025608c9f100
+getOutputPowerTakeOffs :: function: 0x025608239f58
+playAnimation :: function: 0x02560803cf40
+configurations :: table: 0x02561aa2d3e0
+loadOutputPowerTakeOff :: function: 0x025607be4880
+updateWheelTireFriction :: function: 0x0256073ddea8
+spec_crawlers :: table: 0x02561aa2ea18
+registeredActionEvents :: table: 0x02561ab0de48
+getOwner :: function: 0x025604f29108
+getAISteeringSpeed :: function: 0x025609932828
+loadInputPowerTakeOff :: function: 0x025607f24220
+getDailyUpkeep :: function: 0x025607902d60
+spec_fillUnit :: table: 0x02561aa2ed78
+getCruiseControlState :: function: 0x025607421800
+getIsActiveForInput :: function: 0x025609310800
+loadDifferentials :: function: 0x025609406478
+getMotorNotAllowedWarning :: function: 0x0256094d5b98
+loadWheelsSteeringDataFromXML :: function: 0x0256073de2e8
+getCompensationGroundPosition :: function: 0x025604ce4180
+getActiveCamera :: function: 0x025608e87e50
+repairVehicle :: function: 0x025604b16bd8
+addAIDebugText :: function: 0x0256098f8ee8
+getIsDrivingBackward :: function: 0x025604d71318
+addWearableNodes :: function: 0x025605128e80
+getDashboardSteeringAxis :: function: 0x025607c6e598
+playAttachSound :: function: 0x025604da5328
+getFillUnitFirstSupportedFillType :: function: 0x025609c085b8
+getFillUnitFillType :: function: 0x025609bff2c8
+stopAnimation :: function: 0x0256081ef338
+addFillUnitTrigger :: function: 0x025609c6c4a0
+getIsAIImplementInLine :: function: 0x0256093efa48
+loadHubs :: function: 0x0256073dce68
+updateConnectionHose :: function: 0x02560471a960
+loadAnimationPart :: function: 0x0256096b2330
+lengthOffset :: 0
+selectVehicle :: function: 0x025604b47978
+clearAIDebugLines :: function: 0x0256098e0588
+getPlayerColorIndex :: function: 0x0256097f1448
+getLimitedVehicleYPosition :: function: 0x025604cc7a90
+finalizeWheel :: function: 0x02560852bf38
+updateCharacterTargetNodeModifier :: function: 0x0256090d76f8
+setSelectedObject :: function: 0x025604b20bd0
+getFillUnitFreeCapacity :: function: 0x025609bff1d8
+getUseHighProfile :: function: 0x025608704888
+drawUIInfo :: function: 0x025609300660
+synchronizePosition :: true
+loadWiperFromXML :: function: 0x02560743e830
+getIsSuspensionNodeActive :: function: 0x025604d02db8
+getClonedSkipHoseNode :: function: 0x025604cd26d0
+setFillUnitFillType :: function: 0x025609c1d258
+lastSpeedAcceleration :: 0
+getSpeedRotatingPartDirection :: function: 0x025605078008
+setNodeWearAmount :: function: 0x0256049bbd80
+loadDependentAnimations :: function: 0x025608953df8
+getWheelsWithTipOcclisionAreaGroupId :: function: 0x0256049b5198
+getAITerrainDetailProhibitedRange :: function: 0x0256093af600
+getConnectionTarget :: function: 0x0256046dc218
+removeWearableNode :: function: 0x025607858a90
+getAnimationExists :: function: 0x025604a396d0
+getAttacherJointIndexFromImplementIndex :: function: 0x0256040ab748
+loadSpeedRotatingPartFromXML :: function: 0x0256045b3c60
+spec_suspensions :: table: 0x02561aa2f510
+highPrecisionPositionSynchronization :: false
+loadNumberDashboardFromXML :: function: 0x025608c91d88
+getNodeWearAmount :: function: 0x0256049bbdb0
+removeFillUnitTrigger :: function: 0x025609c6c4d0
+getIsFillUnitActive :: function: 0x025609c6eb48
+loadVisualLights :: function: 0x025608e30800
+setTurnLightState :: function: 0x025608c087a0
+updateSteeringWheel :: function: 0x0256074217d0
+connectHosesToAttacherVehicle :: function: 0x025604819d68
+loadAlarmTrigger :: function: 0x025609c44648
+loadNonPhysicalWheelFromXML :: function: 0x0256073de388
+getBunkerSiloCompacter :: function: 0x025604be93d8
+updateFillUnitFillPlane :: function: 0x025609c6c3e0
+getRepairPrice :: function: 0x0256091a21a0
+loadLocalPowerTakeOff :: function: 0x025607f24250
+spec_mountable :: table: 0x02561aa2e790
+calculateAttacherJointMoveUpperLowerAlpha :: function: 0x0256040aba70
+loadAnimation :: function: 0x025604cf4218
+validateWashableNode :: function: 0x0256093f28a8
+activateAttachments :: function: 0x025604a5f530
+getImplementFromAttacherJointIndex :: function: 0x025604523618
+updateWheelChocksPosition :: function: 0x0256073de6c8
+deleteVisualWheel :: function: 0x0256073de3b8
+loadAttacherJointFromXML :: function: 0x02560470c4b0
+setComponentJointTransLimit :: function: 0x025607f118b0
+spec_lights :: table: 0x02561aa2f288
+isDeleted :: false
+addToGlobalWearableNode :: function: 0x025604e7b560
+onVehicleWakeUpCallback :: function: 0x0256079025a0
+addAIFruitRequirement :: function: 0x025608732458
+getFillUnitFillLevel :: function: 0x025609bff208
+getAITurnRadiusLimitation :: function: 0x0256083a86c0
+getCanToggleSelectable :: function: 0x02560920f7c0
+updatePowerTakeOffLength :: function: 0x02560841ab90
+lastMovedDistance :: 0
+setBrakeLightsVisibility :: function: 0x025608c0b2f8
+addSubselection :: function: 0x0256050b6810
+getIsAIActive :: function: 0x025605361870
+getMotor :: function: 0x0256081ae748
+setAIMarkersInverted :: function: 0x02560875ac10
+registerSelectableObjects :: function: 0x02560461b558
+detachImplement :: function: 0x02560474b0a8
+updateEasyControl :: function: 0x0256089174d8
+setAbsolutePosition :: function: 0x025604cc7a60
+getDisableVehicleCharacterOnLeave :: function: 0x025608090280
+setBroken :: function: 0x025604dcdd78
+getIsLowered :: function: 0x025604ca5b28
+getIsActiveForWipers :: function: 0x025608447a98
+getIsReadyForAutomatedTrainTravel :: function: 0x025608cb09f0
+addNodeObjectMapping :: function: 0x02560899f4c8
+loadConnectorFromXML :: function: 0x0256073de148
+addWearAmount :: function: 0x025604c2dfd8
+loadSchemaOverlay :: function: 0x025607ec5940
+aiBlock :: function: 0x02560990c540
+getCruiseControlMaxSpeed :: function: 0x025604c076f0
+isClient :: true
+loadFillPlane :: function: 0x025609c49f58
+getTurnLightState :: function: 0x025608c0b2c8
+loadWheelDataFromExternalXML :: function: 0x0256073de218
+loadComponentFromXML :: function: 0x025607f118e0
+getUpdatePriority :: function: 0x025604dc4030
+updateFillUnitAutoAimTarget :: function: 0x025609c6c410
+addHoseTargetNodes :: function: 0x0256046de1a0
+getIsActiveForSound :: function: 0x025604b21c18
+getFillUnits :: function: 0x025609bf5e58
+removeToolCameras :: function: 0x025604ec6750
+getFirstValidFillUnitToFill :: function: 0x025609c1d228
+clearAIFruitRequirements :: function: 0x0256075cf528
+updateDirtAmount :: function: 0x0256079f3c10
+getWheelFromWheelIndex :: function: 0x0256073de488
+getAIInvertMarkersOnTurn :: function: 0x02560875ab28
+registerSecureAITask :: function: 0x0256099d4d30
+loadBendingNodeFromXML :: function: 0x025605193c48
+getCurrentSurfaceSound :: function: 0x0256073ddb68
+requiredDriveMode :: 1
+getControllerName :: function: 0x025608e87e20
+updateFillUnitTriggers :: function: 0x025609c6c990
+getParentComponent :: function: 0x0256083e0ae8
+getDrawFirstFillText :: function: 0x025609bf29e0
+loadBaseMaterialParameterFromXML :: function: 0x025604931d60
+setCruiseControlMaxSpeed :: function: 0x025607bed368
+anyMovingPartsDirty :: false
+loadDependentTranslatingParts :: function: 0x025608953788
+getCanToggleLight :: function: 0x02560872fe08
+loadDashboardFromXML :: function: 0x025608c91cc8
+wheelSteeringDuration :: 0.675
+spec_dynamicallyLoadedParts :: table: 0x02561aa2e430
+getAnimationDuration :: function: 0x025604b0bfc0
+setFillUnitFillTypeToDisplay :: function: 0x025609c1d2e8
+maxRotation :: 0.47123889803847
+spec_slopeCompensation :: table: 0x02561aa2eaf0
+updateWearAmount :: function: 0x025604c2dfa8
+forceIsActive :: false
+isVehicleSaved :: true
+rotatedTimeInterpolator :: table: 0x025625feb6f0
+maxRotTime :: 0.675
+attachPowerTakeOff :: function: 0x025608857d98
+speedLimit :: inf
+checkSpeedLimit :: true
+vehicleDirtyFlag :: 1
+callFunctionOnAllImplements :: function: 0x025604bfbaa0
+setFillSoundIsPlaying :: function: 0x025609c6eb18
+updateAIImplementData :: function: 0x02560992ee08
+firstTimeRun :: false
+selectionObjects :: table: 0x02561ab0db78
+getSellPrice :: function: 0x025604fb1ea8
+getAIMarkers :: function: 0x02560875acf8
+loadHoseSkipNode :: function: 0x025604bc68a0
+isSelectable :: true
+lastMoveTime :: -10000
+getIsConnectionHoseUsed :: function: 0x0256046a5a10
+lastSignedSpeed :: 0
+setIsTabbable :: function: 0x025608af2900
+lastSpeedReal :: 0
+getAIVehicleDirectionNode :: function: 0x0256084a3ce8
+lastSpeed :: 0
+applyBaseMaterialConfiguration :: function: 0x02560471b0c0
+getOutputPowerTakeOffsByJointDescIndex :: function: 0x025608239f28
+setFillUnitLastValidFillType :: function: 0x025609c30550
+operatingTime :: 0
+loadPowerTakeOffFromConfigFile :: function: 0x025605107a00
+autoRotateBackSpeed :: 2
+isBroken :: false
+loadCharacterTargetNodeModifier :: function: 0x025607652398
+destroyFruitArea :: function: 0x0256073de558
+rotatedTime :: 0
+updateAttacherJointRotationNodes :: function: 0x025604ac1620
+getFillUnitSupportedToolTypes :: function: 0x025609c13f40
+setFillUnitFillLevelToDisplay :: function: 0x025609c1d318
+networkTimeInterpolator :: table: 0x02561ab0db30
+propertyState :: 0
+removeAllSubWashableNodes :: function: 0x025604622678
+thresholdTailwaterDepth :: 2.5
+xmlFile :: 86470
+loadCompensationNodeFromXML :: function: 0x025604746ac0
+updateActionEvents :: function: 0x025607ebca18
+showTailwaterDepthWarning :: false
+setFillUnitIsFilling :: function: 0x025609c6c9c0
+sizeLength :: 5
+loadHubFromXML :: function: 0x0256073dcf68
+widthOffset :: 0
+supportsRadio :: true
+emptyAllFillUnits :: function: 0x025609c3b420
+loadAdditionalCharacterFromXML :: function: 0x025608f169d0
+componentJoints :: table: 0x02561ab0b4c8
+schemaOverlay :: table: 0x02561ab0b480
+steeringAxleNode :: 86745
+loadMotor :: function: 0x0256094064a8
+numComponents :: 2
+getIsEnterable :: function: 0x025608af2930
+isMassDirty :: false
+components :: table: 0x02561ab016a0
+getIsEntered :: function: 0x025608ab9130
+serverMass :: 0
+loadBendingNodeModifierFromXML :: function: 0x025605193c78
+canBeReset :: true
+updateMotorTemperature :: function: 0x02567efa8ad8
+getIsSelected :: function: 0x025604b20c00
+typeDesc :: tractor
+spec_wearable :: table: 0x02561aa2e358
+getAIVehicleSteeringNode :: function: 0x0256099382c0
+loadRealLightSetup :: function: 0x025608cfb090
+getTireTrackColor :: function: 0x0256073dda98
+activateBendingNodes :: function: 0x02560837dae8
+setDelayedData :: function: 0x025608916130
+updateWheelChockPosition :: function: 0x0256073de6f8
+spec_ikChains :: table: 0x02561aa2e868
+spec_cylindered :: table: 0x02561aa2e6b8
+getIsDrivingForward :: function: 0x025604d712e8
+spec_dashboard :: table: 0x02561aa2e5e0
+maxTurningRadiusWheel :: 2
+boughtConfigurations :: table: 0x02561aa2da40
+spec_tipOccluder :: table: 0x02561aa2e0d0
+spec_baseMaterial :: table: 0x02561aa2dff8
+getNumOfActiveAnimations :: function: 0x02560437a488
+updateSpeedRotatingPart :: function: 0x025605078038
+getFillUnitSupportsToolTypeAndFillType :: function: 0x025609c0e490
+getFillUnitFillLevelPercentage :: function: 0x025609bff298
+getObjectFromImplementIndex :: function: 0x0256040941f8
+thresholdTailwaterDepthWarning :: 1
+doCheckSpeedLimit :: function: 0x02560801eb70
+getIsWheelFoliageDestructionAllowed :: function: 0x0256073ddd08
+unselectVehicle :: function: 0x025604b478d0
+removeFromPhysics :: function: 0x025607ec6d68
+mountableTriggerCallback :: function: 0x02560418e670
+getFillUnitSupportsFillType :: function: 0x025609c0dfa0
+getSuspensionNodeFromIndex :: function: 0x025604722098
+setNodeDirtAmount :: function: 0x025604b2ae38
+spec_motorized :: table: 0x02561aa2ee50
+setReverseLightsVisibility :: function: 0x025608cafac8
+loadRotationDashboardFromXML :: function: 0x025608c986e0
+setLightsTypesMask :: function: 0x025608bfa120
+updateWheelFriction :: function: 0x0256073dddd8
+loadRealLights :: function: 0x025608cfb0c0
+loadMovingPartFromXML :: function: 0x025608924238
+getAttacherJoints :: function: 0x0256049a6a40
+loadComponentJointFromXML :: function: 0x025607eeb728
+addAITerrainDetailProhibitedRange :: function: 0x025604f6dae0
+collisionPairs :: table: 0x02561ab0d4d0
+loadWheelData :: function: 0x0256073de2b8
+deactivateAttachments :: function: 0x0256048419a0
+setAIFruitProhibitions :: function: 0x02560759b3a0
+getAILookAheadSize :: function: 0x02560876f080
+getAIImplementCollisionTriggers :: function: 0x025608949d00
+getAISizeMarkers :: function: 0x0256087595d8
+updateWheelTireTracks :: function: 0x0256073ddac8
+getCanImplementBeUsedForAI :: function: 0x025608fb2b38
+detachTypedPowerTakeOff :: function: 0x025604ca83b0
+getMotorRpmPercentage :: function: 0x025604a23e48
+getIsAdditionalCharacterActive :: function: 0x025607652368
+getCanToggleAttach :: function: 0x0256091d40d0
+raiseAIEvent :: function: 0x02560990b8b8
+setMassDirty :: function: 0x025608179140
+deactivate :: function: 0x0256082d3b70
+setAIFruitRequirements :: function: 0x025608d33b10
+aiEndTurn :: function: 0x02560990c748
+aiStartTurn :: function: 0x02560990ccc0
+getAttacherJointByJointDescIndex :: function: 0x0256048d7620
+movingDirection :: 0
+updateAttacherJointRotation :: function: 0x0256048c3310
+getCanAIImplementContinueWork :: function: 0x025608fb5cf0
+setComponentJointFrame :: function: 0x02560528e168
+spec_enterable :: table: 0x02561aa2eca0
+setAIMapHotspotVisibility :: function: 0x0256099115b8
+getFoliageBendingNodeByIndex :: function: 0x025604f46800
+getTipOcclusionAreas :: function: 0x0256049b5168
+getAIFruitRequirements :: function: 0x025608c95d88
+setBaseMaterialColor :: function: 0x025604a394a8
+enterVehicle :: function: 0x0256090d7728
+getCanAIVehicleContinueWork :: function: 0x0256099d4fe8
+getFillUnitForcedMaterialFillType :: function: 0x025609c32118
+updatePowerTakeOff :: function: 0x0256082d5638
+getIsInUse :: function: 0x02560510bf78
+getFillLevelInformation :: function: 0x025604661b68
+loadDependentAttacherJoints :: function: 0x025608953408
+getReverserDirection :: function: 0x025604ac6670
+applyBaseMaterial :: function: 0x025604931d90
+getWorkWearMultiplier :: function: 0x025604c5ad40
+saveAttachmentsToXMLFile :: function: 0x0256048b16e8
+getFillUnitExactFillRootNode :: function: 0x025609c08648
+loadExhaustEffects :: function: 0x025608e81310
+getAxisForward :: function: 0x0256048f5a50
+getCruiseControlSpeed :: function: 0x025604c076c0
+getIsMotorStarted :: function: 0x025604b43830
+setCruiseControlState :: function: 0x025607bed338
+updateWheelContact :: function: 0x0256073dd9f8
+getInteractionHelp :: function: 0x02560923e198
+mountDynamic :: function: 0x025604a35a60
+updateConsumers :: function: 0x02567efa8aa8
+getAttachedAIImplements :: function: 0x025609926a00
+loadEmitterDashboardFromXML :: function: 0x025608c91d58
+i3dMappings :: table: 0x02561ab02ba0
+loadAnimationDashboardFromXML :: function: 0x025608c986b0
+updateDashboards :: function: 0x025608c4f290
+addToPhysics :: function: 0x025604744218
+getName :: function: 0x0256076b9400
+addToolCameras :: function: 0x025604ec6720
+getAllowCharacterVisibilityUpdate :: function: 0x025608e87f80
+updateWheelDirtAmount :: function: 0x0256073dd5e8
+parkPowerTakeOff :: function: 0x0256088ddb30
+getAILowerIfAnyIsLowered :: function: 0x02560896d918
+hardDetachImplement :: function: 0x025604862bd8
+getFillUnitExists :: function: 0x025609bf5f18
+getAIToolReverserDirectionNode :: function: 0x0256083a8a68
+registerAITask :: function: 0x0256099d4f00
+deactivateLights :: function: 0x025608cbc0a0
+loadMeasurementNode :: function: 0x025609c446d8
+getActiveFarm :: function: 0x025608380ee0
+getStopMotorOnLeave :: function: 0x025605208ab0
+updateSingleJointPowerTakeOff :: function: 0x025604c74a00
+getFillUnitFromNode :: function: 0x025609c3b3f0
+getPropertyState :: function: 0x025607905800
+updateAnimationPart :: function: 0x0256082c25f8
+getSupportsMountDynamic :: function: 0x0256045e9d08
+getDashboardGroupByName :: function: 0x025608c8f500
+getCenterPointAngleRegulation :: function: 0x0256046a2bb0
+getWheels :: function: 0x0256073de528
+setAlarmTriggerState :: function: 0x025609c32a78
+setFillUnitForcedMaterialFillType :: function: 0x025609c266f8
+setFillUnitCapacity :: function: 0x025609c266c8
+getAITerrainDetailRequiredRange :: function: 0x025609046f08
+updateWheelDestruction :: function: 0x0256073ddc68
+getCenterPointAngle :: function: 0x0256046a2b80
+setSelectedVehicle :: function: 0x025604b479a8
+loadExtraDependentParts :: function: 0x025607e37348
+spec_connectionHoses :: table: 0x02561aa2f5e8
+getBrakeForce :: function: 0x0256084a29e0
+loadingState :: 1
+getWashDuration :: function: 0x0256045a9230
+getTailwaterDepth :: function: 0x025604ca5b58
+baseDirectory :: 
+getDirectionSnapAngle :: function: 0x0256049c7330
+getVehicleCharacter :: function: 0x025608e87f50
+removeWashableNode :: function: 0x0256046226a8
+getAIBlockTurnBackward :: function: 0x025609666f28
+getSelectedVehicle :: function: 0x0256049e9a08
+getCanMotorRun :: function: 0x025604b43860
+deleteListeners :: table: 0x02561aa2d850
+getBeaconLightsVisibility :: function: 0x025608c08770
+eventListeners :: table: 0x0256085aecd8
+configFileName :: data/vehicles/fiat/fiat1300dt/fiat1300dt.xml
+getSelectedImplement :: function: 0x025604793dc8
+spec_foliageBending :: table: 0x02561aa2e1a8
+specializations :: table: 0x02560858ead8
+registerActionEvents :: function: 0x025604bed7d8
+setRelativePosition :: function: 0x02560807f548
+addToLocalWearableNode :: function: 0x025607858a60
+detachImplementByObject :: function: 0x02560474afc0
+getUserPlayerStyle :: function: 0x0256097f1478
+deactivateBendingNodes :: function: 0x02560837db18
+updateWheelDensityMapHeight :: function: 0x0256073ddc38
+getAttacherJointDescFromObject :: function: 0x0256040f8b00
+unloadFillUnits :: function: 0x025609c3bd50
+handleLowerImplementByAttacherJointIndex :: function: 0x02560489f430
+getFillUnitSupportsToolType :: function: 0x025609c0e460
+i3dFilename :: $data/vehicles/fiat/fiat1300dt/fiat1300dt.i3d
+getAirConsumerUsage :: function: 0x025604d86e88
+loadBaseMaterialFromXML :: function: 0x0256083ce678
+disconnectHose :: function: 0x025604b46db0
+addHoseToDelayedMountings :: function: 0x0256047760b8
+updateAttacherJointGraphics :: function: 0x0256040a4bf0
+getIsActiveForLights :: function: 0x02560845e628
+nextDirtyFlag :: 8192
+getAdditionalComponentMass :: function: 0x0256089a5880
+getInputPowerTakeOffs :: function: 0x025608839f40
+getAIAllowTurnBackward :: function: 0x02560896b718
+getTotalMass :: function: 0x0256045610f0
+getImplementIndexByObject :: function: 0x025604b239e0
+getAttachedImplements :: function: 0x025604758390
+resetAnimationPartValues :: function: 0x0256085256a8
+updateLoopIndex :: -1
+clearAITerrainDetailRequiredRange :: function: 0x02560846dd90
+getIsHardAttachAllowed :: function: 0x02560470c680
+mount :: function: 0x02560418e6a0
+getNodeDirtAmount :: function: 0x0256050f0df0
+getAccelerationAxis :: function: 0x0256048f5a80
+loadWheelParticleSystem :: function: 0x0256073de1e8
+getDashboardColor :: function: 0x025608e808b8
+spec_speedRotatingParts :: table: 0x02561aa2ebc8
+clearAITerrainDetailProhibitedRange :: function: 0x025608979c48
+getSelectedObject :: function: 0x0256049e99d8
+placeLocalPowerTakeOff :: function: 0x0256082d5608
+loadDependentComponentJoints :: function: 0x025608943f68
+addAllSubWearableNodes :: function: 0x025605128e50
+getDeactivateLightsOnLeave :: function: 0x0256085587c0
+createComponentJoint :: function: 0x025607eeb758
+startAttacherJointCombo :: function: 0x025604802920
+loadDynamicallyPartsFromXML :: function: 0x025608adccc0
+attachImplement :: function: 0x025604cc30b8
+updateWheelSink :: function: 0x0256073ddd38
+aiImplementEndLine :: function: 0x025608b93bd0
+getFillUnitAllowsFillType :: function: 0x025609c13fd0
+createAttachmentJoint :: function: 0x025604ac1538
+detachingIsPossible :: function: 0x025604b50da8
+getMotorStartTime :: function: 0x0256081ae778
+retryHoseSkipNodeConnections :: function: 0x025604819d98
+setSelectedImplementByObject :: function: 0x025604896be8
+getIsOperating :: function: 0x0256085862e0
+getIsOnField :: function: 0x025604fb1ed8
+getFillUnitAutoAimTargetNode :: function: 0x025609c0df70
+getCruiseControlAxis :: function: 0x0256082a5148
+connectHoseToSkipNode :: function: 0x0256047760e8
+getConnectionHosesByInputAttacherJoint :: function: 0x025604b4c8a8
+loadCrawlerFromXML :: function: 0x02560405cc10
+setBeaconLightsVisibility :: function: 0x025608bfd3d8
+loadToolConnectorHoseNode :: function: 0x025604bc68d0
+getIsVehicleNode :: function: 0x02560893d838
+addAIFruitProhibitions :: function: 0x025608aedb28
+attachTypedPowerTakeOff :: function: 0x025604ca8380
+getFullName :: function: 0x025607903140
+loadDoubleJointPowerTakeOff :: function: 0x02560832c8f8
+getFillTypeChangeThreshold :: function: 0x025609c14000
+isAddedToPhysics :: false
+interact :: function: 0x025609232d88
+addToLocalWashableNode :: function: 0x0256050384e0
+deleteVehicleCharacter :: function: 0x0256076d1a68
+getCanBeSelected :: function: 0x0256050b6840
+setAIFruitExtraRequirements :: function: 0x0256083a8510
+isAddedToMission :: false
+getAIFruitExtraRequirements :: function: 0x025608f486a8
+setActiveCameraIndex :: function: 0x0256090d7858
+setWorldPositionQuaternion :: function: 0x025604e457a0
+getDriveGroundParticleSystemsScale :: function: 0x0256073dded8
+removeNodeObjectMapping :: function: 0x025608815020
+dirtyMask :: 0
+getMovingPartByNode :: function: 0x0256089741d8
+loadHoseTargetNode :: function: 0x0256046de1d0
+getDynamicMountObject :: function: 0x02560447fa70
+getExitNode :: function: 0x025604ec63b0
+updateVehicleSpeed :: function: 0x025607de2060
+getCurrentHelper :: function: 0x02560988e340
+getIsSpeedRotatingPartActive :: function: 0x0256046a87d0
+getMovingToolByNode :: function: 0x0256089741a8
+clearAIDebugTexts :: function: 0x02560990a3d8
+getFillUnitSupportedFillTypes :: function: 0x025609c13f10
+getRootVehicle :: function: 0x025604c06a00
+id :: 5
+initializeAnimationParts :: function: 0x0256040a01c0
+loadGears :: function: 0x025608e812e0
+getCurrentPlayerStyle :: function: 0x025609318488
+startAIVehicle :: function: 0x0256099aebe8
+getCanStartAIVehicle :: function: 0x02560848bee8
+loadWheelPhysicsData :: function: 0x0256073dd008
+getDrivingDirection :: function: 0x0256082e9ce8
+setReverserDirection :: function: 0x025607c6e5c8
+getDistanceToNode :: function: 0x0256092e7c98
+addVehicleToAIImplementList :: function: 0x025604dbe448
+loadDashboardGroupFromXML :: function: 0x02560491fb68
+postAttachImplement :: function: 0x025604cc31a0
+setAnimationSpeed :: function: 0x025604a7eef0
+supportsPickUp :: true
+setVehicleCharacter :: function: 0x0256093184b8
+maxTurningRadius :: 6.2740163866086

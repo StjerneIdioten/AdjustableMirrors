@@ -61,5 +61,5 @@ end
 --### supplied
 --#######################################################################################
 function FS_Debug.getIdentity(obj)
-    return " (rootNode: " .. obj.rootNode .. ", typeName: " .. obj.typeName .. ", typeDesc: " .. obj.typeDesc .. ")"
+    return " (name: " .. obj:getFullName() .. ", rootNode: " .. obj.rootNode .. ", typeName: " .. obj.typeName .. ", typeDesc: " .. obj.typeDesc .. ")"
   end
