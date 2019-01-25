@@ -14,6 +14,8 @@ AdjustableMirrors.dir = g_currentModDirectory; -- Maybe rename to modDirectory
 --#######################################################################################
 --### Check if certain things are present before going further with the mod, 
 --### runs when entering the savegame.
+--### This mod handles the checks in AdjustableMirrors_Register.lua so there are no spec
+--### checks here
 --#######################################################################################
 function AdjustableMirrors.prerequisitesPresent(specializations)
     return true
@@ -26,7 +28,7 @@ end;
 --#######################################################################################
 function AdjustableMirrors.registerEventListeners(vehicleType)
 	FS_Debug.info("registerEventListeners")
-	for _,n in pairs( { "onLoad", "onPostLoad", "saveToXMLFile", "onUpdate", "onUpdateTick", "onReadStream", "onWriteStream", "onRegisterActionEvents", "onEnterVehicle"} ) do
+	for _,n in pairs( { "onLoad", "onPostLoad", "saveToXMLFile", "onUpdate", "onUpdateTick", "onReadStream", "onWriteStream", "onRegisterActionEvents", "onEnterVehicle", "onCameraChanged"} ) do
 		SpecializationUtil.registerEventListener(vehicleType, n, AdjustableMirrors)
 	end
 end
@@ -43,6 +45,7 @@ function AdjustableMirrors:onLoad(savegame)
 	self.mirror_has_been_adjusted = false
 	self.mirror_adjusting = false
 	self.max_rotation = math.rad(20)
+	self.event_IDs = {}
 
 	self.mirrors_adjusted = {}
 	local idx = 1
@@ -84,6 +87,7 @@ function AdjustableMirrors:onLoad(savegame)
 			if children_count > 0 then
 				for j = children_count, 1, -1 do
 					addMirror(getChildAt(self.spec_enterable.mirrors[i].node, j-1))
+					FS_Debug.info("")
 				end
 			else
 				addMirror(self.spec_enterable.mirrors[i].node)
@@ -113,7 +117,7 @@ end
 --### runs a 100 times per second. The dt argument supplies the the frametime since the
 --### last frame. So use this to make your code not be framerate dependent.
 --#######################################################################################
-function AdjustableMirrors:onUpdate(dt)
+function AdjustableMirrors:onUpdate(dt, isActiveForInput, isSelected)
 	--FS_Debug.info("onUpdate" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self))
 end
 
@@ -160,16 +164,45 @@ function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
 	if not self.isClient then
 		return
 	end
+
+	if isOnActiveVehicle and self:getIsControlled() then
+		-- InputBinding.registerActionEvent(g_inputBinding, actionName, object, functionForTriggerEvent, triggerKeyUp, triggerKeyDown, triggerAlways, isActive)
+		
+		local _, eventID = g_inputBinding:registerActionEvent(InputAction.AM_AdjustMirrors, self, AdjustableMirrors.onActionAdjustMirrors, false, true, false, false)
+		--FS_Debug.info(actionEventId)
+		self.event_IDs[InputAction.AM_AdjustMirrors] = eventID
+
+		--Actions that have to do with moving the mirrors around
+		local actions_adjust = { InputAction.AM_TiltUp, InputAction.AM_TiltDown, InputAction.AM_TiltLeft, InputAction.AM_TiltRight }
+
+		--Register the adjustment actions
+		for _,actionName in pairs(actions_adjust) do
+			local _, eventID = g_inputBinding:registerActionEvent(actionName, self, AdjustableMirrors.onActionAdjustmentCall, false, true, true, false)	
+			self.event_IDs[actionName] = eventID
+		end
+		
+		g_inputBinding:setActionEventActive(self.event_IDs[InputAction.AM_AdjustMirrors], true)
+		g_inputBinding:setActionEventTextVisibility(self.event_IDs[InputAction.AM_AdjustMirrors], true)
+	end
+
+end
+
+function AdjustableMirrors:onCameraChanged(activeCamera, camIndex)
+	FS_Debug.info("onCameraChanged - camIndex: " .. camIndex .. FS_Debug.getIdentity(self))
+
+end
+
+function AdjustableMirrors:onActionAdjustMirrors(actionName, keyStatus)
+	FS_Debug.info("onActionAdjustMirrors - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
 end
 
 --#######################################################################################
---### Called when a registered action is takin place. So for example a keyboard input or
---### something like that.
+--### Called when one of the adjustment actions take place
 --#######################################################################################
-function AdjustableMirrors:onActionCall(actionName, keyStatus, arg4, arg5, arg6)
-	FS_Debug.info("onActionCall - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
-	FS_Debug.info("onActionCall arg4 - " .. arg4, 1)
-	FS_Debug.info("onActionCall arg5 - " .. arg5, 1)
-	FS_Debug.info("onActionCall arg6 - " .. arg6, 1)
+function AdjustableMirrors:onActionAdjustmentCall(actionName, keyStatus, arg4, arg5, arg6)
+	FS_Debug.info("onActionAdjustmentCall - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
+	--FS_Debug.info("onActionCall arg4 - " .. arg4, 1)
+	--FS_Debug.info("onActionCall arg5 - " .. arg5, 1)
+	--FS_Debug.info("onActionCall arg6 - " .. arg6, 1)
 	return
 end

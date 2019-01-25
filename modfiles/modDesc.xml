@@ -15,15 +15,43 @@
 		<text name="input_AM_AdjustMirrors">
 			<en>AM: Adjust Mirrors on/off</en>
 		</text>
+		<text name="input_AM_TiltUp">
+			<en>AM: Tilt the mirror up</en>
+		</text>
+		<text name="input_AM_TiltDown">
+			<en>AM: Tilt the mirror down</en>
+		</text>
+		<text name="input_AM_TiltLeft">
+			<en>AM: Tilt the mirror left</en>
+		</text>
+		<text name="input_AM_TiltRight">
+			<en>AM: Tilt the mirror right</en>
+		</text>
 	</l10n>
 
 	<actions>
 		<action name="AM_AdjustMirrors" category="VEHICLE"/>
+		<action name="AM_TiltUp" 		category="VEHICLE"/>
+		<action name="AM_TiltDown" 		category="VEHICLE"/>
+		<action name="AM_TiltLeft" 		category="VEHICLE"/>
+		<action name="AM_TiltRight" 	category="VEHICLE"/>
 	</actions>
 
 	<inputBinding>
 		<actionBinding action="AM_AdjustMirrors">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_5" axisComponent="+" inputComponent="+" index="2"/>
+		</actionBinding>
+		<actionBinding action="AM_TiltUp">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_8" axisComponent="+" inputComponent="+" index="2"/>
+		</actionBinding>
+		<actionBinding action="AM_TiltDown">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_2" axisComponent="+" inputComponent="+" index="2"/>
+		</actionBinding>
+		<actionBinding action="AM_TiltLeft">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_4" axisComponent="+" inputComponent="+" index="2"/>
+		</actionBinding>
+		<actionBinding action="AM_TiltRight">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_6" axisComponent="+" inputComponent="+" index="2"/>
 		</actionBinding>
 	</inputBinding>
 
