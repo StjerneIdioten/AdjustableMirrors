@@ -129,14 +129,14 @@ end
 --### last frame. So use this to make your code not be framerate dependent.
 --#######################################################################################
 function AdjustableMirrors:onUpdate(dt, isActiveForInput, isSelected)
-	FS_Debug.info("onUpdate" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self), 3)
+	FS_Debug.debug("onUpdate" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self), 4)
 end
 
 --#######################################################################################
 --### Same as onUpdate, but it only updates with the network ticks. 
 --#######################################################################################
 function AdjustableMirrors:onUpdateTick(dt)
-	FS_Debug.info("onUpdateTick" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self), 3)
+	FS_Debug.debug("onUpdateTick" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self), 4)
 end
 
 --#######################################################################################

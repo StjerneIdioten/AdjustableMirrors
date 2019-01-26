@@ -18,7 +18,8 @@ local modDesc = loadXMLFile("modDesc", g_currentModDirectory .. "modDesc.xml")
 AdjustableMirrors_Register.version = getXMLString(modDesc, "modDesc.version")
 AdjustableMirrors_Register.author = getXMLString(modDesc, "modDesc.author")
 AdjustableMirrors_Register.title = getXMLString(modDesc, "modDesc.title.en")
-FS_Debug.modName = AdjustableMirrors_Register.title
+FS_Debug.mod_name = AdjustableMirrors_Register.title
+FS_Debug.log_level_max = 3
 
 --#######################################################################################
 --### This isn't a seperate function per say, but it is responsible for checking if the
@@ -30,7 +31,6 @@ if g_specializationManager:getSpecializationByName("AdjustableMirrors") == nil t
 	if AdjustableMirrors == nil then
 		FS_Debug.error("Unable to find specialization '" .. "AdjustableMirrors" .. "'");
 	else
-		FS_Debug.debug("Found specialization '" .. "AdjustableMirrors" .. "'");
 		for i, typeDef in pairs(g_vehicleTypeManager.vehicleTypes) do
 			if typeDef ~= nil and i ~= "locomotive" then
 				local isDrivable = false
