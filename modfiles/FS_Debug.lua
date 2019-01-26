@@ -24,7 +24,7 @@ function FS_Debug._log(log_level,log_prefix,...)
         for idx = 1,select("#", ...) do
             txt = txt .. tostring(select(idx, ...))
         end
-        print(string.format("%7ums [%s]", (g_currentMission ~= nil and g_currentMission.time or 0), FS_Debug.mod_name)  .. "[" .. tostring(log_level) .. "]" .. log_prefix .. " " .. txt);
+        print(string.format("%7ums [%s]", (g_currentMission ~= nil and g_currentMission.time or 0), FS_Debug.mod_name)  .. "[" .. tostring(log_level_max) .. "]" .. log_prefix .. " " .. txt);
     end
 end
 
