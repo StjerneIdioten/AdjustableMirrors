@@ -5,8 +5,8 @@
 --#######################################################################################
 FS_Debug= {}
 
-FS_Debug.MAX_LOG_LEVEL = 0
-FS_Debug.modName = "Unspecified Modname"
+FS_Debug.log_level_max = 3
+FS_Debug.mod_name = "Unspecified Modname"
 
 --#######################################################################################
 --### Base function for creating the properly formatted log output in the form of:
@@ -19,12 +19,12 @@ FS_Debug.modName = "Unspecified Modname"
 --#######################################################################################
 function FS_Debug._log(log_level,log_prefix,...)
     log_level = log_level or 0 -- default value for log level
-    if  log_level <= FS_Debug.MAX_LOG_LEVEL then
+    if  log_level <= FS_Debug.log_level_max then
         local txt = ""
         for idx = 1,select("#", ...) do
             txt = txt .. tostring(select(idx, ...))
         end
-        print(string.format("%7ums [%s]", (g_currentMission ~= nil and g_currentMission.time or 0), FS_Debug.modName)  .. "[" .. tostring(log_level) .. "]" .. log_prefix .. " " .. txt);
+        print(string.format("%7ums [%s]", (g_currentMission ~= nil and g_currentMission.time or 0), FS_Debug.mod_name)  .. "[" .. tostring(log_level) .. "]" .. log_prefix .. " " .. txt);
     end
 end
 
@@ -32,6 +32,7 @@ end
 --### Function with prefix=Debug
 --#######################################################################################
 function FS_Debug.debug(message, log_level)
+    log_level = log_level or 3
 	FS_Debug._log(log_level, "[Debug]", message)
 end
 
@@ -39,6 +40,7 @@ end
 --### Function with prefix=Info
 --#######################################################################################
 function FS_Debug.info(message, log_level)
+    log_level = log_level or 2
 	FS_Debug._log(log_level, "[Info]", message)
 end
 
@@ -46,6 +48,7 @@ end
 --### Function with prefix=Warning
 --#######################################################################################
 function FS_Debug.warning(message, log_level)
+    log_level = log_level or 1
 	FS_Debug._log(log_level, "[Warning]", message)
 end
 
@@ -53,6 +56,7 @@ end
 --### Function with prefix=Error
 --#######################################################################################
 function FS_Debug.error(message, log_level)
+    log_level = log_level or 0
 	FS_Debug._log(log_level, "[Error]", message)
 end
 
