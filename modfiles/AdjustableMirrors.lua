@@ -28,7 +28,7 @@ end;
 --#######################################################################################
 function AdjustableMirrors.registerEventListeners(vehicleType)
 	FS_Debug.info("registerEventListeners")
-	for _,n in pairs( { "onLoad", "onPostLoad", "saveToXMLFile", "onUpdate", "onUpdateTick", "onReadStream", "onWriteStream", "onRegisterActionEvents", "onEnterVehicle", "onCameraChanged"} ) do
+	for _,n in pairs( { "onLoad", "onPostLoad", "saveToXMLFile", "onUpdate", "onUpdateTick", "onReadStream", "onWriteStream", "onRegisterActionEvents", "onEnterVehicle", "onLeaveVehicle", "onCameraChanged"} ) do
 		SpecializationUtil.registerEventListener(vehicleType, n, AdjustableMirrors)
 	end
 end
@@ -154,11 +154,19 @@ function AdjustableMirrors:onEnterVehicle()
 end
 
 --#######################################################################################
---### I think this updates the list of actions currently available? So what is shown in
---### the input area hud. Basically which buttons you can press to trigger stuff
+--### This is run when someone leaves the vehicle.
+--#######################################################################################
+function AdjustableMirrors:onLeaveVehicle()
+	FS_Debug.info("onLeaveVehicle" .. FS_Debug.getIdentity(self))
+end
+
+--#######################################################################################
+--### This function is called when the vehicle state is changed. Fx. when switching to
+--### the vehicle or switching implements. It is used to register the current actions
+--### that are available to be used for the vehicle
 --#######################################################################################
 function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
-	FS_Debug.info("onRegisterActionEvents " .. tostring(isSelected) .. ", " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self))
+	FS_Debug.info("onRegisterActionEvents, selected: " .. tostring(isSelected) .. ", activeVehicle: " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self))
 	
 	--Actions are only relevant if the function is run clientside
 	if not self.isClient then
@@ -168,32 +176,80 @@ function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
 	if isOnActiveVehicle and self:getIsControlled() then
 		-- InputBinding.registerActionEvent(g_inputBinding, actionName, object, functionForTriggerEvent, triggerKeyUp, triggerKeyDown, triggerAlways, isActive)
 		
-		local _, eventID = g_inputBinding:registerActionEvent(InputAction.AM_AdjustMirrors, self, AdjustableMirrors.onActionAdjustMirrors, false, true, false, false)
-		--FS_Debug.info(actionEventId)
+
+		-- Register AdjustMirrors action, with the active value to be based on whether or not the camera is inside when we switched
+		local _, eventID = g_inputBinding:registerActionEvent(InputAction.AM_AdjustMirrors, self, AdjustableMirrors.onActionAdjustMirrors, false, true, false, self:getActiveCamera().isInside)
 		self.event_IDs[InputAction.AM_AdjustMirrors] = eventID
 
 		--Actions that have to do with moving the mirrors around
 		local actions_adjust = { InputAction.AM_TiltUp, InputAction.AM_TiltDown, InputAction.AM_TiltLeft, InputAction.AM_TiltRight }
 
 		--Register the adjustment actions
+		self.event_IDs.adjustment = {}
 		for _,actionName in pairs(actions_adjust) do
 			local _, eventID = g_inputBinding:registerActionEvent(actionName, self, AdjustableMirrors.onActionAdjustmentCall, false, true, true, false)	
-			self.event_IDs[actionName] = eventID
+			self.event_IDs.adjustment[actionName] = eventID
 		end
 		
-		g_inputBinding:setActionEventActive(self.event_IDs[InputAction.AM_AdjustMirrors], true)
-		g_inputBinding:setActionEventTextVisibility(self.event_IDs[InputAction.AM_AdjustMirrors], true)
+		--g_inputBinding:setActionEventActive(self.event_IDs[InputAction.AM_AdjustMirrors], true)
+		--g_inputBinding:setActionEventTextVisibility(self.event_IDs[InputAction.AM_AdjustMirrors], true)
 	end
-
 end
 
+--#######################################################################################
+--### Callback for the onCameraChanged event, which is triggered when the active camera
+--### is changed. This event is fx. raised by the Enterable specialization in the
+--### setActiveCameraIndex function.
+--#######################################################################################
 function AdjustableMirrors:onCameraChanged(activeCamera, camIndex)
 	FS_Debug.info("onCameraChanged - camIndex: " .. camIndex .. FS_Debug.getIdentity(self))
+	local eventID = self.event_IDs[InputAction.AM_AdjustMirrors]
 
+	--DebugUtil.printTableRecursively(self, " - ", 0, 1)
+
+	if activeCamera.isInside then 
+		--Enable the Adjustable Mirror action, to show it when inside the cabin
+		g_inputBinding:setActionEventActive(eventID, true)
+	else
+		--Disable the Adjustable Mirror action, to not show it when outside the cabin view.
+		g_inputBinding:setActionEventActive(eventID, false)
+	end
+
+	--Disable the adjustment actions, just in case they were enabled when changing camera.
+	AdjustableMirrors.updateAdjustmentEvents(self,false);
 end
 
+--#######################################################################################
+--### Callback for the AdjustMirrors action
+--#######################################################################################
 function AdjustableMirrors:onActionAdjustMirrors(actionName, keyStatus)
 	FS_Debug.info("onActionAdjustMirrors - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
+	AdjustableMirrors.updateAdjustmentEvents(self);
+end
+
+--#######################################################################################
+--### Update the event prompts for the adjustment events. If state is nothing, then the
+--### function just toggles the state. 
+--#######################################################################################
+function AdjustableMirrors:updateAdjustmentEvents(state)
+	FS_Debug.info("updateAdjustmentEvents: " .. tostring(Utils.getNoNil(state, "Nil")))
+	FS_Debug.info("mirror_adjusting before: " .. tostring(self.mirror_adjusting))
+	self.mirror_adjusting = Utils.getNoNil(state, not self.mirror_adjusting)
+	FS_Debug.info("mirror_adjusting after: " .. tostring(self.mirror_adjusting))
+
+	if self.event_IDs ~= nil then
+		DebugUtil.printTableRecursively(self.event_IDs, " - ", 0, 1)
+	end
+
+	if (self.event_IDs ~= nil) and (self.event_IDs.adjustment ~= nil) then
+		FS_Debug.info("event_IDs.adjustment exists")
+		for _, eventID in pairs(self.event_IDs.adjustment) do
+			g_inputBinding:setActionEventActive(eventID, self.mirror_adjusting )
+			g_inputBinding:setActionEventTextPriority(eventID, GS_PRIO_VERY_HIGH)
+		end
+	else
+		FS_Debug.info("event_IDs.adjustment does not exist")
+	end
 end
 
 --#######################################################################################

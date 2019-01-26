@@ -13,19 +13,19 @@
 
 	<l10n filenamePrefix="modDesc_l10n"> 
 		<text name="input_AM_AdjustMirrors">
-			<en>AM: Adjust Mirrors on/off</en>
+			<en>Adjust Mirrors on/off</en>
 		</text>
 		<text name="input_AM_TiltUp">
-			<en>AM: Tilt the mirror up</en>
+			<en>Tilt the mirror up</en>
 		</text>
 		<text name="input_AM_TiltDown">
-			<en>AM: Tilt the mirror down</en>
+			<en>Tilt the mirror down</en>
 		</text>
 		<text name="input_AM_TiltLeft">
-			<en>AM: Tilt the mirror left</en>
+			<en>Tilt the mirror left</en>
 		</text>
 		<text name="input_AM_TiltRight">
-			<en>AM: Tilt the mirror right</en>
+			<en>Tilt the mirror right</en>
 		</text>
 	</l10n>
 

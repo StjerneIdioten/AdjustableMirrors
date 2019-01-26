@@ -1,0 +1,85 @@
+transMax :: 0
+rotMaxX :: 0.40000000596046
+rotMinX :: -1.1000000238419
+normalX :: 0
+rotZ :: 0
+limit :: true
+hasExtraRotationNode :: false
+defaultVolume :: 0.9
+useOutdoorSounds :: false
+lookAtLastTargetPosition :: table: 0x021abf05f3b8
+lookAtSmoothingParameter :: 0.176
+lastInputValues :: table: 0x021ad8f75658
+cameraNode :: 87756
+position :: table: 0x021abe1d83e0
+lastTargetPosition :: table: 0x021abd8d2428
+isCollisionEnabled :: true
+headTrackingRotationOffset :: table: 0x021abe7bea20
+origRotX :: -0.32288593053818
+rotX :: -0.32288593053818
+transZ :: -0.86053097248077
+origTransX :: -1.6769700167759e-15
+origTransY :: 2.5648999214172
+origRotZ :: 0
+rotYSteeringRotSpeed :: 0
+allowHeadTracking :: true
+allowTranslation :: false
+isInside :: true
+rotY :: 3.1415927410126
+transMin :: 0
+transY :: 2.5648999214172
+transX :: -1.6769700167759e-15
+origRotY :: 3.1415927410126
+useMirror :: true
+origTransZ :: -0.86053097248077
+normalY :: 0
+positionSmoothingParameter :: 0.128
+lookAtPosition :: table: 0x021abdf722f0
+disableCollisionTime :: -1
+vehicle :: table: 0x021ad92beb50
+zoomLimitedTarget :: -1
+shadowFocusBoxNode :: 87760
+isActivated :: true
+isRotatable :: true
+rotateNode :: 89025
+raycastDistance :: 0
+raycastNodes :: table: 0x021ac0e61030
+lookAtSmoothingParameter :: 0.022
+lastInputValues :: table: 0x021abfd37ae8
+cameraNode :: 87755
+position :: table: 0x021abf732a28
+lastTargetPosition :: table: 0x021abe891d28
+isCollisionEnabled :: true
+headTrackingRotationOffset :: table: 0x021abf07c7e0
+transDirX :: 0
+fovY :: 1.4736199829309
+zoom :: 5.00001
+normalZ :: 0
+cameraPositionNode :: 89024
+defaultLowPassGain :: 1
+transDirZ :: 0.999998000004
+transDirY :: 0
+limitRotXDelta :: 0
+zoomTarget :: 5.00001
+headTrackingPositionOffset :: table: 0x021abecd0670
+rotY :: 3.1415927410126
+transZ :: 5
+rotX :: -0.34906584024429
+origTransX :: 0
+origTransY :: 0
+rotYSteeringRotSpeed :: 0
+allowHeadTracking :: false
+allowTranslation :: true
+isInside :: false
+origRotY :: 3.1415927410126
+transMin :: 3.5
+transY :: 0
+transX :: 0
+origRotX :: -0.34906584024429
+useMirror :: false
+origTransZ :: 5
+origRotZ :: 0
+positionSmoothingParameter :: 0.016
+lookAtPosition :: table: 0x021abffe3df8
+useWorldXZRotation :: true
+isActivated :: true
