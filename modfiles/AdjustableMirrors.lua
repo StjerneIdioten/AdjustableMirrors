@@ -40,7 +40,7 @@ end
 --#######################################################################################
 function AdjustableMirrors.registerEventListeners(vehicleType)
 	FS_Debug.info("registerEventListeners")
-	for _,n in pairs( { "onLoad", "onPostLoad", "saveToXMLFile", "onUpdate", "onUpdateTick", "onReadStream", "onWriteStream", "onRegisterActionEvents", "onEnterVehicle", "onLeaveVehicle", "onCameraChanged"} ) do
+	for _,n in pairs( { "onLoad", "onPostLoad", "saveToXMLFile", "onUpdate", "onUpdateTick", "onDraw", "onReadStream", "onWriteStream", "onRegisterActionEvents", "onEnterVehicle", "onLeaveVehicle", "onCameraChanged"} ) do
 		SpecializationUtil.registerEventListener(vehicleType, n, AdjustableMirrors)
 	end
 end
@@ -56,7 +56,7 @@ function AdjustableMirrors:onLoad(savegame)
 	spec.mirror_has_been_adjusted = false
 	spec.mirror_adjusting = false
 	spec.max_rotation = math.rad(20)
-	spec.adjust_value = 0.0005
+	spec.adjust_value = 0.001
 	spec.event_IDs = {}
 
 	spec.mirrors_adjusted = {}
@@ -93,6 +93,7 @@ function AdjustableMirrors:onLoad(savegame)
 	end
 
 	if self.spec_enterable.mirrors and spec.spec_enterable.mirrors[1] then
+		spec.mirror_index = 1
 		FS_Debug.info("This vehicle has mirrors" .. FS_Debug.getIdentity(self))
 		for i = 1, table.getn(spec.spec_enterable.mirrors) do
 			local children_count = getNumOfChildren(spec.spec_enterable.mirrors[i].node)
@@ -138,6 +139,20 @@ end
 --#######################################################################################
 function AdjustableMirrors:onUpdateTick(dt)
 	FS_Debug.debug("onUpdateTick" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self), 5)
+end
+
+--#######################################################################################
+--### Used for updating drawn stuff like GUI elements
+--#######################################################################################
+function AdjustableMirrors:onDraw()
+	FS_Debug.debug("onDraw" .. FS_Debug.getIdentity(self), 5)
+	local spec = self.spec_AdjustableMirrors
+
+	if spec.mirror_adjusting == true then
+		--This is a bit of a crude way to do it, since you aren't really supposed to use debug functions for anything else than debug stuff
+		--I will change this at some point, but for now it works fine.
+		DebugUtil.drawDebugNode(spec.mirrors_adjusted[spec.mirror_index].node, "This Mirror")
+	end
 end
 
 --#######################################################################################
@@ -190,19 +205,22 @@ function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
 		-- Register AdjustMirrors action, with the active value to be based on whether or not the camera is inside when we switched
 		local _, eventID = g_inputBinding:registerActionEvent(InputAction.AM_AdjustMirrors, self, AdjustableMirrors.onActionAdjustMirrors, false, true, false, self:getActiveCamera().isInside)
 		spec.event_IDs[InputAction.AM_AdjustMirrors] = eventID
-
+		
 		--Actions that have to do with moving the mirrors around
 		local actions_adjust = { InputAction.AM_TiltUp, InputAction.AM_TiltDown, InputAction.AM_TiltLeft, InputAction.AM_TiltRight }
 
 		--Register the adjustment actions
 		spec.event_IDs.adjustment = {}
+
+		-- Register SwitchMirror action
+		local _, eventID = g_inputBinding:registerActionEvent(InputAction.AM_SwitchMirror, self, AdjustableMirrors.onActionSwitchMirror, false, true, false, false)
+		spec.event_IDs.adjustment[InputAction.AM_SwitchMirror] = eventID
+
 		for _,actionName in pairs(actions_adjust) do
 			local _, eventID = g_inputBinding:registerActionEvent(actionName, self, AdjustableMirrors.onActionAdjustmentCall, false, true, true, false)	
 			spec.event_IDs.adjustment[actionName] = eventID
 		end
 		
-		--g_inputBinding:setActionEventActive(self.event_IDs[InputAction.AM_AdjustMirrors], true)
-		--g_inputBinding:setActionEventTextVisibility(self.event_IDs[InputAction.AM_AdjustMirrors], true)
 	end
 end
 
@@ -235,7 +253,23 @@ end
 function AdjustableMirrors:onActionAdjustMirrors(actionName, keyStatus)
 	FS_Debug.info("onActionAdjustMirrors - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
-	AdjustableMirrors.updateAdjustmentEvents(self);
+	AdjustableMirrors.updateAdjustmentEvents(self)
+end
+
+--#######################################################################################
+--### Callback for the SwitchMirror action
+--#######################################################################################
+function AdjustableMirrors:onActionSwitchMirror(actionName, keyStatus)
+	FS_Debug.info("onActionSwitchMirror - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
+	local spec = self.spec_AdjustableMirrors
+	
+	if spec.mirror_index == #spec.mirrors_adjusted then
+		spec.mirror_index = 1
+	else
+		spec.mirror_index = spec.mirror_index + 1
+	end
+
+	FS_Debug.debug("new value of mirror_index: " .. spec.mirror_index)
 end
 
 --#######################################################################################
@@ -261,7 +295,7 @@ end
 function AdjustableMirrors:onActionAdjustmentCall(actionName, keyStatus, arg4, arg5, arg6)
 	FS_Debug.info("onActionAdjustmentCall - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self), 4)
 	local spec = self.spec_AdjustableMirrors
-	local mirror = spec.mirrors_adjusted[1]
+	local mirror = spec.mirrors_adjusted[spec.mirror_index]
 
 	if actionName == "AM_TiltUp" then
 		mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.x0 - spec.adjust_value))

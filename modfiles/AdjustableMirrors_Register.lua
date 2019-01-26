@@ -19,7 +19,7 @@ AdjustableMirrors_Register.version = getXMLString(modDesc, "modDesc.version")
 AdjustableMirrors_Register.author = getXMLString(modDesc, "modDesc.author")
 AdjustableMirrors_Register.title = getXMLString(modDesc, "modDesc.title.en")
 FS_Debug.mod_name = AdjustableMirrors_Register.title
-FS_Debug.log_level_max = 3
+FS_Debug.log_level_max = 1
 
 --#######################################################################################
 --### This isn't a seperate function per say, but it is responsible for checking if the

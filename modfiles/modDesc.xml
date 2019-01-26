@@ -15,6 +15,9 @@
 		<text name="input_AM_AdjustMirrors">
 			<en>AM: Adjust Mirrors on/off</en>
 		</text>
+		<text name="input_AM_SwitchMirror">
+			<en>AM: Change mirror</en>
+		</text>
 		<text name="input_AM_TiltUp">
 			<en>AM: Tilt the mirror up</en>
 		</text>
@@ -31,6 +34,7 @@
 
 	<actions>
 		<action name="AM_AdjustMirrors" category="VEHICLE"/>
+		<action name="AM_SwitchMirror" 	category="VEHICLE"/>
 		<action name="AM_TiltUp" 		category="VEHICLE"/>
 		<action name="AM_TiltDown" 		category="VEHICLE"/>
 		<action name="AM_TiltLeft" 		category="VEHICLE"/>
@@ -40,6 +44,9 @@
 	<inputBinding>
 		<actionBinding action="AM_AdjustMirrors">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_5" axisComponent="+" inputComponent="+" index="1"/>
+		</actionBinding>
+		<actionBinding action="AM_SwitchMirror">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_0" axisComponent="+" inputComponent="+" index="1"/>
 		</actionBinding>
 		<actionBinding action="AM_TiltUp">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_8" axisComponent="+" inputComponent="+" index="1"/>
