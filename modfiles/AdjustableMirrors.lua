@@ -56,6 +56,7 @@ function AdjustableMirrors:onLoad(savegame)
 	spec.mirror_has_been_adjusted = false
 	spec.mirror_adjusting = false
 	spec.max_rotation = math.rad(20)
+	spec.adjust_value = 0.0005
 	spec.event_IDs = {}
 
 	spec.mirrors_adjusted = {}
@@ -129,14 +130,14 @@ end
 --### last frame. So use this to make your code not be framerate dependent.
 --#######################################################################################
 function AdjustableMirrors:onUpdate(dt, isActiveForInput, isSelected)
-	FS_Debug.debug("onUpdate" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self), 4)
+	FS_Debug.debug("onUpdate" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self), 5)
 end
 
 --#######################################################################################
 --### Same as onUpdate, but it only updates with the network ticks. 
 --#######################################################################################
 function AdjustableMirrors:onUpdateTick(dt)
-	FS_Debug.debug("onUpdateTick" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self), 4)
+	FS_Debug.debug("onUpdateTick" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self), 5)
 end
 
 --#######################################################################################
@@ -258,10 +259,30 @@ end
 --### Called when one of the adjustment actions take place
 --#######################################################################################
 function AdjustableMirrors:onActionAdjustmentCall(actionName, keyStatus, arg4, arg5, arg6)
-	FS_Debug.info("onActionAdjustmentCall - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
+	FS_Debug.info("onActionAdjustmentCall - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self), 4)
 	local spec = self.spec_AdjustableMirrors
-	--FS_Debug.info("onActionCall arg4 - " .. arg4, 1)
-	--FS_Debug.info("onActionCall arg5 - " .. arg5, 1)
-	--FS_Debug.info("onActionCall arg6 - " .. arg6, 1)
-	return
+	local mirror = spec.mirrors_adjusted[1]
+
+	if actionName == "AM_TiltUp" then
+		mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.x0 - spec.adjust_value))
+		mirror.y0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.y0))
+	elseif actionName == "AM_TiltDown" then
+		mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.x0 + spec.adjust_value))
+		mirror.y0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.y0))
+	elseif actionName == "AM_TiltLeft" then
+		mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.x0))
+		mirror.y0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.y0 - spec.adjust_value))
+	elseif actionName == "AM_TiltRight" then
+		mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.x0))
+		mirror.y0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.y0 + spec.adjust_value))
+	end
+
+	--FS_Debug.debug("mirror.x0: " .. tostring(mirror.x0))
+	--FS_Debug.debug("mirror.y0: " .. tostring(mirror.y0))
+
+	setRotation(mirror.x1,math.min(0,mirror.x0),0,0);
+	setRotation(mirror.x2,math.max(0,mirror.x0),0,0);
+	setRotation(mirror.y1,0,0,math.max(0,mirror.y0));
+	setRotation(mirror.y2,0,0,math.min(0,mirror.y0));
+
 end
