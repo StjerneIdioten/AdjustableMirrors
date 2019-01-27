@@ -8,15 +8,14 @@
 --### onLoad will run for as many times as there are vehicles with the specialization.
 --#######################################################################################
 AdjustableMirrors = {};
---AdjustableMirrors.sendNumBits = 7; --Used for multiplayer sync stuff
---AdjustableMirrors.dir = g_currentModDirectory; -- Maybe rename to modDirectory
+--Modwide version, should be set in AdjustableMirrors_Register.lua
 AdjustableMirrors.version = "Unspecified Version"
 
 --#######################################################################################
 --### Check if certain things are present before going further with the mod, 
 --### runs when entering the savegame.
---### This mod handles the checks in AdjustableMirrors_Register.lua so there are no spec
---### checks here
+--### This mod handles the checks in AdjustableMirrors_Register.lua so there are no 
+--### specialization checks here
 --#######################################################################################
 function AdjustableMirrors.prerequisitesPresent(specializations)
     return true
@@ -26,12 +25,11 @@ end;
 --### Can be used to expose a function directly into the self object. So fx. making it so
 --### you could call a function directly by writing self:function(arg1, arg2) instead of 
 --### specialization.function(self, arg1, arg2) I don't know why you would do that though
---### since this might actually clutter stuff instead of keeping things neat instead of
+--### since this might actually clutter stuff instead of keeping things neat inside of
 --### the self.spec_specializationName table
 --#######################################################################################
 function AdjustableMirrors.registerFunctions(vehicleType)
 	FS_Debug.info("registerFunctions")
-	--SpecializationUtil.registerFunction(vehicleType, "updateAdjustmentEvents", AdjustableMirrors.updateAdjustmentEvents)
 end
 
 --#######################################################################################
@@ -41,8 +39,23 @@ end
 --#######################################################################################
 function AdjustableMirrors.registerEventListeners(vehicleType)
 	FS_Debug.info("registerEventListeners")
-	for _,n in pairs( { "onLoad", "onPostLoad", "saveToXMLFile", "onUpdate", "onUpdateTick", "onDraw", "onReadStream", "onWriteStream", "onRegisterActionEvents", "onEnterVehicle", "onLeaveVehicle", "onCameraChanged"} ) do
-		SpecializationUtil.registerEventListener(vehicleType, n, AdjustableMirrors)
+	--Table holding all the events, makes it a bit easier to read the code
+	local events = { "onLoad", 
+					  "onPostLoad", 
+					  "saveToXMLFile", 
+					  "onUpdate", 
+					  "onUpdateTick", 
+					  "onDraw", 
+					  "onReadStream", 
+					  "onWriteStream", 
+					  "onRegisterActionEvents", 
+					  "onEnterVehicle", 
+					  "onLeaveVehicle", 
+					  "onCameraChanged"}
+	--Register the events we want our spec to react to. Make sure that you have functions with the same name
+	--defined as the this list
+	for _,event in pairs(events) do
+		SpecializationUtil.registerEventListener(vehicleType, event, AdjustableMirrors)
 	end
 end
 
@@ -60,52 +73,62 @@ end
 --#######################################################################################
 function AdjustableMirrors:onPostLoad(savegame)
 	FS_Debug.info("onPostLoad" .. FS_Debug.getIdentity(self))
+	--Quick reference to the specialization, where we should keep all of our variables
 	local spec = self.spec_AdjustableMirrors
-
-	spec.mirror_is_adjustable = false
-	spec.mirror_has_been_adjusted = false
-	spec.mirror_adjusting = false
+	--Are we allowed to adjust the mirrors
+	spec.mirror_adjustment_enabled = false
+	--Maximum rotation value, for capping the rotation of the mirrors
 	spec.max_rotation = math.rad(20)
-	spec.adjust_value = 0.001
+	--How much we should add to the rotation each time a keypress is detected
+	spec.mirror_adjustment_step_size = 0.001
+	--Table for holding all of the ID's returned when registering the action events in onRegisterActionEvents
 	spec.event_IDs = {}
+	--Table for holding all of the new adjustment mirrors
+	spec.mirrors = {}
 
-	spec.mirrors_adjusted = {}
+	--#######################################################################################
+	--### Used for adding new adjustable mirrors. They require some more transform groups to
+	--### be able to be rotated. This ned structure allows for tilt and pan of the mirror
+	--### without it going through the mirror arm structure of the model.
+	--#######################################################################################
 	local idx = 1
 	local function addMirror(mirror)
 		FS_Debug.info("Adding adjustable mirror #" .. idx .. FS_Debug.getIdentity(self))
-		spec.mirrors_adjusted[idx] = {}
-		spec.mirrors_adjusted[idx].node = mirror
-		spec.mirrors_adjusted[idx].rotation_org = {getRotation(spec.mirrors_adjusted[idx].node)}
-		spec.mirrors_adjusted[idx].translation_org = {getTranslation(spec.mirrors_adjusted[idx].node)}
-		spec.mirrors_adjusted[idx].base = createTransformGroup("Base")
-		spec.mirrors_adjusted[idx].x0 = 0
-		spec.mirrors_adjusted[idx].y0 = 0
-		spec.mirrors_adjusted[idx].x1 = createTransformGroup("x1")
-		spec.mirrors_adjusted[idx].x2 = createTransformGroup("x2")
-		spec.mirrors_adjusted[idx].y1 = createTransformGroup("y1")
-		spec.mirrors_adjusted[idx].y2 = createTransformGroup("y2")
-		link(getParent(spec.mirrors_adjusted[idx].node), spec.mirrors_adjusted[idx].base)
-		link(spec.mirrors_adjusted[idx].base, spec.mirrors_adjusted[idx].x1)
-		link(spec.mirrors_adjusted[idx].x1, spec.mirrors_adjusted[idx].x2)
-		link(spec.mirrors_adjusted[idx].x2, spec.mirrors_adjusted[idx].y1)
-		link(spec.mirrors_adjusted[idx].y1, spec.mirrors_adjusted[idx].y2)
-		link(spec.mirrors_adjusted[idx].y2, spec.mirrors_adjusted[idx].node)
-		setTranslation(spec.mirrors_adjusted[idx].base,unpack(spec.mirrors_adjusted[idx].translation_org))
-		setRotation(spec.mirrors_adjusted[idx].base,unpack(spec.mirrors_adjusted[idx].rotation_org))
-		setTranslation(spec.mirrors_adjusted[idx].x1,0,0,-0.25)
-		setTranslation(spec.mirrors_adjusted[idx].x2,0,0,0.5)
-		setTranslation(spec.mirrors_adjusted[idx].y1,-0.14,0,0)
-		setTranslation(spec.mirrors_adjusted[idx].y2,0.28,0,0)
-		setTranslation(spec.mirrors_adjusted[idx].node,-0.14,0,-0.25)
-		setRotation(spec.mirrors_adjusted[idx].node,0,0,0)
-		--DebugUtil.printTableRecursively(spec.mirrors_adjusted[idx], " - ", 0, 1)
+		spec.mirrors[idx] = {}
+		spec.mirrors[idx].node = mirror
+		spec.mirrors[idx].rotation_org = {getRotation(spec.mirrors[idx].node)}
+		spec.mirrors[idx].translation_org = {getTranslation(spec.mirrors[idx].node)}
+		spec.mirrors[idx].base = createTransformGroup("Base")
+		spec.mirrors[idx].x0 = 0
+		spec.mirrors[idx].y0 = 0
+		spec.mirrors[idx].x1 = createTransformGroup("x1")
+		spec.mirrors[idx].x2 = createTransformGroup("x2")
+		spec.mirrors[idx].y1 = createTransformGroup("y1")
+		spec.mirrors[idx].y2 = createTransformGroup("y2")
+		link(getParent(spec.mirrors[idx].node), spec.mirrors[idx].base)
+		link(spec.mirrors[idx].base, spec.mirrors[idx].x1)
+		link(spec.mirrors[idx].x1, spec.mirrors[idx].x2)
+		link(spec.mirrors[idx].x2, spec.mirrors[idx].y1)
+		link(spec.mirrors[idx].y1, spec.mirrors[idx].y2)
+		link(spec.mirrors[idx].y2, spec.mirrors[idx].node)
+		setTranslation(spec.mirrors[idx].base,unpack(spec.mirrors[idx].translation_org))
+		setRotation(spec.mirrors[idx].base,unpack(spec.mirrors[idx].rotation_org))
+		setTranslation(spec.mirrors[idx].x1,0,0,-0.25)
+		setTranslation(spec.mirrors[idx].x2,0,0,0.5)
+		setTranslation(spec.mirrors[idx].y1,-0.14,0,0)
+		setTranslation(spec.mirrors[idx].y2,0.28,0,0)
+		setTranslation(spec.mirrors[idx].node,-0.14,0,-0.25)
+		setRotation(spec.mirrors[idx].node,0,0,0)
 		idx = idx + 1
 	end
 
+	--If the mirror actually has mirrors, since the specialization checks don't account for this
 	if self.spec_enterable.mirrors and spec.spec_enterable.mirrors[1] then
 		spec.mirror_index = 1
 		FS_Debug.info("This vehicle has mirrors" .. FS_Debug.getIdentity(self))
 		for i = 1, table.getn(spec.spec_enterable.mirrors) do
+			--Account for case when the mirror itself actually has other mirrors attached to it
+			--and allow these mirrors to be adjusted as well
 			local children_count = getNumOfChildren(spec.spec_enterable.mirrors[i].node)
 			if children_count > 0 then
 				for j = children_count, 1, -1 do
@@ -117,11 +140,11 @@ function AdjustableMirrors:onPostLoad(savegame)
 		end
 	end
 
+	--If there was a savegame file to load things from
 	if savegame ~= nil then
 		local xmlFile = savegame.xmlFile
 		local key = savegame.key .. ".AdjustableMirrors"
-		--FS_Debug.debug("Key: " .. key .. FS_Debug.getIdentity(self))
-		
+		--Load in the modversion saved in the savegame file
 		local savegameVersion = getXMLString(xmlFile, key .. "#version")
 		if savegameVersion == nil then
 			FS_Debug.info("No savegame data present, defaults are used for mirrors" .. FS_Debug.getIdentity(self))
@@ -129,9 +152,9 @@ function AdjustableMirrors:onPostLoad(savegame)
 			FS_Debug.warning("Savegame data is from mod version " .. savegameVersion .. " while the current mod is version " .. AdjustableMirrors.version .. " therefore mirrors are reset to defaults" .. FS_Debug.getIdentity(self))
 		else
 			FS_Debug.info("Loading savegame mirror settings" .. FS_Debug.getIdentity(self))
-			for idx, mirror in ipairs(spec.mirrors_adjusted) do
-				local x0 = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#x0"), 0)
-				local y0 = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#y0"), 0)
+			for idx, mirror in ipairs(spec.mirrors) do
+				local x0 = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#x0"), 0) --Just in case someone has tampered with the savegame file
+				local y0 = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#y0"), 0) --Just in case someone has tampered with the savegame file
 				FS_Debug.debug("x0: " .. x0 .. ", y0: " .. y0 .. FS_Debug.getIdentity(self))
 				AdjustableMirrors.setMirrors(self, mirror, x0, y0)
 			end
@@ -144,16 +167,16 @@ end
 --### contains the specialization name. DO NOT try to nest more than one tag! So
 --### basically you are only allowed to have one '.' in the key you save your data
 --### under. If you try to further group your stuff by making subgroups, then you will
---### get weird errors on load of the savegame files. Which to me points to that the
---### loading can only handle 5 nested xml tags. Since the saving works fine if you try
---### to do more and it will show up properly in the vehichles.xml file.
+--### get weird errors on load of the savegame files. Which to me points to that the xml
+--### loading functions can only handle 5 nested xml tags. Since the saving works fine if 
+--### you try to do more and it will show up properly in the vehichles.xml file.
 --#######################################################################################
 function AdjustableMirrors:saveToXMLFile(xmlFile, key)
 	FS_Debug.info("saveToXMLFile - File: " .. xmlFile .. ", Key: " .. key .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 	setXMLString(xmlFile, key .. "#version", AdjustableMirrors.version)
 
-	for idx, mirror in ipairs(spec.mirrors_adjusted) do
+	for idx, mirror in ipairs(spec.mirrors) do
 		setXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#x0", mirror.x0)
 		setXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#y0", mirror.y0)
 	end
@@ -183,10 +206,10 @@ function AdjustableMirrors:onDraw()
 	FS_Debug.debug("onDraw" .. FS_Debug.getIdentity(self), 5)
 	local spec = self.spec_AdjustableMirrors
 
-	if spec.mirror_adjusting == true then
+	if spec.mirror_adjustment_enabled == true then
 		--This is a bit of a crude way to do it, since you aren't really supposed to use debug functions for anything else than debug stuff
-		--I will change this at some point, but for now it works fine.
-		DebugUtil.drawDebugNode(spec.mirrors_adjusted[spec.mirror_index].node, "This Mirror")
+		--I will change this at some point, but for now it works fine for the purpose of showing the currently selected mirror
+		DebugUtil.drawDebugNode(spec.mirrors[spec.mirror_index].node, "This Mirror")
 	end
 end
 
@@ -211,7 +234,6 @@ end
 --#######################################################################################
 function AdjustableMirrors:onEnterVehicle()
 	FS_Debug.info("onEnterVehicle" .. FS_Debug.getIdentity(self))
-	--DebugUtil.printTableRecursively(self:getActiveCamera(), " - ", 0, 0)
 end
 
 --#######################################################################################
@@ -224,7 +246,12 @@ end
 --#######################################################################################
 --### This function is called when the vehicle state is changed. Fx. when switching to
 --### the vehicle or switching implements. It is used to register the current actions
---### that are available to be used for the vehicle
+--### that are available to be used for the vehicle.
+--### isSelected: true if the current implement/vehicle is selected. This value is always
+--### false on a tractor, but will be true on fx. a harvester when it is selected instead 
+--### of the header.
+--### isOnActiveVehicle: Used to determine if the implement is currently attached to
+--### the active vehicle.
 --#######################################################################################
 function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
 	FS_Debug.info("onRegisterActionEvents, selected: " .. tostring(isSelected) .. ", activeVehicle: " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self))
@@ -233,7 +260,7 @@ function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
 	if not self.isClient then
 		return
 	end
-
+	--Actions should only be registered if we are on and in control of the vehicle
 	if isOnActiveVehicle and self:getIsControlled() then
 		-- InputBinding.registerActionEvent(g_inputBinding, actionName, object, functionForTriggerEvent, triggerKeyUp, triggerKeyDown, triggerAlways, isActive)
 
@@ -244,18 +271,18 @@ function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
 		--Actions that have to do with moving the mirrors around
 		local actions_adjust = { InputAction.AM_TiltUp, InputAction.AM_TiltDown, InputAction.AM_TiltLeft, InputAction.AM_TiltRight }
 
-		--Register the adjustment actions
+		--Keep the adjustment action events grouped, since they will be toggled on/off at the same time
 		spec.event_IDs.adjustment = {}
 
-		-- Register SwitchMirror action
+		-- Register SwitchMirror action, this one is only based on a single keypress and not a continues keypress like the rest of the adjustment actions
 		local _, eventID = g_inputBinding:registerActionEvent(InputAction.AM_SwitchMirror, self, AdjustableMirrors.onActionSwitchMirror, false, true, false, false)
 		spec.event_IDs.adjustment[InputAction.AM_SwitchMirror] = eventID
 
+		-- Register the rest of the adjustment actions
 		for _,actionName in pairs(actions_adjust) do
 			local _, eventID = g_inputBinding:registerActionEvent(actionName, self, AdjustableMirrors.onActionAdjustmentCall, false, true, true, false)	
 			spec.event_IDs.adjustment[actionName] = eventID
 		end
-		
 	end
 end
 
@@ -288,6 +315,7 @@ end
 function AdjustableMirrors:onActionAdjustMirrors(actionName, keyStatus)
 	FS_Debug.info("onActionAdjustMirrors - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
+	--Toggles the adjustment actions
 	AdjustableMirrors.updateAdjustmentEvents(self)
 end
 
@@ -298,7 +326,8 @@ function AdjustableMirrors:onActionSwitchMirror(actionName, keyStatus)
 	FS_Debug.info("onActionSwitchMirror - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 	
-	if spec.mirror_index == #spec.mirrors_adjusted then
+	--Selected the next mirror or loop around to the first one if the last one was selected
+	if spec.mirror_index == #spec.mirrors then
 		spec.mirror_index = 1
 	else
 		spec.mirror_index = spec.mirror_index + 1
@@ -314,11 +343,12 @@ end
 function AdjustableMirrors:updateAdjustmentEvents(state)
 	FS_Debug.info("updateAdjustmentEvents - state: " .. tostring(Utils.getNoNil(state, "Nil")))
 	local spec = self.spec_AdjustableMirrors
-	spec.mirror_adjusting = Utils.getNoNil(state, not spec.mirror_adjusting)
+	--If 'state' was supplied then use that, and if not then act as a toggle
+	spec.mirror_adjustment_enabled = Utils.getNoNil(state, not spec.mirror_adjustment_enabled)
 
 	if (spec.event_IDs ~= nil) and (spec.event_IDs.adjustment ~= nil) then
 		for _, eventID in pairs(spec.event_IDs.adjustment) do
-			g_inputBinding:setActionEventActive(eventID, spec.mirror_adjusting )
+			g_inputBinding:setActionEventActive(eventID, spec.mirror_adjustment_enabled )
 			g_inputBinding:setActionEventTextPriority(eventID, GS_PRIO_VERY_HIGH)
 		end
 	end
@@ -330,16 +360,19 @@ end
 function AdjustableMirrors:onActionAdjustmentCall(actionName, keyStatus, arg4, arg5, arg6)
 	FS_Debug.info("onActionAdjustmentCall - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self), 4)
 	local spec = self.spec_AdjustableMirrors
-	local mirror = spec.mirrors_adjusted[spec.mirror_index]
 
+	--Get a reference to the currently selected mirror
+	local mirror = spec.mirrors[spec.mirror_index]
+
+	--Adjust the mirror depending on which of the adjustment events was called
 	if actionName == "AM_TiltUp" then
-		AdjustableMirrors.setMirrors(self, mirror, mirror.x0 - spec.adjust_value, mirror.y0)
+		AdjustableMirrors.setMirrors(self, mirror, mirror.x0 - spec.mirror_adjustment_step_size, mirror.y0)
 	elseif actionName == "AM_TiltDown" then
-		AdjustableMirrors.setMirrors(self, mirror, mirror.x0 + spec.adjust_value, mirror.y0)
+		AdjustableMirrors.setMirrors(self, mirror, mirror.x0 + spec.mirror_adjustment_step_size, mirror.y0)
 	elseif actionName == "AM_TiltLeft" then
-		AdjustableMirrors.setMirrors(self, mirror, mirror.x0, mirror.y0 - spec.adjust_value)
+		AdjustableMirrors.setMirrors(self, mirror, mirror.x0, mirror.y0 - spec.mirror_adjustment_step_size)
 	elseif actionName == "AM_TiltRight" then
-		AdjustableMirrors.setMirrors(self, mirror, mirror.x0, mirror.y0 + spec.adjust_value)
+		AdjustableMirrors.setMirrors(self, mirror, mirror.x0, mirror.y0 + spec.mirror_adjustment_step_size)
 	end
 end
 
@@ -350,8 +383,12 @@ function AdjustableMirrors:setMirrors(mirror, new_x0, new_y0)
 	FS_Debug.debug("setMirrors" .. FS_Debug.getIdentity(self), 4)
 	local spec = self.spec_AdjustableMirrors
 
+	--Clamps the rotation of the mirrors between -max_rotation and rotation
 	mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation, new_x0))
 	mirror.y0 = math.min(spec.max_rotation,math.max(-spec.max_rotation, new_y0))
+	--Set the rotations of the individual joints to accomodate the special adjustment pattern.
+	--The mirrors hinges at the top or bottom, left or right. Depending on which edge hits the
+	--Mirror arm where the mirror is attached
 	setRotation(mirror.x1,math.min(0,mirror.x0),0,0);
 	setRotation(mirror.x2,math.max(0,mirror.x0),0,0);
 	setRotation(mirror.y1,0,0,math.max(0,mirror.y0));

@@ -7,11 +7,12 @@
 --### as opposed to the code in AdjustableMirrors.lua, which will be run once for each
 --### vehichle the specialization is inserted into.
 --#######################################################################################
+
+--source is used for telling the giants engine to import these files, it is sort of equivalent to when you would use the lua function "require"
 source(Utils.getFilename("AdjustableMirrors.lua", g_currentModDirectory))
 source(Utils.getFilename("FS_Debug.lua", g_currentModDirectory))
 
 AdjustableMirrors_Register = {};
-AdjustableMirrors_Register.modDirectory = g_currentModDirectory;
 
 --Fetch some variables from the moddesc file, to be used when writing out load statements
 local modDesc = loadXMLFile("modDesc", g_currentModDirectory .. "modDesc.xml")
@@ -19,12 +20,15 @@ AdjustableMirrors_Register.version = getXMLString(modDesc, "modDesc.version")
 AdjustableMirrors.version = AdjustableMirrors_Register.version
 AdjustableMirrors_Register.author = getXMLString(modDesc, "modDesc.author")
 AdjustableMirrors_Register.title = getXMLString(modDesc, "modDesc.title.en")
+
+--Set the modname to use when outputting to the log through FS_Debug
 FS_Debug.mod_name = AdjustableMirrors_Register.title
+--Set the max log level for FS_Debug. Error = 0, Warning = 1, Info = 2, Debug = 3 and so on for even more debug info.
 FS_Debug.log_level_max = 3
 
 --#######################################################################################
 --### This isn't a seperate function per say, but it is responsible for checking if the
---### AdjustableMirrors class was includeded properly and is accessible. And then it goes
+--### AdjustableMirrors class was included properly and is accessible. And then it goes
 --### through the registered vehicletypes and checks if they meet certain criteria like
 --### being drivable, before adding the AdjustableMirrors specialization.
 --#######################################################################################
@@ -32,7 +36,9 @@ if g_specializationManager:getSpecializationByName("AdjustableMirrors") == nil t
 	if AdjustableMirrors == nil then
 		FS_Debug.error("Unable to find specialization '" .. "AdjustableMirrors" .. "'");
 	else
+		--Go through the different vehicle types and see if they meet the criteria required for adjustable mirrors
 		for i, typeDef in pairs(g_vehicleTypeManager.vehicleTypes) do
+			--Sort out nil keys and trains, since we don't need to adjust mirrors on trains
 			if typeDef ~= nil and i ~= "locomotive" then
 				local isDrivable = false
 				local isEnterable = false
