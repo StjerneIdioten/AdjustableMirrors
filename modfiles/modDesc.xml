@@ -8,7 +8,7 @@
     <description>
         <en>Adjustable Mirrors</en>
  	</description>
-    <multiplayer supported="true"/>   
+    <multiplayer supported="false"/>   
 	<iconFilename>store.dds</iconFilename>
 
 	<l10n filenamePrefix="modDesc_l10n"> 
