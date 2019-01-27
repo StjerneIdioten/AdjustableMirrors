@@ -127,16 +127,7 @@ function AdjustableMirrors:onPostLoad(savegame)
 		spec.mirror_index = 1
 		FS_Debug.info("This vehicle has mirrors" .. FS_Debug.getIdentity(self))
 		for i = 1, table.getn(spec.spec_enterable.mirrors) do
-			--Account for case when the mirror itself actually has other mirrors attached to it
-			--and allow these mirrors to be adjusted as well
-			local children_count = getNumOfChildren(spec.spec_enterable.mirrors[i].node)
-			if children_count > 0 then
-				for j = children_count, 1, -1 do
-					addMirror(getChildAt(spec.spec_enterable.mirrors[i].node, j-1))
-				end
-			else
-				addMirror(spec.spec_enterable.mirrors[i].node)
-			end
+			addMirror(spec.spec_enterable.mirrors[i].node)
 		end
 	end
 
