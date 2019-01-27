@@ -43,10 +43,10 @@
 
 	<inputBinding>
 		<actionBinding action="AM_AdjustMirrors">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_5" axisComponent="+" inputComponent="+" index="1"/>
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_0" axisComponent="+" inputComponent="+" index="1"/>
 		</actionBinding>
 		<actionBinding action="AM_SwitchMirror">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_0" axisComponent="+" inputComponent="+" index="1"/>
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_5" axisComponent="+" inputComponent="+" index="1"/>
 		</actionBinding>
 		<actionBinding action="AM_TiltUp">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_8" axisComponent="+" inputComponent="+" index="1"/>
