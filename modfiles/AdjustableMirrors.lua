@@ -10,6 +10,7 @@
 AdjustableMirrors = {};
 --AdjustableMirrors.sendNumBits = 7; --Used for multiplayer sync stuff
 --AdjustableMirrors.dir = g_currentModDirectory; -- Maybe rename to modDirectory
+AdjustableMirrors.version = "Unspecified Version"
 
 --#######################################################################################
 --### Check if certain things are present before going further with the mod, 
@@ -46,10 +47,19 @@ function AdjustableMirrors.registerEventListeners(vehicleType)
 end
 
 --#######################################################################################
---### Runs when a vehicle with the specialization is loaded
+--### Runs when a vehicle with the specialization is loaded. Usefull if you want to
+--### fx. expose something that other mods should be able to use in their own onPostLoad
 --#######################################################################################
 function AdjustableMirrors:onLoad(savegame)
-	FS_Debug.info("onLoad" .. FS_Debug.getIdentity(self))
+	FS_Debug.info("onload" .. FS_Debug.getIdentity(self))
+end
+
+--#######################################################################################
+--### Runs when a vehicle with the specialization has been loaded. Useful if you need to 
+--### use some values, that has to be loaded from the savegame first.
+--#######################################################################################
+function AdjustableMirrors:onPostLoad(savegame)
+	FS_Debug.info("onPostLoad" .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 
 	spec.mirror_is_adjustable = false
@@ -107,22 +117,47 @@ function AdjustableMirrors:onLoad(savegame)
 		end
 	end
 
-end
-
---#######################################################################################
---### Runs when a vehicle with the specialization has been loaded. Useful if you need to 
---### use some values, that has to be loaded from the savegame first.
---#######################################################################################
-function AdjustableMirrors:onPostLoad(savegame)
-	FS_Debug.info("onPostload" .. FS_Debug.getIdentity(self))
+	if savegame ~= nil then
+		local xmlFile = savegame.xmlFile
+		local key = savegame.key .. ".AdjustableMirrors"
+		--FS_Debug.debug("Key: " .. key .. FS_Debug.getIdentity(self))
+		
+		local savegameVersion = getXMLString(xmlFile, key .. "#version")
+		if savegameVersion == nil then
+			FS_Debug.info("No savegame data present, defaults are used for mirrors" .. FS_Debug.getIdentity(self))
+		elseif savegameVersion ~= AdjustableMirrors.version then
+			FS_Debug.warning("Savegame data is from mod version " .. savegameVersion .. " while the current mod is version " .. AdjustableMirrors.version .. " therefore mirrors are reset to defaults" .. FS_Debug.getIdentity(self))
+		else
+			FS_Debug.info("Loading savegame mirror settings" .. FS_Debug.getIdentity(self))
+			for idx, mirror in ipairs(spec.mirrors_adjusted) do
+				local x0 = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#x0"), 0)
+				local y0 = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#y0"), 0)
+				FS_Debug.debug("x0: " .. x0 .. ", y0: " .. y0 .. FS_Debug.getIdentity(self))
+				AdjustableMirrors.setMirrors(self, mirror, x0, y0)
+			end
+		end
+	end
 end
 
 --#######################################################################################
 --### Called when saving ingame. The xmlfile is the savegame file and the key already
---### contains the specialization name
+--### contains the specialization name. DO NOT try to nest more than one tag! So
+--### basically you are only allowed to have one '.' in the key you save your data
+--### under. If you try to further group your stuff by making subgroups, then you will
+--### get weird errors on load of the savegame files. Which to me points to that the
+--### loading can only handle 5 nested xml tags. Since the saving works fine if you try
+--### to do more and it will show up properly in the vehichles.xml file.
 --#######################################################################################
 function AdjustableMirrors:saveToXMLFile(xmlFile, key)
 	FS_Debug.info("saveToXMLFile - File: " .. xmlFile .. ", Key: " .. key .. FS_Debug.getIdentity(self))
+	local spec = self.spec_AdjustableMirrors
+	setXMLString(xmlFile, key .. "#version", AdjustableMirrors.version)
+
+	for idx, mirror in ipairs(spec.mirrors_adjusted) do
+		setXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#x0", mirror.x0)
+		setXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#y0", mirror.y0)
+	end
+
 end
 
 --#######################################################################################
@@ -298,25 +333,27 @@ function AdjustableMirrors:onActionAdjustmentCall(actionName, keyStatus, arg4, a
 	local mirror = spec.mirrors_adjusted[spec.mirror_index]
 
 	if actionName == "AM_TiltUp" then
-		mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.x0 - spec.adjust_value))
-		mirror.y0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.y0))
+		AdjustableMirrors.setMirrors(self, mirror, mirror.x0 - spec.adjust_value, mirror.y0)
 	elseif actionName == "AM_TiltDown" then
-		mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.x0 + spec.adjust_value))
-		mirror.y0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.y0))
+		AdjustableMirrors.setMirrors(self, mirror, mirror.x0 + spec.adjust_value, mirror.y0)
 	elseif actionName == "AM_TiltLeft" then
-		mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.x0))
-		mirror.y0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.y0 - spec.adjust_value))
+		AdjustableMirrors.setMirrors(self, mirror, mirror.x0, mirror.y0 - spec.adjust_value)
 	elseif actionName == "AM_TiltRight" then
-		mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.x0))
-		mirror.y0 = math.min(spec.max_rotation,math.max(-spec.max_rotation,mirror.y0 + spec.adjust_value))
+		AdjustableMirrors.setMirrors(self, mirror, mirror.x0, mirror.y0 + spec.adjust_value)
 	end
+end
 
-	--FS_Debug.debug("mirror.x0: " .. tostring(mirror.x0))
-	--FS_Debug.debug("mirror.y0: " .. tostring(mirror.y0))
+--#######################################################################################
+--### Used to update the mirror from new values of x0 and y0
+--#######################################################################################
+function AdjustableMirrors:setMirrors(mirror, new_x0, new_y0)
+	FS_Debug.debug("setMirrors" .. FS_Debug.getIdentity(self), 4)
+	local spec = self.spec_AdjustableMirrors
 
+	mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation, new_x0))
+	mirror.y0 = math.min(spec.max_rotation,math.max(-spec.max_rotation, new_y0))
 	setRotation(mirror.x1,math.min(0,mirror.x0),0,0);
 	setRotation(mirror.x2,math.max(0,mirror.x0),0,0);
 	setRotation(mirror.y1,0,0,math.max(0,mirror.y0));
 	setRotation(mirror.y2,0,0,math.min(0,mirror.y0));
-
 end

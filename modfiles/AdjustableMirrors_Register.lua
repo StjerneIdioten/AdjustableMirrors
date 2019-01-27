@@ -16,10 +16,11 @@ AdjustableMirrors_Register.modDirectory = g_currentModDirectory;
 --Fetch some variables from the moddesc file, to be used when writing out load statements
 local modDesc = loadXMLFile("modDesc", g_currentModDirectory .. "modDesc.xml")
 AdjustableMirrors_Register.version = getXMLString(modDesc, "modDesc.version")
+AdjustableMirrors.version = AdjustableMirrors_Register.version
 AdjustableMirrors_Register.author = getXMLString(modDesc, "modDesc.author")
 AdjustableMirrors_Register.title = getXMLString(modDesc, "modDesc.title.en")
 FS_Debug.mod_name = AdjustableMirrors_Register.title
-FS_Debug.log_level_max = 1
+FS_Debug.log_level_max = 3
 
 --#######################################################################################
 --### This isn't a seperate function per say, but it is responsible for checking if the
