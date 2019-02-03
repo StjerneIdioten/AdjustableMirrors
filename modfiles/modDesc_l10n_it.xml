@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <texts>
+        <text name="adjustableMirrors_ADJUSTMIRRORS" text="Sistema specchietti" />
+        <text name="adjustableMirrors_ADJUSTMIRRORS_Off" text="Sistema specchietti: disattiva" />
+        <text name="input_adjustableMirrors_ADJUSTMIRRORS" text="Sistema specchietti" />
+    </texts>
+</l10n>
