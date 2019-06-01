@@ -21,3 +21,4 @@ zip -r FS19_AdjustableMirrors.zip .
 
 #Move mod into mods directory
 mv -f FS19_AdjustableMirrors.zip "${FS_MOD_DIR}/"
+

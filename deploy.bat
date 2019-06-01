@@ -7,4 +7,4 @@ cd "%fsDir%"
 :: Open the log file in notepad++
 start notepad++ "%cd%"/log.txt
 :: Launch FS
-FS2019
+START C:\"Program Files (x86)"\Steam\steamapps\common\"Farming Simulator 19"\FarmingSimulator2019
