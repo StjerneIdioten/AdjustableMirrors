@@ -95,9 +95,9 @@ function AdjustableMirrors:onPostLoad(savegame)
 	local function addMirror(mirror)
 		FS_Debug.info("Adding adjustable mirror #" .. idx .. FS_Debug.getIdentity(self))
 		spec.mirrors[idx] = {}
-		spec.mirrors[idx].node = mirror
-		spec.mirrors[idx].rotation_org = {getRotation(spec.mirrors[idx].node)}
-		spec.mirrors[idx].translation_org = {getTranslation(spec.mirrors[idx].node)}
+		spec.mirrors[idx].mirror_ref = mirror
+		spec.mirrors[idx].rotation_org = {getRotation(spec.mirrors[idx].mirror_ref.node)}
+		spec.mirrors[idx].translation_org = {getTranslation(spec.mirrors[idx].mirror_ref.node)}
 		spec.mirrors[idx].base = createTransformGroup("Base")
 		spec.mirrors[idx].x0 = 0
 		spec.mirrors[idx].y0 = 0
@@ -105,20 +105,20 @@ function AdjustableMirrors:onPostLoad(savegame)
 		spec.mirrors[idx].x2 = createTransformGroup("x2")
 		spec.mirrors[idx].y1 = createTransformGroup("y1")
 		spec.mirrors[idx].y2 = createTransformGroup("y2")
-		link(getParent(spec.mirrors[idx].node), spec.mirrors[idx].base)
+		link(getParent(spec.mirrors[idx].mirror_ref.node), spec.mirrors[idx].base)
 		link(spec.mirrors[idx].base, spec.mirrors[idx].x1)
 		link(spec.mirrors[idx].x1, spec.mirrors[idx].x2)
 		link(spec.mirrors[idx].x2, spec.mirrors[idx].y1)
 		link(spec.mirrors[idx].y1, spec.mirrors[idx].y2)
-		link(spec.mirrors[idx].y2, spec.mirrors[idx].node)
+		link(spec.mirrors[idx].y2, spec.mirrors[idx].mirror_ref.node)
 		setTranslation(spec.mirrors[idx].base,unpack(spec.mirrors[idx].translation_org))
 		setRotation(spec.mirrors[idx].base,unpack(spec.mirrors[idx].rotation_org))
 		setTranslation(spec.mirrors[idx].x1,0,0,-0.25)
 		setTranslation(spec.mirrors[idx].x2,0,0,0.5)
 		setTranslation(spec.mirrors[idx].y1,-0.14,0,0)
 		setTranslation(spec.mirrors[idx].y2,0.28,0,0)
-		setTranslation(spec.mirrors[idx].node,-0.14,0,-0.25)
-		setRotation(spec.mirrors[idx].node,0,0,0)
+		setTranslation(spec.mirrors[idx].mirror_ref.node,-0.14,0,-0.25)
+		setRotation(spec.mirrors[idx].mirror_ref.node,0,0,0)
 		idx = idx + 1
 	end
 
@@ -127,7 +127,7 @@ function AdjustableMirrors:onPostLoad(savegame)
 		spec.mirror_index = 1
 		FS_Debug.info("This vehicle has mirrors" .. FS_Debug.getIdentity(self))
 		for i = 1, table.getn(spec.spec_enterable.mirrors) do
-			addMirror(spec.spec_enterable.mirrors[i].node)
+			addMirror(spec.spec_enterable.mirrors[i])
 		end
 	end
 
@@ -200,7 +200,7 @@ function AdjustableMirrors:onDraw()
 	if spec.mirror_adjustment_enabled == true then
 		--This is a bit of a crude way to do it, since you aren't really supposed to use debug functions for anything else than debug stuff
 		--I will change this at some point, but for now it works fine for the purpose of showing the currently selected mirror
-		DebugUtil.drawDebugNode(spec.mirrors[spec.mirror_index].node, "This Mirror")
+		DebugUtil.drawDebugNode(spec.mirrors[spec.mirror_index].mirror_ref.node, "This Mirror")
 	end
 end
 
@@ -336,6 +336,8 @@ function AdjustableMirrors:updateAdjustmentEvents(state)
 	local spec = self.spec_AdjustableMirrors
 	--If 'state' was supplied then use that, and if not then act as a toggle
 	spec.mirror_adjustment_enabled = Utils.getNoNil(state, not spec.mirror_adjustment_enabled)
+
+	DebugUtil.printTableRecursively(spec.mirrors[spec.mirror_index].mirror_ref, " - ", 0, 0)
 
 	if (spec.event_IDs ~= nil) and (spec.event_IDs.adjustment ~= nil) then
 		for _, eventID in pairs(spec.event_IDs.adjustment) do
