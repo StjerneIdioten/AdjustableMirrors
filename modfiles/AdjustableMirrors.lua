@@ -13,8 +13,8 @@ AdjustableMirrors.version = "Unspecified Version"
 
 --#######################################################################################
 --### Check if certain things are present before going further with the mod, 
---### runs when entering the savegame.
---### This mod handles the checks in AdjustableMirrors_Register.lua so there are no 
+--### runs when entering the savegame and is run once per specialization it is registered
+--### to. This mod handles the checks in AdjustableMirrors_Register.lua so there are no 
 --### specialization checks here
 --#######################################################################################
 function AdjustableMirrors.prerequisitesPresent(specializations)
@@ -75,60 +75,69 @@ function AdjustableMirrors:onPostLoad(savegame)
 	FS_Debug.info("onPostLoad" .. FS_Debug.getIdentity(self))
 	--Quick reference to the specialization, where we should keep all of our variables
 	local spec = self.spec_AdjustableMirrors
-	--Are we allowed to adjust the mirrors
-	spec.mirror_adjustment_enabled = false
-	--Maximum rotation value, for capping the rotation of the mirrors
-	spec.max_rotation = math.rad(20)
-	--How much we should add to the rotation each time a keypress is detected
-	spec.mirror_adjustment_step_size = 0.001
-	--Table for holding all of the ID's returned when registering the action events in onRegisterActionEvents
-	spec.event_IDs = {}
+
 	--Table for holding all of the new adjustment mirrors
 	spec.mirrors = {}
 
-	--#######################################################################################
-	--### Used for adding new adjustable mirrors. They require some more transform groups to
-	--### be able to be rotated. This ned structure allows for tilt and pan of the mirror
-	--### without it going through the mirror arm structure of the model.
-	--#######################################################################################
-	local idx = 1
-	local function addMirror(mirror)
-		FS_Debug.info("Adding adjustable mirror #" .. idx .. FS_Debug.getIdentity(self))
-		spec.mirrors[idx] = {}
-		spec.mirrors[idx].mirror_ref = mirror
-		spec.mirrors[idx].rotation_org = {getRotation(spec.mirrors[idx].mirror_ref.node)}
-		spec.mirrors[idx].translation_org = {getTranslation(spec.mirrors[idx].mirror_ref.node)}
-		spec.mirrors[idx].base = createTransformGroup("Base")
-		spec.mirrors[idx].x0 = 0
-		spec.mirrors[idx].y0 = 0
-		spec.mirrors[idx].x1 = createTransformGroup("x1")
-		spec.mirrors[idx].x2 = createTransformGroup("x2")
-		spec.mirrors[idx].y1 = createTransformGroup("y1")
-		spec.mirrors[idx].y2 = createTransformGroup("y2")
-		link(getParent(spec.mirrors[idx].mirror_ref.node), spec.mirrors[idx].base)
-		link(spec.mirrors[idx].base, spec.mirrors[idx].x1)
-		link(spec.mirrors[idx].x1, spec.mirrors[idx].x2)
-		link(spec.mirrors[idx].x2, spec.mirrors[idx].y1)
-		link(spec.mirrors[idx].y1, spec.mirrors[idx].y2)
-		link(spec.mirrors[idx].y2, spec.mirrors[idx].mirror_ref.node)
-		setTranslation(spec.mirrors[idx].base,unpack(spec.mirrors[idx].translation_org))
-		setRotation(spec.mirrors[idx].base,unpack(spec.mirrors[idx].rotation_org))
-		setTranslation(spec.mirrors[idx].x1,0,0,-0.25)
-		setTranslation(spec.mirrors[idx].x2,0,0,0.5)
-		setTranslation(spec.mirrors[idx].y1,-0.14,0,0)
-		setTranslation(spec.mirrors[idx].y2,0.28,0,0)
-		setTranslation(spec.mirrors[idx].mirror_ref.node,-0.14,0,-0.25)
-		setRotation(spec.mirrors[idx].mirror_ref.node,0,0,0)
-		idx = idx + 1
-	end
+	--Maximum rotation value, for capping the rotation of the mirrors
+	spec.max_rotation = math.rad(20)
 
-	--If the mirror actually has mirrors, since the specialization checks don't account for this
-	if self.spec_enterable.mirrors and spec.spec_enterable.mirrors[1] then
-		spec.mirror_index = 1
-		FS_Debug.info("This vehicle has mirrors" .. FS_Debug.getIdentity(self))
-		for i = 1, table.getn(spec.spec_enterable.mirrors) do
-			addMirror(spec.spec_enterable.mirrors[i])
+	--It is only relevant to setup mirrors, if we are on a client of some sort. Since the dedicated server does not know about mirrors.
+	if self.isClient then
+		FS_Debug.info("Clientside-only initialization stuff")
+	
+		--Are we allowed to adjust the mirrors
+		spec.mirror_adjustment_enabled = false
+		--How much we should add to the rotation each time a keypress is detected
+		spec.mirror_adjustment_step_size = 0.001
+		--Table for holding all of the ID's returned when registering the action events in onRegisterActionEvents
+		spec.event_IDs = {}
+
+		--#######################################################################################
+		--### Used for adding new adjustable mirrors. They require some more transform groups to
+		--### be able to be rotated. This new structure allows for tilt and pan of the mirror
+		--### without it clipping through the mirror arm structure of the model.
+		--#######################################################################################
+		local idx = 1
+		local function addMirror(mirror)
+			FS_Debug.info("Adding adjustable mirror #" .. idx .. FS_Debug.getIdentity(self))
+			spec.mirrors[idx] = {}
+			spec.mirrors[idx].mirror_ref = mirror
+			spec.mirrors[idx].rotation_org = {getRotation(spec.mirrors[idx].mirror_ref.node)}
+			spec.mirrors[idx].translation_org = {getTranslation(spec.mirrors[idx].mirror_ref.node)}
+			spec.mirrors[idx].base = createTransformGroup("Base")
+			spec.mirrors[idx].x0 = 0
+			spec.mirrors[idx].y0 = 0
+			spec.mirrors[idx].x1 = createTransformGroup("x1")
+			spec.mirrors[idx].x2 = createTransformGroup("x2")
+			spec.mirrors[idx].y1 = createTransformGroup("y1")
+			spec.mirrors[idx].y2 = createTransformGroup("y2")
+			link(getParent(spec.mirrors[idx].mirror_ref.node), spec.mirrors[idx].base)
+			link(spec.mirrors[idx].base, spec.mirrors[idx].x1)
+			link(spec.mirrors[idx].x1, spec.mirrors[idx].x2)
+			link(spec.mirrors[idx].x2, spec.mirrors[idx].y1)
+			link(spec.mirrors[idx].y1, spec.mirrors[idx].y2)
+			link(spec.mirrors[idx].y2, spec.mirrors[idx].mirror_ref.node)
+			setTranslation(spec.mirrors[idx].base,unpack(spec.mirrors[idx].translation_org))
+			setRotation(spec.mirrors[idx].base,unpack(spec.mirrors[idx].rotation_org))
+			setTranslation(spec.mirrors[idx].x1,0,0,-0.25)
+			setTranslation(spec.mirrors[idx].x2,0,0,0.5)
+			setTranslation(spec.mirrors[idx].y1,-0.14,0,0)
+			setTranslation(spec.mirrors[idx].y2,0.28,0,0)
+			setTranslation(spec.mirrors[idx].mirror_ref.node,-0.14,0,-0.25)
+			setRotation(spec.mirrors[idx].mirror_ref.node,0,0,0)
+			idx = idx + 1
 		end
+
+		--If the mirror actually has mirrors, since the specialization checks don't account for this
+		if self.spec_enterable.mirrors and spec.spec_enterable.mirrors[1] then
+			spec.mirror_index = 1
+			FS_Debug.info("This vehicle has mirrors" .. FS_Debug.getIdentity(self))
+			for i = 1, table.getn(spec.spec_enterable.mirrors) do
+				addMirror(spec.spec_enterable.mirrors[i])
+			end
+		end
+
 	end
 
 	--If there was a savegame file to load things from
@@ -143,11 +152,24 @@ function AdjustableMirrors:onPostLoad(savegame)
 			FS_Debug.warning("Savegame data is from mod version " .. savegameVersion .. " while the current mod is version " .. AdjustableMirrors.version .. " therefore mirrors are reset to defaults" .. FS_Debug.getIdentity(self))
 		else
 			FS_Debug.info("Loading savegame mirror settings" .. FS_Debug.getIdentity(self))
-			for idx, mirror in ipairs(spec.mirrors) do
-				local x0 = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#x0"), 0) --Just in case someone has tampered with the savegame file
-				local y0 = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#y0"), 0) --Just in case someone has tampered with the savegame file
-				FS_Debug.debug("x0: " .. x0 .. ", y0: " .. y0 .. FS_Debug.getIdentity(self))
-				AdjustableMirrors.setMirrors(self, mirror, x0, y0)
+			
+			local idx = 1
+			while true do
+				if spec.mirrors[idx] == nil then
+					spec.mirrors[idx] = {}
+				end
+
+				local x0 = getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#x0")
+				local y0 = getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#y0")
+
+				if x0 == nil or y0 == nil then
+					FS_Debug.info("Found " .. idx - 1 .. " mirrors" .. FS_Debug.getIdentity(self))
+					break
+				else
+					FS_Debug.debug("x0: " .. x0 .. ", y0: " .. y0 .. FS_Debug.getIdentity(self))
+					AdjustableMirrors.setMirrors(self, spec.mirrors[idx], x0, y0)
+					idx = idx + 1
+				end
 			end
 		end
 	end
@@ -382,8 +404,10 @@ function AdjustableMirrors:setMirrors(mirror, new_x0, new_y0)
 	--Set the rotations of the individual joints to accomodate the special adjustment pattern.
 	--The mirrors hinges at the top or bottom, left or right. Depending on which edge hits the
 	--Mirror arm where the mirror is attached
-	setRotation(mirror.x1,math.min(0,mirror.x0),0,0);
-	setRotation(mirror.x2,math.max(0,mirror.x0),0,0);
-	setRotation(mirror.y1,0,0,math.max(0,mirror.y0));
-	setRotation(mirror.y2,0,0,math.min(0,mirror.y0));
+	if self.isClient then
+		setRotation(mirror.x1,math.min(0,mirror.x0),0,0);
+		setRotation(mirror.x2,math.max(0,mirror.x0),0,0);
+		setRotation(mirror.y1,0,0,math.max(0,mirror.y0));
+		setRotation(mirror.y2,0,0,math.min(0,mirror.y0));
+	end
 end
