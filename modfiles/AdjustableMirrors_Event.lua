@@ -17,7 +17,7 @@ function AdjustableMirrors_Event:new(vehicle, ...)
     local self = AdjustableMirrors_Event:emptyNew()
     self.vehicle = vehicle
     self.vehicle.data = { unpack(args) }
-    FS_Debug.info(myName .. ": elements in data: " .. #self.vehicle.data)
+    --FS_Debug.info(myName .. ": elements in data: " .. #self.vehicle.data)
     return self
 end
 
@@ -33,7 +33,10 @@ function AdjustableMirrors_Event:readStream(streamID, connection)
     FS_Debug.info(myName .. ": Spec mirror count: " .. #spec.mirrors)
 
     for i=1,numbOfMirrors do
-        spec.mirrors[i] = {}
+        --The server is only guaranteed to have the mirror array, and not necessarily any mirrors in it.
+        if g_server ~= nil then
+            spec.mirrors[i] = {}
+        end
         spec.mirrors[i].x0 = streamReadFloat32(streamID)
         spec.mirrors[i].y0 = streamReadFloat32(streamID)
         FS_Debug.info(myName .. ": Mirror" .. i .. " x0:" .. spec.mirrors[i].x0 .. " y0:" .. spec.mirrors[i].y0)
@@ -56,9 +59,12 @@ function AdjustableMirrors_Event:readStream(streamID, connection)
 
     if g_server == nil then
         FS_Debug.info(myName .. ": This should be on receiving clients")
-        for i=1, #spec.mirrors do
-            FS_Debug.info(myName .. ": Mirror" .. i .. " x0:" .. spec.mirror[i].x0 .. " y0:" .. spec.mirror[i].y0)
-            AdjustableMirrors.setMirrors(self.vehicle, spec.mirror[i], spec.mirror[i].x0, spec.mirror[i].y0)
+
+        DebugUtil.printTableRecursively(spec.mirrors, '-', 0, 3)
+
+        for idx, mirror in ipairs(spec.mirrors) do
+            FS_Debug.info(myName .. ": Mirror" .. idx .. " x0:" .. mirror.x0 .. " y0:" .. mirror.y0)
+            AdjustableMirrors.setMirrors(self.vehicle, mirror, mirror.x0, mirror.y0)
         end
     end
 end
