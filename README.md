@@ -1,4 +1,4 @@
 # AdjustableMirrors
-Originally a conversion mod from fs 2015 to 2017.
-I have since added more features for multiplayer compatibility.
-Currently there are builds available for FS17 that enables singleplayer and dedicated server multiplayer.
+The mod that allows you to adjust your mirrors, to make your cab-view driving experience that more pleasureable.
+Currently there are old build available for FS17, but the mod is going to be focused on FS19 going forward. Currently there is a singleplayer release ready for FS19.
+
