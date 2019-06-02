@@ -236,16 +236,41 @@ end
 --### This is where the client receives data, when it joins the server. Use this to
 --### get data on the initial join and synch the states between client and server.
 --#######################################################################################
-function AdjustableMirrors:onReadStream(streamId, connection)
-	FS_Debug.info("onReadStream - " .. streamId .. FS_Debug.getIdentity(self))
+function AdjustableMirrors:onReadStream(streamID, connection)
+	FS_Debug.info("onReadStream - " .. streamID .. FS_Debug.getIdentity(self))
+	local spec = self.spec_AdjustableMirrors
+
+	local numbOfMirrors = streamReadInt8(streamID) 
+
+	if numbOfMirrors > 0 then
+		FS_Debug.info("Server has mirror data for " .. numbOfMirrors .. " mirrors")
+
+		for idx, mirror in ipairs(spec.mirrors) do
+			AdjustableMirrors.setMirrors(self, mirror, streamReadFloat32(streamID), streamReadFloat32(streamID))
+			FS_Debug.info("mirror" .. idx .. " x0:" .. mirror.x0 .. " y0:" .. mirror.y0)
+		end
+	else
+		FS_Debug.info("No mirror data stored on server for this vehicle")
+	end
 end
 
 --#######################################################################################
 --### This is run on the server when a client joins. Use this to supply initial synch
 --### data with the client.
 --#######################################################################################
-function AdjustableMirrors:onWriteStream(streamId, connection)
-	FS_Debug.info("onWriteStream - " .. streamId .. FS_Debug.getIdentity(self))
+function AdjustableMirrors:onWriteStream(streamID, connection)
+	FS_Debug.info("onWriteStream - " .. streamID .. FS_Debug.getIdentity(self))
+	local spec = self.spec_AdjustableMirrors
+
+	FS_Debug.info("mirrors stored on server: " .. #spec.mirrors)
+	streamWriteInt8(streamID, #spec.mirrors)
+
+	for idx, mirror in ipairs(spec.mirrors) do
+		FS_Debug.info("mirror" .. idx .. " x0:" .. mirror.x0 .. " y0:" .. mirror.y0)
+		streamWriteFloat32(streamID, mirror.x0)
+		streamWriteFloat32(streamID, mirror.y0)
+	end
+
 end
 
 --#######################################################################################
