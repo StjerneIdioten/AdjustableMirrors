@@ -69,7 +69,8 @@ end
 
 --#######################################################################################
 --### Runs when a vehicle with the specialization has been loaded. Useful if you need to 
---### use some values, that has to be loaded from the savegame first.
+--### use some values, that has to be loaded from the savegame first. Also runs when 
+--### joining a server and the vehicle is loaded in.
 --#######################################################################################
 function AdjustableMirrors:onPostLoad(savegame)
 	FS_Debug.info("onPostLoad" .. FS_Debug.getIdentity(self))
@@ -81,9 +82,21 @@ function AdjustableMirrors:onPostLoad(savegame)
 
 	--Maximum rotation value, for capping the rotation of the mirrors
 	spec.max_rotation = math.rad(20)
+	if g_server ~=nil then
+		if g_dedicatedServerInfo ~= nil then
+			FS_Debug.info("Dedi server")
+		else
+			FS_Debug.info("Listen server")
+		end
+	else 
+		FS_Debug.info("This should be a client")
+	end
+
+	FS_Debug.info("Is server: " .. tostring(self.isServer))
+	FS_Debug.info("Is client: " .. tostring(self.isClient))
 
 	--It is only relevant to setup mirrors, if we are on a client of some sort. Since the dedicated server does not know about mirrors.
-	if g_server == nil then
+	if g_dedicatedServerInfo == nil then
 		FS_Debug.info("Clientside-only initialization stuff")
 	
 		--Are we allowed to adjust the mirrors
@@ -315,7 +328,7 @@ function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
 	FS_Debug.info("onRegisterActionEvents, selected: " .. tostring(isSelected) .. ", activeVehicle: " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 	--Actions are only relevant if the function is run clientside
-	if not self.isClient then
+	if g_dedicatedServerInfo ~= nil then
 		return
 	end
 	--Actions should only be registered if we are on and in control of the vehicle
@@ -404,8 +417,6 @@ function AdjustableMirrors:updateAdjustmentEvents(state)
 	--If 'state' was supplied then use that, and if not then act as a toggle
 	spec.mirror_adjustment_enabled = Utils.getNoNil(state, not spec.mirror_adjustment_enabled)
 
-	DebugUtil.printTableRecursively(spec.mirrors[spec.mirror_index].mirror_ref, " - ", 0, 0)
-
 	if (spec.event_IDs ~= nil) and (spec.event_IDs.adjustment ~= nil) then
 		for _, eventID in pairs(spec.event_IDs.adjustment) do
 			g_inputBinding:setActionEventActive(eventID, spec.mirror_adjustment_enabled )
@@ -452,7 +463,7 @@ function AdjustableMirrors:setMirrors(mirror, new_x0, new_y0)
 	--Set the rotations of the individual joints to accomodate the special adjustment pattern.
 	--The mirrors hinges at the top or bottom, left or right. Depending on which edge hits the
 	--Mirror arm where the mirror is attached
-	if g_server == nil then
+	if g_dedicatedServerInfo == nil then
 		setRotation(mirror.x1,math.min(0,mirror.x0),0,0);
 		setRotation(mirror.x2,math.max(0,mirror.x0),0,0);
 		setRotation(mirror.y1,0,0,math.max(0,mirror.y0));

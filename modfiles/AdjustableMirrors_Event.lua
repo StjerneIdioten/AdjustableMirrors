@@ -74,7 +74,7 @@ function AdjustableMirrors_Event:readStream(streamID, connection)
     --Read in the new mirror values
     for i=1,numbOfMirrors do
         --The server is only guaranteed to have the mirror array, and not necessarily any mirrors in it.
-        if g_server ~= nil then
+        if g_dedicatedServerInfo ~= nil then
             spec.mirrors[i] = {}
         end
         spec.mirrors[i].x0 = streamReadFloat32(streamID)
@@ -96,8 +96,8 @@ function AdjustableMirrors_Event:readStream(streamID, connection)
         g_server:broadcastEvent(AdjustableMirrors_Event:new(self.vehicle, unpack(data)), nil, connection)
     end
 
-    --If we are not a server ourselves then we should update all of the mirrors with the new values
-    if g_server == nil then
+    --If we are also a client then we should also update all of the mirrors with the new values
+    if g_dedicatedServerInfo == nil then
         FS_Debug.info(myName .. ": Client received update from server")
 
         for idx, mirror in ipairs(spec.mirrors) do
