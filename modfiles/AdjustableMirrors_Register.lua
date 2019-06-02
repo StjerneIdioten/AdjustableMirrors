@@ -10,6 +10,7 @@
 
 --source is used for telling the giants engine to import these files, it is sort of equivalent to when you would use the lua function "require"
 source(Utils.getFilename("AdjustableMirrors.lua", g_currentModDirectory))
+source(Utils.getFilename("AdjustableMirrors_Event.lua", g_currentModDirectory))
 source(Utils.getFilename("FS_Debug.lua", g_currentModDirectory))
 
 AdjustableMirrors_Register = {};

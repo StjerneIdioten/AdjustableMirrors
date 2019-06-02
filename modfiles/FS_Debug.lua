@@ -67,3 +67,17 @@ end
 function FS_Debug.getIdentity(obj)
     return " (name: " .. obj:getFullName() .. ", rootNode: " .. obj.rootNode .. ", typeName: " .. obj.typeName .. ", typeDesc: " .. obj.typeDesc .. ")"
   end
+
+  function FS_Debug:args_to_txt(...)
+    local args = { ... }
+    local txt = ""
+    local i, v
+    for i, v in ipairs(args) do
+      if i > 1 then
+        txt = txt .. ", "
+      end
+      txt = txt .. i .. ": " .. tostring(v)
+    end
+  
+    return(txt)
+  end

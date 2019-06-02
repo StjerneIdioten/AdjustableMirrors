@@ -83,11 +83,13 @@ function AdjustableMirrors:onPostLoad(savegame)
 	spec.max_rotation = math.rad(20)
 
 	--It is only relevant to setup mirrors, if we are on a client of some sort. Since the dedicated server does not know about mirrors.
-	if self.isClient then
+	if g_server == nil then
 		FS_Debug.info("Clientside-only initialization stuff")
 	
 		--Are we allowed to adjust the mirrors
 		spec.mirror_adjustment_enabled = false
+		--For knowing when to send out an update event to the server and other clients
+		spec.mirrors_have_been_adjusted = false
 		--How much we should add to the rotation each time a keypress is detected
 		spec.mirror_adjustment_step_size = 0.001
 		--Table for holding all of the ID's returned when registering the action events in onRegisterActionEvents
@@ -155,10 +157,6 @@ function AdjustableMirrors:onPostLoad(savegame)
 			
 			local idx = 1
 			while true do
-				if spec.mirrors[idx] == nil then
-					spec.mirrors[idx] = {}
-				end
-
 				local x0 = getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#x0")
 				local y0 = getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#y0")
 
@@ -167,6 +165,11 @@ function AdjustableMirrors:onPostLoad(savegame)
 					break
 				else
 					FS_Debug.debug("x0: " .. x0 .. ", y0: " .. y0 .. FS_Debug.getIdentity(self))
+					--Needed for the server only since its mirror array is empty on startup as it can't generate the structure itself without knowledge from a savefile or client
+					if spec.mirrors[idx] == nil then
+						spec.mirrors[idx] = {}
+					end
+
 					AdjustableMirrors.setMirrors(self, spec.mirrors[idx], x0, y0)
 					idx = idx + 1
 				end
@@ -190,6 +193,9 @@ function AdjustableMirrors:saveToXMLFile(xmlFile, key)
 	setXMLString(xmlFile, key .. "#version", AdjustableMirrors.version)
 
 	for idx, mirror in ipairs(spec.mirrors) do
+		FS_Debug.info("saving mirror" .. idx)
+		FS_Debug.info("x0:" .. mirror.x0)
+		FS_Debug.info("y0:" .. mirror.y0)
 		setXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#x0", mirror.x0)
 		setXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#y0", mirror.y0)
 	end
@@ -254,6 +260,13 @@ end
 --#######################################################################################
 function AdjustableMirrors:onLeaveVehicle()
 	FS_Debug.info("onLeaveVehicle" .. FS_Debug.getIdentity(self))
+	local spec = self.spec_AdjustableMirrors
+
+	if spec.mirrors_have_been_adjusted then
+		FS_Debug.info("Mirrors have changed, sending update event")
+		AdjustableMirrors_Event:sendEvent(self)
+		spec.mirrors_have_been_adjusted = false
+	end
 end
 
 --#######################################################################################
@@ -376,6 +389,8 @@ function AdjustableMirrors:onActionAdjustmentCall(actionName, keyStatus, arg4, a
 	FS_Debug.info("onActionAdjustmentCall - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self), 4)
 	local spec = self.spec_AdjustableMirrors
 
+	spec.mirrors_have_been_adjusted = true
+
 	--Get a reference to the currently selected mirror
 	local mirror = spec.mirrors[spec.mirror_index]
 
@@ -404,7 +419,7 @@ function AdjustableMirrors:setMirrors(mirror, new_x0, new_y0)
 	--Set the rotations of the individual joints to accomodate the special adjustment pattern.
 	--The mirrors hinges at the top or bottom, left or right. Depending on which edge hits the
 	--Mirror arm where the mirror is attached
-	if self.isClient then
+	if g_server == nil then
 		setRotation(mirror.x1,math.min(0,mirror.x0),0,0);
 		setRotation(mirror.x2,math.max(0,mirror.x0),0,0);
 		setRotation(mirror.y1,0,0,math.max(0,mirror.y0));
