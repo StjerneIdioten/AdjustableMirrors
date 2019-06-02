@@ -240,14 +240,18 @@ function AdjustableMirrors:onReadStream(streamID, connection)
 	FS_Debug.info("onReadStream - " .. streamID .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 
+	--The first value streamed is the number of mirrors, since this i very dynamic vehicle
+	--from vehicle to vehicle.
 	local numbOfMirrors = streamReadInt8(streamID) 
 
+	--The server does not necessarily have any mirror data, since it does know the existence
+	--of mirrors on the vehicle (mirrors are only present clientside)
 	if numbOfMirrors > 0 then
 		FS_Debug.info("Server has mirror data for " .. numbOfMirrors .. " mirrors")
 
+		--Get mirror data for each mirror and update the position clientside
 		for idx, mirror in ipairs(spec.mirrors) do
 			AdjustableMirrors.setMirrors(self, mirror, streamReadFloat32(streamID), streamReadFloat32(streamID))
-			FS_Debug.info("mirror" .. idx .. " x0:" .. mirror.x0 .. " y0:" .. mirror.y0)
 		end
 	else
 		FS_Debug.info("No mirror data stored on server for this vehicle")
@@ -263,14 +267,16 @@ function AdjustableMirrors:onWriteStream(streamID, connection)
 	local spec = self.spec_AdjustableMirrors
 
 	FS_Debug.info("mirrors stored on server: " .. #spec.mirrors)
+	--Write out the number of mirrors as the first data value to be synched, so the client
+	--knows if it should expect data from the server.
 	streamWriteInt8(streamID, #spec.mirrors)
 
+	--Stream the mirror position data to the client, if any.
 	for idx, mirror in ipairs(spec.mirrors) do
 		FS_Debug.info("mirror" .. idx .. " x0:" .. mirror.x0 .. " y0:" .. mirror.y0)
 		streamWriteFloat32(streamID, mirror.x0)
 		streamWriteFloat32(streamID, mirror.y0)
 	end
-
 end
 
 --#######################################################################################
@@ -287,6 +293,7 @@ function AdjustableMirrors:onLeaveVehicle()
 	FS_Debug.info("onLeaveVehicle" .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 
+	--No need to send an update event unless the mirrors have actually been changed
 	if spec.mirrors_have_been_adjusted then
 		FS_Debug.info("Mirrors have changed, sending update event")
 		AdjustableMirrors_Event:sendEvent(self)
@@ -441,6 +448,7 @@ function AdjustableMirrors:setMirrors(mirror, new_x0, new_y0)
 	--Clamps the rotation of the mirrors between -max_rotation and rotation
 	mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation, new_x0))
 	mirror.y0 = math.min(spec.max_rotation,math.max(-spec.max_rotation, new_y0))
+
 	--Set the rotations of the individual joints to accomodate the special adjustment pattern.
 	--The mirrors hinges at the top or bottom, left or right. Depending on which edge hits the
 	--Mirror arm where the mirror is attached
