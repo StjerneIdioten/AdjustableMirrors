@@ -1,36 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="42">
+<modDesc descVersion="43">
 	<author>StjerneIdioten - Original 2015 version by Marhu</author>
-	<version>2.0.0.0</version> 
+	<version>2.0.1.0</version> 
 	<title>
 		<en>AdjustableMirrors</en>       
     </title>
     <description>
-        <en>Adjustable Mirrors</en>
+        <en><![CDATA[
+		This mod enables you to adjust the mirrors of you vehicles and actually make them useful when using the in-cab view.
+		Everything is fully multiplayer compatible and mirrors will be synched between all clients and saved by the server.
+
+		Default bindings are as follows:
+		   	- "AM: Adjust Mirrors on/off" : [rctrl + keypad_0]
+   			- "AM: Change mirror" : [rctrl + keypad_5]
+   			- "AM: Tilt the mirror down" : [rctrl + keypad_8]
+   			- "AM: Tilt the mirror up" : [rctrl + keypad_2]
+   			- "AM: Tilt the mirror left" : [rctrl + keypad_4]
+   			- "AM: Tilt the mirror right" : [rctrl + keypad_6]
+		]]></en>
  	</description>
     <multiplayer supported="true"/>   
-	<iconFilename>store.dds</iconFilename>
+	<iconFilename>store.png</iconFilename>
 
-	<l10n filenamePrefix="modDesc_l10n"> 
-		<text name="input_AM_AdjustMirrors">
-			<en>AM: Adjust Mirrors on/off</en>
-		</text>
-		<text name="input_AM_SwitchMirror">
-			<en>AM: Change mirror</en>
-		</text>
-		<text name="input_AM_TiltUp">
-			<en>AM: Tilt the mirror up</en>
-		</text>
-		<text name="input_AM_TiltDown">
-			<en>AM: Tilt the mirror down</en>
-		</text>
-		<text name="input_AM_TiltLeft">
-			<en>AM: Tilt the mirror left</en>
-		</text>
-		<text name="input_AM_TiltRight">
-			<en>AM: Tilt the mirror right</en>
-		</text>
-	</l10n>
+	<l10n filenamePrefix="modDesc_l10n" />
 
 	<actions>
 		<action name="AM_AdjustMirrors" category="VEHICLE"/>
@@ -49,10 +41,10 @@
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_5" axisComponent="+" inputComponent="+" index="1"/>
 		</actionBinding>
 		<actionBinding action="AM_TiltUp">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_8" axisComponent="+" inputComponent="+" index="1"/>
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_2" axisComponent="+" inputComponent="+" index="1"/>
 		</actionBinding>
 		<actionBinding action="AM_TiltDown">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_2" axisComponent="+" inputComponent="+" index="1"/>
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_8" axisComponent="+" inputComponent="+" index="1"/>
 		</actionBinding>
 		<actionBinding action="AM_TiltLeft">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_rctrl KEY_KP_4" axisComponent="+" inputComponent="+" index="1"/>
