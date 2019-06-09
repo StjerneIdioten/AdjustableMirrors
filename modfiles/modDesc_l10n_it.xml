@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <texts>
+        <text name="input_AM_AdjustMirrors" text="AM: Regolare Specchietti attiva/disattiva"/>
+        <text name="input_AM_SwitchMirror" text="AM: Cambia specchietto"/>
+        <text name="input_AM_TiltUp" text="AM: Inclina lo specchietto in su"/>
+        <text name="input_AM_TiltDown" text="AM: Inclina lo specchietto in giù"/>
+        <text name="input_AM_TiltLeft" text="AM: Inclina lo specchietto a sinistra"/>
+        <text name="input_AM_TiltRight" text="AM: Inclina lo specchietto a destra"/>
+        <text name="adjustableMirrors_ADJUSTMIRRORS" text="Regolare Specchietti" />
+        <text name="adjustableMirrors_ADJUSTMIRRORS_Off" text="Disattiva Regolazione Specchietti" />
+        <text name="input_adjustableMirrors_ADJUSTMIRRORS" text="Regolare Specchietti" />
+    </texts>
+</l10n>
