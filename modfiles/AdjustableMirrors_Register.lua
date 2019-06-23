@@ -34,30 +34,33 @@ FS_Debug.log_level_max = 1
 --### being drivable, before adding the AdjustableMirrors specialization.
 --#######################################################################################
 if g_specializationManager:getSpecializationByName("AdjustableMirrors") == nil then
-	if AdjustableMirrors == nil then
-		FS_Debug.error("Unable to find specialization '" .. "AdjustableMirrors" .. "'");
-	else
-		--Go through the different vehicle types and see if they meet the criteria required for adjustable mirrors
-		for i, typeDef in pairs(g_vehicleTypeManager.vehicleTypes) do
-			--Sort out nil keys and trains, since we don't need to adjust mirrors on trains
-			if typeDef ~= nil and i ~= "locomotive" then
-				local isDrivable = false
-				local isEnterable = false
-				local hasMotor = false
-				for name, spec in pairs(typeDef.specializationsByName) do
-					if name == "drivable" then
-						isDrivable = true
-					elseif name == "motorized" then
-						hasMotor = true
-					elseif name == "enterable" then
-						isEnterable = true
+	FS_Debug.info("maxNumMirrors: " .. g_gameSettings:getValue("maxNumMirrors"))
+	if g_gameSettings:getValue("maxNumMirrors") > 0 then -- Register only if at least one mirror is activated in settings
+		if AdjustableMirrors == nil then
+			FS_Debug.error("Unable to find specialization '" .. "AdjustableMirrors" .. "'");
+		else
+			--Go through the different vehicle types and see if they meet the criteria required for adjustable mirrors
+			for i, typeDef in pairs(g_vehicleTypeManager.vehicleTypes) do
+				--Sort out nil keys and trains, since we don't need to adjust mirrors on trains
+				if typeDef ~= nil and i ~= "locomotive" then
+					local isDrivable = false
+					local isEnterable = false
+					local hasMotor = false
+					for name, spec in pairs(typeDef.specializationsByName) do
+						if name == "drivable" then
+							isDrivable = true
+						elseif name == "motorized" then
+							hasMotor = true
+						elseif name == "enterable" then
+							isEnterable = true
+						end
 					end
-				end
-				if isDrivable and isEnterable and hasMotor then
-					FS_Debug.info("Attached specialization " .. "'" .. "AdjustableMirrors" .. "'" .. "to vehicleType '" .. tostring(i) .. "'")
-					typeDef.specializationsByName["AdjustableMirrors"] = AdjustableMirrors
-					table.insert(typeDef.specializationNames, "AdjustableMirrors")
-					table.insert(typeDef.specializations, AdjustableMirrors)
+					if isDrivable and isEnterable and hasMotor then
+						FS_Debug.info("Attached specialization " .. "'" .. "AdjustableMirrors" .. "'" .. "to vehicleType '" .. tostring(i) .. "'")
+						typeDef.specializationsByName["AdjustableMirrors"] = AdjustableMirrors
+						table.insert(typeDef.specializationNames, "AdjustableMirrors")
+						table.insert(typeDef.specializations, AdjustableMirrors)
+					end
 				end
 			end
 		end
