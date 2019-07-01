@@ -92,9 +92,6 @@ function AdjustableMirrors:onPostLoad(savegame)
 		FS_Debug.info("This should be a client")
 	end
 
-	FS_Debug.info("Is server: " .. tostring(self.isServer))
-	FS_Debug.info("Is client: " .. tostring(self.isClient))
-
 	--It is only relevant to setup mirrors, if we are on a client of some sort. Since the dedicated server does not know about mirrors.
 	if g_dedicatedServerInfo == nil then
 		FS_Debug.info("Clientside-only initialization stuff")
@@ -198,7 +195,7 @@ end
 --### under. If you try to further group your stuff by making subgroups, then you will
 --### get weird errors on load of the savegame files. Which to me points to that the xml
 --### loading functions can only handle 5 nested xml tags. Since the saving works fine if 
---### you try to do more and it will show up properly in the vehichles.xml file.
+--### you try to do more and it will show up properly in the vehicles.xml file.
 --#######################################################################################
 function AdjustableMirrors:saveToXMLFile(xmlFile, key)
 	FS_Debug.info("saveToXMLFile - File: " .. xmlFile .. ", Key: " .. key .. FS_Debug.getIdentity(self))
@@ -253,26 +250,35 @@ function AdjustableMirrors:onReadStream(streamID, connection)
 	FS_Debug.info("onReadStream - " .. streamID .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 
-	--The first value streamed is the number of mirrors, since this i very dynamic vehicle
-	--from vehicle to vehicle.
+	--The first value streamed is the number of mirrors, since this is very dynamic from
+	--vehicle to vehicle.
 	local numbOfMirrors = streamReadInt8(streamID) 
 
 	--The server does not necessarily have any mirror data, since it does know the existence
-	--of mirrors on the vehicle (mirrors are only present clientside)
+	--of mirrors on the vehicle (mirrors are only ever present clientside)
 	if numbOfMirrors > 0 then
 		FS_Debug.info("Server has mirror data for " .. numbOfMirrors .. " mirrors")
 
-		--Get mirror data for each mirror and update the position clientside
-		for idx, mirror in ipairs(spec.mirrors) do
-			AdjustableMirrors.setMirrors(self, mirror, streamReadFloat32(streamID), streamReadFloat32(streamID))
+		local mirrorData = {}
+
+		--Read in all the server data first, to keep synchronization with the server even if we don't have mirrors on the client.
+		for idx = 1, numbOfMirrors, 1 do
+			mirrorData[idx] = {streamReadFloat32(streamID), streamReadFloat32(streamID)}
 		end
+
+		--Loop through all available mirrors and update accordingly 
+		--(Should handle the case where a client has less mirrors enabled than the server has info for)
+		for idx, mirror in ipairs(spec.mirrors) do
+			AdjustableMirrors.setMirrors(self, mirror, mirrorData[idx][1], mirrorData[idx][2])
+		end
+	
 	else
 		FS_Debug.info("No mirror data stored on server for this vehicle")
 	end
 end
 
 --#######################################################################################
---### This is run on the server when a client joins. Use this to supply initial synch
+--### This runs on the server when a client joins. Use this to supply initial synch
 --### data with the client.
 --#######################################################################################
 function AdjustableMirrors:onWriteStream(streamID, connection)
