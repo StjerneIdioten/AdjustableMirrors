@@ -333,10 +333,12 @@ end
 function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
 	FS_Debug.info("onRegisterActionEvents, selected: " .. tostring(isSelected) .. ", activeVehicle: " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
-	--Actions are only relevant if the function is run clientside
-	if g_dedicatedServerInfo ~= nil then
+
+	--Actions are only relevant if the function is run clientside and mirrors are available
+	if g_dedicatedServerInfo ~= nil or g_gameSettings:getValue("maxNumMirrors") < 1 then
 		return
 	end
+
 	--Actions should only be registered if we are on and in control of the vehicle
 	if isOnActiveVehicle and self:getIsControlled() then
 		-- InputBinding.registerActionEvent(g_inputBinding, actionName, object, functionForTriggerEvent, triggerKeyUp, triggerKeyDown, triggerAlways, isActive)
@@ -372,18 +374,20 @@ function AdjustableMirrors:onCameraChanged(activeCamera, camIndex)
 	FS_Debug.info("onCameraChanged - camIndex: " .. camIndex .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 
-	local eventID = spec.event_IDs[InputAction.AM_AdjustMirrors]
+	if g_gameSettings:getValue("maxNumMirrors") > 0 then
+		local eventID = spec.event_IDs[InputAction.AM_AdjustMirrors]
 
-	if activeCamera.isInside then 
-		--Enable the Adjustable Mirror action, to show it when inside the cabin
-		g_inputBinding:setActionEventActive(eventID, true)
-	else
-		--Disable the Adjustable Mirror action, to not show it when outside the cabin view.
-		g_inputBinding:setActionEventActive(eventID, false)
+		if activeCamera.isInside  then 
+			--Enable the Adjustable Mirror action, to show it when inside the cabin
+			g_inputBinding:setActionEventActive(eventID, true)
+		else
+			--Disable the Adjustable Mirror action, to not show it when outside the cabin view.
+			g_inputBinding:setActionEventActive(eventID, false)
+		end
+
+		--Disable the adjustment actions, just in case they were enabled when changing camera.
+		AdjustableMirrors.updateAdjustmentEvents(self,false);
 	end
-
-	--Disable the adjustment actions, just in case they were enabled when changing camera.
-	AdjustableMirrors.updateAdjustmentEvents(self,false);
 end
 
 --#######################################################################################

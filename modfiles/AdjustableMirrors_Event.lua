@@ -80,6 +80,7 @@ function AdjustableMirrors_Event:readStream(streamID, connection)
         if g_dedicatedServerInfo ~= nil then
             spec.mirrors[idx] = {}
         end
+        
     end
 
     --If the entity we are connected to is not the server, then we are currently running the function on the server
