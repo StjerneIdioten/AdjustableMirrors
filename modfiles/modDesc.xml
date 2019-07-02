@@ -19,7 +19,7 @@ Default bindings are as follows:
 - "Tilt the mirror right" : [rctrl + keypad_6]]]></en>
  	</description>
     <multiplayer supported="true"/>   
-	<iconFilename>store.png</iconFilename>
+	<iconFilename>store.dds</iconFilename>
 
 	<l10n filenamePrefix="modDesc_l10n" />
 
