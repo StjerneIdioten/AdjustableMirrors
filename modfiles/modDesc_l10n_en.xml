@@ -1,14 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <l10n>
     <texts>
-        <text name="input_AM_AdjustMirrors" text="AM: Adjust Mirrors on/off"/>
-        <text name="input_AM_SwitchMirror" text="AM: Change mirror"/>
-        <text name="input_AM_TiltUp" text="AM: Tilt the mirror up"/>
-        <text name="input_AM_TiltDown" text="AM: Tilt the mirror down"/>
-        <text name="input_AM_TiltLeft" text="AM: Tilt the mirror left"/>
-        <text name="input_AM_TiltRight" text="AM: Tilt the mirror right"/>
-        <text name="adjustableMirrors_ADJUSTMIRRORS" text="Adjust Mirrors" />
-        <text name="adjustableMirrors_ADJUSTMIRRORS_Off" text="Stop Adjusting Mirrors" />
-        <text name="input_adjustableMirrors_ADJUSTMIRRORS" text="Adjust Mirrors" />
+        <text name="input_AM_AdjustMirrors" text="Adjust Mirrors on/off"/>
+        <text name="input_AM_SwitchMirror" text="Change mirror"/>
+        <text name="input_AM_TiltUp" text="Tilt the mirror up"/>
+        <text name="input_AM_TiltDown" text="Tilt the mirror down"/>
+        <text name="input_AM_TiltLeft" text="Tilt the mirror left"/>
+        <text name="input_AM_TiltRight" text="Tilt the mirror right"/>
     </texts>
 </l10n>

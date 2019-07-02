@@ -7,17 +7,16 @@
     </title>
     <description>
         <en><![CDATA[
-		This mod enables you to adjust the mirrors of you vehicles and actually make them useful when using the in-cab view.
-		Everything is fully multiplayer compatible and mirrors will be synched between all clients and saved by the server.
+This mod enables you to adjust the mirrors of you vehicles and actually make them useful when using the in-cab view.
+Everything is fully multiplayer compatible and mirrors will be synched between all clients and saved by the server.
 
-		Default bindings are as follows:
-		   	- "AM: Adjust Mirrors on/off" : [rctrl + keypad_0]
-   			- "AM: Change mirror" : [rctrl + keypad_5]
-   			- "AM: Tilt the mirror down" : [rctrl + keypad_8]
-   			- "AM: Tilt the mirror up" : [rctrl + keypad_2]
-   			- "AM: Tilt the mirror left" : [rctrl + keypad_4]
-   			- "AM: Tilt the mirror right" : [rctrl + keypad_6]
-		]]></en>
+Default bindings are as follows:
+- "Adjust Mirrors on/off" : [rctrl + keypad_0]
+- "Change mirror" : [rctrl + keypad_5]
+- "Tilt the mirror down" : [rctrl + keypad_8]
+- "Tilt the mirror up" : [rctrl + keypad_2]
+- "Tilt the mirror left" : [rctrl + keypad_4]
+- "Tilt the mirror right" : [rctrl + keypad_6]]]></en>
  	</description>
     <multiplayer supported="true"/>   
 	<iconFilename>store.png</iconFilename>

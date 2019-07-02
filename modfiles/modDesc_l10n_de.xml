@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <texts>
+        <text name="input_AM_AdjustMirrors" text="Spiegel einstellen an/aus"/>
+        <text name="input_AM_SwitchMirror" text="Spiegel wechseln"/>
+        <text name="input_AM_TiltUp" text="Drehen Sie den Spiegel nach oben"/>
+        <text name="input_AM_TiltDown" text="Drehen Sie den Spiegel nach unten"/>
+        <text name="input_AM_TiltLeft" text="Drehen Sie den Spiegel nach links"/>
+        <text name="input_AM_TiltRight" text="Drehen Sie den Spiegel nach rechts"/>
+    </texts>
+</l10n>
