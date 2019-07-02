@@ -473,7 +473,7 @@ function AdjustableMirrors:setMirrors(mirror, new_x0, new_y0)
 	--Set the rotations of the individual joints to accomodate the special adjustment pattern.
 	--The mirrors hinges at the top or bottom, left or right. Depending on which edge hits the
 	--Mirror arm where the mirror is attached
-	if g_dedicatedServerInfo == nil then
+	if g_dedicatedServerInfo == nil and g_gameSettings:getValue("maxNumMirrors") > 0 then
 		setRotation(mirror.x1,math.min(0,mirror.x0),0,0);
 		setRotation(mirror.x2,math.max(0,mirror.x0),0,0);
 		setRotation(mirror.y1,0,0,math.max(0,mirror.y0));
