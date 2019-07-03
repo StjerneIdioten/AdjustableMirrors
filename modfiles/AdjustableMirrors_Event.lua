@@ -98,9 +98,9 @@ function AdjustableMirrors_Event:readStream(streamID, connection)
         g_server:broadcastEvent(AdjustableMirrors_Event:new(self.vehicle, unpack(data)), nil, connection)
     end
 
-    --Update mirrors, setMirrors function handles the difference between server and client
+    --Update mirrors, setMirror function handles the difference between server and client
     for idx, mirror in ipairs(spec.mirrors) do
-        AdjustableMirrors.setMirrors(self.vehicle, mirror, mirrorData[idx][1], mirrorData[idx][2])
+        AdjustableMirrors.setMirror(self.vehicle, idx, mirrorData[idx][1], mirrorData[idx][2])
     end
 
     if g_dedicatedServerInfo == nil then
