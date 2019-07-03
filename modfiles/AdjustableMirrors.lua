@@ -65,6 +65,25 @@ end
 --#######################################################################################
 function AdjustableMirrors:onLoad(savegame)
 	FS_Debug.info("onload" .. FS_Debug.getIdentity(self))
+	local spec = self.spec_AdjustableMirrors
+
+	spec.has_usable_mirrors = false
+
+	--This could be reduced into one if statement, but it would look horrible and in this
+	--way it allows me to write several prints depending on the condition that failed
+	if g_dedicatedServerInfo ~= nil then
+		FS_Debug.info("This vehicle is loaded on a dedicated server and therefor does not have mirrors" .. FS_Debug.getIdentity(self))
+		spec.has_usable_mirrors = false
+	elseif g_gameSettings:getValue("maxNumMirrors") < 1 then
+		FS_Debug.info("This vehicle is loaded on a client that does not have mirrors enabled" .. FS_Debug.getIdentity(self))
+		spec.has_usable_mirrors = false
+	elseif not self.spec_enterable.mirrors or not self.spec_enterable.mirrors[1] then
+		FS_Debug.info("This vehicle does not have mirrors" .. FS_Debug.getIdentity(self))
+		spec.has_usable_mirrors = false
+	else
+		FS_Debug.info("This vehicle has usable mirrors" .. FS_Debug.getIdentity(self))
+		spec.has_usable_mirrors = true
+	end
 end
 
 --#######################################################################################
@@ -142,7 +161,7 @@ function AdjustableMirrors:onPostLoad(savegame)
 		end
 
 		--If the mirror actually has mirrors, since the specialization checks don't account for this
-		if self.spec_enterable.mirrors and spec.spec_enterable.mirrors[1] then
+		if self.spec_enterable.mirrors and self.spec_enterable.mirrors[1] then
 			spec.mirror_index = 1
 			FS_Debug.info("This vehicle has mirrors" .. FS_Debug.getIdentity(self))
 			for i = 1, table.getn(spec.spec_enterable.mirrors) do
@@ -334,8 +353,8 @@ function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
 	FS_Debug.info("onRegisterActionEvents, selected: " .. tostring(isSelected) .. ", activeVehicle: " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 
-	--Actions are only relevant if the function is run clientside and mirrors are available
-	if g_dedicatedServerInfo ~= nil or g_gameSettings:getValue("maxNumMirrors") < 1 then
+	--Actions are only relevant if the function is run clientside, mirrors are enabled clientside and the vehicle has mirrors
+	if g_dedicatedServerInfo ~= nil or g_gameSettings:getValue("maxNumMirrors") < 1 or #spec.mirrors == 0 then
 		return
 	end
 
@@ -374,7 +393,7 @@ function AdjustableMirrors:onCameraChanged(activeCamera, camIndex)
 	FS_Debug.info("onCameraChanged - camIndex: " .. camIndex .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 
-	if g_gameSettings:getValue("maxNumMirrors") > 0 then
+	if g_gameSettings:getValue("maxNumMirrors") > 0 and #spec.mirrors > 0 then
 		local eventID = spec.event_IDs[InputAction.AM_AdjustMirrors]
 
 		if activeCamera.isInside  then 
