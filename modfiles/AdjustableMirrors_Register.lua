@@ -25,44 +25,48 @@ AdjustableMirrors_Register.title = getXMLString(modDesc, "modDesc.title.en")
 --Set the modname to use when outputting to the log through FS_Debug
 FS_Debug.mod_name = AdjustableMirrors_Register.title
 --Set the max log level for FS_Debug. Error = 0, Warning = 1, Info = 2, Debug = 3 and so on for even more debug info.
-FS_Debug.log_level_max = 2
+FS_Debug.log_level_max = 1
 
 --#######################################################################################
---### This isn't a seperate function per say, but it is responsible for checking if the
+--### This is responsible for checking if the
 --### AdjustableMirrors class was included properly and is accessible. And then it goes
 --### through the registered vehicletypes and checks if they meet certain criteria like
 --### being drivable, before adding the AdjustableMirrors specialization.
 --#######################################################################################
-if g_specializationManager:getSpecializationByName("AdjustableMirrors") == nil then
-	if AdjustableMirrors == nil then
-		FS_Debug.error("Unable to find specialization '" .. "AdjustableMirrors" .. "'");
-	else
-		--Go through the different vehicle types and see if they meet the criteria required for adjustable mirrors
-		for i, typeDef in pairs(g_vehicleTypeManager.vehicleTypes) do
-			--Sort out nil keys and trains, since we don't need to adjust mirrors on trains
-			if typeDef ~= nil and i ~= "locomotive" then
-				local isDrivable = false
-				local isEnterable = false
-				local hasMotor = false
-				for name, spec in pairs(typeDef.specializationsByName) do
-					if name == "drivable" then
-						isDrivable = true
-					elseif name == "motorized" then
-						hasMotor = true
-					elseif name == "enterable" then
-						isEnterable = true
+local specName = "AdjustableMirrors"
+local function installAMVehicleType()
+	if g_specializationManager:getSpecializationByName(specName) == nil then
+		if AdjustableMirrors == nil then
+			FS_Debug.error("Unable to find specialization '" .. specName .. "'")
+		else
+			--Go through the different vehicle types and see if they meet the criteria required for adjustable mirrors
+			for i, typeDef in pairs(g_vehicleTypeManager:getVehicleTypes()) do
+				--Sort out nil keys and trains, since we don't need to adjust mirrors on trains and conveyor belts
+				if typeDef ~= nil and i ~= "locomotive" and i ~= "conveyorBelt" and i ~= "pickupConveyorBelt" then
+					local isDrivable = false
+					local isEnterable = false
+					local hasMotor = false
+					for name, spec in pairs(typeDef.specializationsByName) do
+						if name == "drivable" then
+							isDrivable = true
+						elseif name == "motorized" then
+							hasMotor = true
+						elseif name == "enterable" then
+							isEnterable = true
+						end
 					end
-				end
-				if isDrivable and isEnterable and hasMotor then
-					FS_Debug.info("Attached specialization " .. "'" .. "AdjustableMirrors" .. "'" .. "to vehicleType '" .. tostring(i) .. "'")
-					typeDef.specializationsByName["AdjustableMirrors"] = AdjustableMirrors
-					table.insert(typeDef.specializationNames, "AdjustableMirrors")
-					table.insert(typeDef.specializations, AdjustableMirrors)
+					if isDrivable and isEnterable and hasMotor then
+						FS_Debug.info("Attached specialization '" .. specName .. "' to vehicleType '" .. tostring(i) .. "'")
+						typeDef.specializationsByName[specName] = AdjustableMirrors
+						table.insert(typeDef.specializationNames, specName)
+						table.insert(typeDef.specializations, AdjustableMirrors)
+					end
 				end
 			end
 		end
 	end
 end
+VehicleTypeManager.validateVehicleTypes = Utils.prependedFunction(VehicleTypeManager.validateVehicleTypes, installAMVehicleType)
 
 --#######################################################################################
 --### If anything special has to happen after the register of the mod, then this function 
