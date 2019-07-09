@@ -70,15 +70,17 @@ function AdjustableMirrors_Event:readStream(streamID, connection)
     local numbOfMirrors = streamReadInt8(streamID)
 
     local spec = self.vehicle.spec_AdjustableMirrors
+    local mirrorData = {}
 
     --Read in the new mirror values
-    for i=1,numbOfMirrors do
+    for idx=1,numbOfMirrors do
+        mirrorData[idx] = {streamReadFloat32(streamID), streamReadFloat32(streamID)}
+        
         --The server is only guaranteed to have the mirror array, and not necessarily any mirrors in it.
         if g_dedicatedServerInfo ~= nil then
-            spec.mirrors[i] = {}
+            spec.mirrors[idx] = {}
         end
-        spec.mirrors[i].x0 = streamReadFloat32(streamID)
-        spec.mirrors[i].y0 = streamReadFloat32(streamID)
+        
     end
 
     --If the entity we are connected to is not the server, then we are currently running the function on the server
@@ -88,21 +90,21 @@ function AdjustableMirrors_Event:readStream(streamID, connection)
         --generate array of mirror data
         local data = {}
         data[1] = numbOfMirrors
-        for i=1,data[1] do
-            data[i*2] = spec.mirrors[i].x0
-            data[i*2+1] = spec.mirrors[i].y0
+        for idx=1,data[1] do
+            data[idx*2] = mirrorData[idx][1]
+            data[idx*2+1] = mirrorData[idx][2]
         end
         --Broadcast the mirror data to all other clients.
         g_server:broadcastEvent(AdjustableMirrors_Event:new(self.vehicle, unpack(data)), nil, connection)
     end
 
-    --If we are also a client then we should also update all of the mirrors with the new values
+    --Update mirrors, setMirror function handles the difference between server and client
+    for idx, mirror in ipairs(spec.mirrors) do
+        AdjustableMirrors.setMirror(self.vehicle, idx, mirrorData[idx][1], mirrorData[idx][2])
+    end
+
     if g_dedicatedServerInfo == nil then
         FS_Debug.info(myName .. ": Client received update from server")
-
-        for idx, mirror in ipairs(spec.mirrors) do
-            AdjustableMirrors.setMirrors(self.vehicle, mirror, mirror.x0, mirror.y0)
-        end
     end
 end
 

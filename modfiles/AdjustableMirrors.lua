@@ -65,6 +65,25 @@ end
 --#######################################################################################
 function AdjustableMirrors:onLoad(savegame)
 	FS_Debug.info("onload" .. FS_Debug.getIdentity(self))
+	local spec = self.spec_AdjustableMirrors
+
+	spec.has_usable_mirrors = false
+
+	--This could be reduced into one if statement, but it would look horrible and in this
+	--way it allows me to write several prints depending on the condition that failed
+	if g_dedicatedServerInfo ~= nil then
+		FS_Debug.info("This vehicle is loaded on a dedicated server and therefor does not have mirrors" .. FS_Debug.getIdentity(self))
+		spec.has_usable_mirrors = false
+	elseif g_gameSettings:getValue("maxNumMirrors") < 1 then
+		FS_Debug.info("This vehicle is loaded on a client that does not have mirrors enabled" .. FS_Debug.getIdentity(self))
+		spec.has_usable_mirrors = false
+	elseif not self.spec_enterable.mirrors or not self.spec_enterable.mirrors[1] then
+		FS_Debug.info("This vehicle does not have mirrors" .. FS_Debug.getIdentity(self))
+		spec.has_usable_mirrors = false
+	else
+		FS_Debug.info("This vehicle has usable mirrors" .. FS_Debug.getIdentity(self))
+		spec.has_usable_mirrors = true
+	end
 end
 
 --#######################################################################################
@@ -92,13 +111,12 @@ function AdjustableMirrors:onPostLoad(savegame)
 		FS_Debug.info("This should be a client")
 	end
 
-	FS_Debug.info("Is server: " .. tostring(self.isServer))
-	FS_Debug.info("Is client: " .. tostring(self.isClient))
-
-	--It is only relevant to setup mirrors, if we are on a client of some sort. Since the dedicated server does not know about mirrors.
-	if g_dedicatedServerInfo == nil then
-		FS_Debug.info("Clientside-only initialization stuff")
-	
+	--It is only relevant to setup mirrors, if we are able to use them.
+	if spec.has_usable_mirrors then
+		FS_Debug.info("Initialization stuff, when we have mirrors")
+		
+		--Initial camera index
+		spec.mirror_index = 1
 		--Are we allowed to adjust the mirrors
 		spec.mirror_adjustment_enabled = false
 		--For knowing when to send out an update event to the server and other clients
@@ -144,15 +162,10 @@ function AdjustableMirrors:onPostLoad(savegame)
 			idx = idx + 1
 		end
 
-		--If the mirror actually has mirrors, since the specialization checks don't account for this
-		if self.spec_enterable.mirrors and spec.spec_enterable.mirrors[1] then
-			spec.mirror_index = 1
-			FS_Debug.info("This vehicle has mirrors" .. FS_Debug.getIdentity(self))
-			for i = 1, table.getn(spec.spec_enterable.mirrors) do
-				addMirror(spec.spec_enterable.mirrors[i])
-			end
+		--Add the new structure for every mirror
+		for i = 1, table.getn(spec.spec_enterable.mirrors) do
+			addMirror(spec.spec_enterable.mirrors[i])
 		end
-
 	end
 
 	--If there was a savegame file to load things from
@@ -178,12 +191,8 @@ function AdjustableMirrors:onPostLoad(savegame)
 					break
 				else
 					FS_Debug.debug("x0: " .. x0 .. ", y0: " .. y0 .. FS_Debug.getIdentity(self))
-					--Needed for the server only since its mirror array is empty on startup as it can't generate the structure itself without knowledge from a savefile or client
-					if spec.mirrors[idx] == nil then
-						spec.mirrors[idx] = {}
-					end
-
-					AdjustableMirrors.setMirrors(self, spec.mirrors[idx], x0, y0)
+					
+					AdjustableMirrors.setMirror(self, idx, x0, y0)
 					idx = idx + 1
 				end
 			end
@@ -198,7 +207,7 @@ end
 --### under. If you try to further group your stuff by making subgroups, then you will
 --### get weird errors on load of the savegame files. Which to me points to that the xml
 --### loading functions can only handle 5 nested xml tags. Since the saving works fine if 
---### you try to do more and it will show up properly in the vehichles.xml file.
+--### you try to do more and it will show up properly in the vehicles.xml file.
 --#######################################################################################
 function AdjustableMirrors:saveToXMLFile(xmlFile, key)
 	FS_Debug.info("saveToXMLFile - File: " .. xmlFile .. ", Key: " .. key .. FS_Debug.getIdentity(self))
@@ -253,26 +262,35 @@ function AdjustableMirrors:onReadStream(streamID, connection)
 	FS_Debug.info("onReadStream - " .. streamID .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 
-	--The first value streamed is the number of mirrors, since this i very dynamic vehicle
-	--from vehicle to vehicle.
+	--The first value streamed is the number of mirrors, since this is very dynamic from
+	--vehicle to vehicle.
 	local numbOfMirrors = streamReadInt8(streamID) 
 
 	--The server does not necessarily have any mirror data, since it does know the existence
-	--of mirrors on the vehicle (mirrors are only present clientside)
+	--of mirrors on the vehicle (mirrors are only ever present clientside)
 	if numbOfMirrors > 0 then
 		FS_Debug.info("Server has mirror data for " .. numbOfMirrors .. " mirrors")
 
-		--Get mirror data for each mirror and update the position clientside
-		for idx, mirror in ipairs(spec.mirrors) do
-			AdjustableMirrors.setMirrors(self, mirror, streamReadFloat32(streamID), streamReadFloat32(streamID))
+		local mirrorData = {}
+
+		--Read in all the server data first, to keep synchronization with the server even if we don't have mirrors on the client.
+		for idx = 1, numbOfMirrors, 1 do
+			mirrorData[idx] = {streamReadFloat32(streamID), streamReadFloat32(streamID)}
 		end
+
+		--Loop through all available mirrors and update accordingly 
+		--(Should handle the case where a client has less mirrors enabled than the server has info for)
+		for idx, mirror in ipairs(spec.mirrors) do
+			AdjustableMirrors.setMirror(self, idx, mirrorData[idx][1], mirrorData[idx][2])
+		end
+	
 	else
 		FS_Debug.info("No mirror data stored on server for this vehicle")
 	end
 end
 
 --#######################################################################################
---### This is run on the server when a client joins. Use this to supply initial synch
+--### This runs on the server when a client joins. Use this to supply initial synch
 --### data with the client.
 --#######################################################################################
 function AdjustableMirrors:onWriteStream(streamID, connection)
@@ -327,32 +345,33 @@ end
 function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
 	FS_Debug.info("onRegisterActionEvents, selected: " .. tostring(isSelected) .. ", activeVehicle: " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
-	--Actions are only relevant if the function is run clientside
-	if g_dedicatedServerInfo ~= nil then
-		return
-	end
-	--Actions should only be registered if we are on and in control of the vehicle
-	if isOnActiveVehicle and self:getIsControlled() then
-		-- InputBinding.registerActionEvent(g_inputBinding, actionName, object, functionForTriggerEvent, triggerKeyUp, triggerKeyDown, triggerAlways, isActive)
 
-		-- Register AdjustMirrors action, with the active value to be based on whether or not the camera is inside when we switched
-		local _, eventID = g_inputBinding:registerActionEvent(InputAction.AM_AdjustMirrors, self, AdjustableMirrors.onActionAdjustMirrors, false, true, false, self:getActiveCamera().isInside)
-		spec.event_IDs[InputAction.AM_AdjustMirrors] = eventID
-		
-		--Actions that have to do with moving the mirrors around
-		local actions_adjust = { InputAction.AM_TiltUp, InputAction.AM_TiltDown, InputAction.AM_TiltLeft, InputAction.AM_TiltRight }
+	--Actions are only relevant if the mirrors are available
+	if spec.has_usable_mirrors then
+		--OnRegisterActionEvents is called for everyone when someone enters the vehicle but in this case
+		--actions should only be registered if we are on and in control of the vehicle
+		if isOnActiveVehicle and self:getIsControlled() then
+			-- InputBinding.registerActionEvent(g_inputBinding, actionName, object, functionForTriggerEvent, triggerKeyUp, triggerKeyDown, triggerAlways, isActive)
 
-		--Keep the adjustment action events grouped, since they will be toggled on/off at the same time
-		spec.event_IDs.adjustment = {}
+			-- Register AdjustMirrors action, with the active value to be based on whether or not the camera is inside when we switched
+			local _, eventID = g_inputBinding:registerActionEvent(InputAction.AM_AdjustMirrors, self, AdjustableMirrors.onActionAdjustMirrors, false, true, false, self:getActiveCamera().isInside)
+			spec.event_IDs[InputAction.AM_AdjustMirrors] = eventID
+			
+			--Actions that have to do with moving the mirrors around
+			local actions_adjust = { InputAction.AM_TiltUp, InputAction.AM_TiltDown, InputAction.AM_TiltLeft, InputAction.AM_TiltRight }
 
-		-- Register SwitchMirror action, this one is only based on a single keypress and not a continues keypress like the rest of the adjustment actions
-		local _, eventID = g_inputBinding:registerActionEvent(InputAction.AM_SwitchMirror, self, AdjustableMirrors.onActionSwitchMirror, false, true, false, false)
-		spec.event_IDs.adjustment[InputAction.AM_SwitchMirror] = eventID
+			--Keep the adjustment action events grouped, since they will be toggled on/off at the same time
+			spec.event_IDs.adjustment = {}
 
-		-- Register the rest of the adjustment actions
-		for _,actionName in pairs(actions_adjust) do
-			local _, eventID = g_inputBinding:registerActionEvent(actionName, self, AdjustableMirrors.onActionAdjustmentCall, false, true, true, false)	
-			spec.event_IDs.adjustment[actionName] = eventID
+			-- Register SwitchMirror action, this one is only based on a single keypress and not a continues keypress like the rest of the adjustment actions
+			local _, eventID = g_inputBinding:registerActionEvent(InputAction.AM_SwitchMirror, self, AdjustableMirrors.onActionSwitchMirror, false, true, false, false)
+			spec.event_IDs.adjustment[InputAction.AM_SwitchMirror] = eventID
+
+			-- Register the rest of the adjustment actions
+			for _,actionName in pairs(actions_adjust) do
+				local _, eventID = g_inputBinding:registerActionEvent(actionName, self, AdjustableMirrors.onActionAdjustmentCall, false, true, true, false)	
+				spec.event_IDs.adjustment[actionName] = eventID
+			end
 		end
 	end
 end
@@ -366,18 +385,22 @@ function AdjustableMirrors:onCameraChanged(activeCamera, camIndex)
 	FS_Debug.info("onCameraChanged - camIndex: " .. camIndex .. FS_Debug.getIdentity(self))
 	local spec = self.spec_AdjustableMirrors
 
-	local eventID = spec.event_IDs[InputAction.AM_AdjustMirrors]
+	--Only relevant to toggle the action event if we have mirrors
+	if spec.has_usable_mirrors then
 
-	if activeCamera.isInside then 
-		--Enable the Adjustable Mirror action, to show it when inside the cabin
-		g_inputBinding:setActionEventActive(eventID, true)
-	else
-		--Disable the Adjustable Mirror action, to not show it when outside the cabin view.
-		g_inputBinding:setActionEventActive(eventID, false)
+		local eventID = spec.event_IDs[InputAction.AM_AdjustMirrors]
+
+		if activeCamera.isInside  then 
+			--Enable the Adjustable Mirror action, to show it when inside the cabin
+			g_inputBinding:setActionEventActive(eventID, true)
+		else
+			--Disable the Adjustable Mirror action, to not show it when outside the cabin view.
+			g_inputBinding:setActionEventActive(eventID, false)
+		end
+
+		--Disable the adjustment actions, just in case they were enabled when changing camera.
+		AdjustableMirrors.updateAdjustmentEvents(self,false);
 	end
-
-	--Disable the adjustment actions, just in case they were enabled when changing camera.
-	AdjustableMirrors.updateAdjustmentEvents(self,false);
 end
 
 --#######################################################################################
@@ -404,7 +427,7 @@ function AdjustableMirrors:onActionSwitchMirror(actionName, keyStatus)
 		spec.mirror_index = spec.mirror_index + 1
 	end
 
-	FS_Debug.debug("new value of mirror_index: " .. spec.mirror_index)
+	FS_Debug.info("new value of mirror_index: " .. spec.mirror_index)
 end
 
 --#######################################################################################
@@ -434,27 +457,33 @@ function AdjustableMirrors:onActionAdjustmentCall(actionName, keyStatus, arg4, a
 
 	spec.mirrors_have_been_adjusted = true
 
-	--Get a reference to the currently selected mirror
 	local mirror = spec.mirrors[spec.mirror_index]
 
 	--Adjust the mirror depending on which of the adjustment events was called
 	if actionName == "AM_TiltUp" then
-		AdjustableMirrors.setMirrors(self, mirror, mirror.x0 - spec.mirror_adjustment_step_size, mirror.y0)
+		AdjustableMirrors.setMirror(self, spec.mirror_index, mirror.x0 - spec.mirror_adjustment_step_size, mirror.y0)
 	elseif actionName == "AM_TiltDown" then
-		AdjustableMirrors.setMirrors(self, mirror, mirror.x0 + spec.mirror_adjustment_step_size, mirror.y0)
+		AdjustableMirrors.setMirror(self, spec.mirror_index, mirror.x0 + spec.mirror_adjustment_step_size, mirror.y0)
 	elseif actionName == "AM_TiltLeft" then
-		AdjustableMirrors.setMirrors(self, mirror, mirror.x0, mirror.y0 - spec.mirror_adjustment_step_size)
+		AdjustableMirrors.setMirror(self, spec.mirror_index, mirror.x0, mirror.y0 - spec.mirror_adjustment_step_size)
 	elseif actionName == "AM_TiltRight" then
-		AdjustableMirrors.setMirrors(self, mirror, mirror.x0, mirror.y0 + spec.mirror_adjustment_step_size)
+		AdjustableMirrors.setMirror(self, spec.mirror_index, mirror.x0, mirror.y0 + spec.mirror_adjustment_step_size)
 	end
 end
 
 --#######################################################################################
 --### Used to update the mirror from new values of x0 and y0
 --#######################################################################################
-function AdjustableMirrors:setMirrors(mirror, new_x0, new_y0)
-	FS_Debug.debug("setMirrors" .. FS_Debug.getIdentity(self), 4)
+function AdjustableMirrors:setMirror(mirror_idx, new_x0, new_y0)
+	FS_Debug.debug("setMirror" .. FS_Debug.getIdentity(self), 4)
 	local spec = self.spec_AdjustableMirrors
+
+	--Just in case that the mirror isn't already present, fx. on the server
+	if spec.mirrors[mirror_idx] == nil then
+		spec.mirrors[mirror_idx] = {}
+	end
+
+	local mirror = spec.mirrors[mirror_idx]
 
 	--Clamps the rotation of the mirrors between -max_rotation and rotation
 	mirror.x0 = math.min(spec.max_rotation,math.max(-spec.max_rotation, new_x0))
@@ -463,7 +492,7 @@ function AdjustableMirrors:setMirrors(mirror, new_x0, new_y0)
 	--Set the rotations of the individual joints to accomodate the special adjustment pattern.
 	--The mirrors hinges at the top or bottom, left or right. Depending on which edge hits the
 	--Mirror arm where the mirror is attached
-	if g_dedicatedServerInfo == nil then
+	if spec.has_usable_mirrors then
 		setRotation(mirror.x1,math.min(0,mirror.x0),0,0);
 		setRotation(mirror.x2,math.max(0,mirror.x0),0,0);
 		setRotation(mirror.y1,0,0,math.max(0,mirror.y0));
