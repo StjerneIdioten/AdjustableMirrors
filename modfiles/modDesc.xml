@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="43">
+<modDesc descVersion="44">
 	<author>StjerneIdioten - Original 2015 version by Marhu</author>
 	<version>1.0.0.0</version> 
 	<title>
-		<en>AdjustableMirrors</en>       
+		<en>Adjustable Mirrors</en>
+		<de>Einstellbare Spiegel</de>    
+		<fr>Miroirs Réglables</fr>   
     </title>
     <description>
         <en><![CDATA[
@@ -17,6 +19,28 @@ Default bindings are as follows:
 - "Tilt the mirror up" : [rctrl + keypad_2]
 - "Tilt the mirror left" : [rctrl + keypad_4]
 - "Tilt the mirror right" : [rctrl + keypad_6]]]></en>
+		<de><![CDATA[
+Dieser Mod ermöglicht es Ihnen, die Spiegel Ihrer Fahrzeuge einzustellen und sie für die Verwendung in der Kabinenansicht nützlich zu machen.
+Alles ist vollständig multiplayerfähig und Spiegel werden zwischen allen Clients synchronisiert und vom Server gespeichert.
+
+Die Standardbindungen sind wie folgt:
+- "Spiegel anpassen ein/aus" : [Strg-Rechts + Keypad 0]
+- "Spiegel ändern" : [Strg-Rechts + Keypad 5]
+- "Kippt den Spiegel nach unten": [Strg-Rechts + Keypad 8]
+- "Kippt den Spiegel nach oben" : [Strg-Rechts + Keypad 2]
+- "Kippt den Spiegel nach links" : [Strg-Rechts + Keypad 4]
+- "Kippt den Spiegel nach rechts" : [Strg-Rechts + Keypad 6]]]></de>
+		<fr><![CDATA[
+This mod enables you to adjust the mirrors of you vehicles and actually make them useful when using the in-cab view.
+Everything is fully multiplayer compatible and mirrors will be synched between all clients and saved by the server.
+
+Default bindings are as follows:
+- "Adjust Mirrors on/off" : [rctrl + keypad_0]
+- "Change mirror" : [rctrl + keypad_5]
+- "Tilt the mirror down" : [rctrl + keypad_8]
+- "Tilt the mirror up" : [rctrl + keypad_2]
+- "Tilt the mirror left" : [rctrl + keypad_4]
+- "Tilt the mirror right" : [rctrl + keypad_6]]]></fr>
  	</description>
     <multiplayer supported="true"/>   
 	<iconFilename>store.dds</iconFilename>

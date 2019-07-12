@@ -250,7 +250,7 @@ function AdjustableMirrors:onDraw()
 	if spec.mirror_adjustment_enabled == true then
 		--This is a bit of a crude way to do it, since you aren't really supposed to use debug functions for anything else than debug stuff
 		--I will change this at some point, but for now it works fine for the purpose of showing the currently selected mirror
-		DebugUtil.drawDebugNode(spec.mirrors[spec.mirror_index].mirror_ref.node, "This Mirror")
+		DebugUtil.drawDebugNode(spec.mirrors[spec.mirror_index].mirror_ref.node, g_i18n:getText("info_AM_SelectedMirror"))
 	end
 end
 

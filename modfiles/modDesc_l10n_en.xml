@@ -7,5 +7,6 @@
         <text name="input_AM_TiltDown" text="Tilt the mirror down"/>
         <text name="input_AM_TiltLeft" text="Tilt the mirror left"/>
         <text name="input_AM_TiltRight" text="Tilt the mirror right"/>
+        <text name="info_AM_SelectedMirror" text="This Mirror"/>
     </texts>
 </l10n>

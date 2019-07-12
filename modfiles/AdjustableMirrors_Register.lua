@@ -25,7 +25,7 @@ AdjustableMirrors_Register.title = getXMLString(modDesc, "modDesc.title.en")
 --Set the modname to use when outputting to the log through FS_Debug
 FS_Debug.mod_name = AdjustableMirrors_Register.title
 --Set the max log level for FS_Debug. Error = 0, Warning = 1, Info = 2, Debug = 3 and so on for even more debug info.
-FS_Debug.log_level_max = 2
+FS_Debug.log_level_max = 1
 
 --#######################################################################################
 --### This isn't a seperate function per say, but it is responsible for checking if the
