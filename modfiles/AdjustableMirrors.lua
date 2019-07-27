@@ -7,7 +7,7 @@
 --### And remember that anything in this file is run on a per instance basis. So fx.
 --### onLoad will run for as many times as there are vehicles with the specialization.
 --#######################################################################################
-AdjustableMirrors = {};
+AdjustableMirrors = {}
 --Modwide version, should be set in AdjustableMirrors_Register.lua
 AdjustableMirrors.version = "Unspecified Version"
 
@@ -19,7 +19,7 @@ AdjustableMirrors.version = "Unspecified Version"
 --#######################################################################################
 function AdjustableMirrors.prerequisitesPresent(specializations)
     return true
-end;
+end
 
 --#######################################################################################
 --### Can be used to expose a function directly into the self object. So fx. making it so
@@ -101,7 +101,7 @@ function AdjustableMirrors:onPostLoad(savegame)
 
 	--Maximum rotation value, for capping the rotation of the mirrors
 	spec.max_rotation = math.rad(20)
-	if g_server ~=nil then
+	if g_server ~= nil then
 		if g_dedicatedServerInfo ~= nil then
 			FS_Debug.info("Dedi server")
 		else
@@ -399,7 +399,7 @@ function AdjustableMirrors:onCameraChanged(activeCamera, camIndex)
 		end
 
 		--Disable the adjustment actions, just in case they were enabled when changing camera.
-		AdjustableMirrors.updateAdjustmentEvents(self,false);
+		AdjustableMirrors.updateAdjustmentEvents(self,false)
 	end
 end
 
@@ -493,9 +493,9 @@ function AdjustableMirrors:setMirror(mirror_idx, new_x0, new_y0)
 	--The mirrors hinges at the top or bottom, left or right. Depending on which edge hits the
 	--Mirror arm where the mirror is attached
 	if spec.has_usable_mirrors then
-		setRotation(mirror.x1,math.min(0,mirror.x0),0,0);
-		setRotation(mirror.x2,math.max(0,mirror.x0),0,0);
-		setRotation(mirror.y1,0,0,math.max(0,mirror.y0));
-		setRotation(mirror.y2,0,0,math.min(0,mirror.y0));
+		setRotation(mirror.x1,math.min(0,mirror.x0),0,0)
+		setRotation(mirror.x2,math.max(0,mirror.x0),0,0)
+		setRotation(mirror.y1,0,0,math.max(0,mirror.y0))
+		setRotation(mirror.y2,0,0,math.min(0,mirror.y0))
 	end
 end

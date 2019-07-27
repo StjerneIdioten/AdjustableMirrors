@@ -3,7 +3,7 @@
 --### MAX_LOG_LEVEL: Log levels  higher than this value, wont be output
 --### modName: The mod name that gets prepended in console
 --#######################################################################################
-FS_Debug= {}
+FS_Debug = {}
 
 FS_Debug.log_level_max = 3
 FS_Debug.mod_name = "Unspecified Modname"
@@ -17,14 +17,14 @@ FS_Debug.mod_name = "Unspecified Modname"
 --### prefix: A little prefix to indicate error type f.eks. "info", "warning", "Error"
 --### message: The log message
 --#######################################################################################
-function FS_Debug._log(log_level,log_prefix,...)
+function FS_Debug._log(log_level, log_prefix,...)
     log_level = log_level or 0 -- default value for log level
     if  log_level <= FS_Debug.log_level_max then
         local txt = ""
         for idx = 1,select("#", ...) do
             txt = txt .. tostring(select(idx, ...))
         end
-        print(string.format("%7ums [%s]", (g_currentMission ~= nil and g_currentMission.time or 0), FS_Debug.mod_name)  .. "[" .. FS_Debug.log_level_max .. "]" .. log_prefix .. " " .. txt);
+        print(string.format("%7ums [%s]", (g_currentMission ~= nil and g_currentMission.time or 0), FS_Debug.mod_name) .. "[" .. FS_Debug.log_level_max .. "]" .. log_prefix .. " " .. txt)
     end
 end
 
@@ -66,18 +66,18 @@ end
 --#######################################################################################
 function FS_Debug.getIdentity(obj)
     return " (name: " .. obj:getFullName() .. ", rootNode: " .. obj.rootNode .. ", typeName: " .. obj.typeName .. ", typeDesc: " .. obj.typeDesc .. ")"
-  end
+end
 
-  function FS_Debug:args_to_txt(...)
+function FS_Debug:args_to_txt(...)
     local args = { ... }
     local txt = ""
     local i, v
     for i, v in ipairs(args) do
-      if i > 1 then
+        if i > 1 then
         txt = txt .. ", "
-      end
-      txt = txt .. i .. ": " .. tostring(v)
+        end
+        txt = txt .. i .. ": " .. tostring(v)
     end
-  
+
     return(txt)
-  end
+end
