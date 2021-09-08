@@ -69,7 +69,7 @@ function AdjustableMirrors_Event:readStream(streamID, connection)
     --Then comes the number of mirrors
     local numbOfMirrors = streamReadInt8(streamID)
 
-    local spec = self.vehicle.spec_AdjustableMirrors
+    local spec = self.vehicle.spec_adjustableMirrors
     local mirrorData = {}
 
     --Read in the new mirror values
@@ -133,7 +133,7 @@ end
 function AdjustableMirrors_Event:sendEvent(vehicle)
     FS_Debug.info(myName .. ": sendEvent()")
 
-    local spec = vehicle.spec_AdjustableMirrors
+    local spec = vehicle.spec_adjustableMirrors
 
     --generate array of the mirror data
     local data = {}

@@ -10,6 +10,8 @@
 AdjustableMirrors = {}
 --Modwide version, should be set in AdjustableMirrors_Register.lua
 AdjustableMirrors.version = "Unspecified Version"
+AdjustableMirrors.modName = "None"
+
 
 --#######################################################################################
 --### Check if certain things are present before going further with the mod, 
@@ -65,7 +67,9 @@ end
 --#######################################################################################
 function AdjustableMirrors:onLoad(savegame)
 	FS_Debug.info("onload" .. FS_Debug.getIdentity(self))
-	local spec = self.spec_AdjustableMirrors
+	--DebugUtil.printTableRecursively(self.controlled, '-', 0, 2) --self["spec_FS19_AdjustableMirrors.adjustableMirrors"]
+	self.spec_adjustableMirrors = self[("spec_%s.adjustableMirrors"):format(AdjustableMirrors.modName)]
+	local spec = self.spec_adjustableMirrors
 
 	spec.has_usable_mirrors = false
 
@@ -94,7 +98,7 @@ end
 function AdjustableMirrors:onPostLoad(savegame)
 	FS_Debug.info("onPostLoad" .. FS_Debug.getIdentity(self))
 	--Quick reference to the specialization, where we should keep all of our variables
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 
 	--Table for holding all of the new adjustment mirrors
 	spec.mirrors = {}
@@ -211,7 +215,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:saveToXMLFile(xmlFile, key)
 	FS_Debug.info("saveToXMLFile - File: " .. xmlFile .. ", Key: " .. key .. FS_Debug.getIdentity(self))
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 	setXMLString(xmlFile, key .. "#version", AdjustableMirrors.version)
 
 	for idx, mirror in ipairs(spec.mirrors) do
@@ -245,7 +249,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:onDraw()
 	FS_Debug.debug("onDraw" .. FS_Debug.getIdentity(self), 5)
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 
 	if spec.mirror_adjustment_enabled == true then
 		--This is a bit of a crude way to do it, since you aren't really supposed to use debug functions for anything else than debug stuff
@@ -260,7 +264,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:onReadStream(streamID, connection)
 	FS_Debug.info("onReadStream - " .. streamID .. FS_Debug.getIdentity(self))
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 
 	--The first value streamed is the number of mirrors, since this is very dynamic from
 	--vehicle to vehicle.
@@ -295,7 +299,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:onWriteStream(streamID, connection)
 	FS_Debug.info("onWriteStream - " .. streamID .. FS_Debug.getIdentity(self))
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 
 	FS_Debug.info("mirrors stored on server: " .. #spec.mirrors)
 	--Write out the number of mirrors as the first data value to be synched, so the client
@@ -322,7 +326,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:onLeaveVehicle()
 	FS_Debug.info("onLeaveVehicle" .. FS_Debug.getIdentity(self))
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 
 	--No need to send an update event unless the mirrors have actually been changed
 	if spec.mirrors_have_been_adjusted then
@@ -344,7 +348,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
 	FS_Debug.info("onRegisterActionEvents, selected: " .. tostring(isSelected) .. ", activeVehicle: " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self))
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 
 	--Actions are only relevant if the mirrors are available
 	if spec.has_usable_mirrors then
@@ -383,7 +387,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:onCameraChanged(activeCamera, camIndex)
 	FS_Debug.info("onCameraChanged - camIndex: " .. camIndex .. FS_Debug.getIdentity(self))
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 
 	--Only relevant to toggle the action event if we have mirrors
 	if spec.has_usable_mirrors then
@@ -408,7 +412,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:onActionAdjustMirrors(actionName, keyStatus)
 	FS_Debug.info("onActionAdjustMirrors - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 	--Toggles the adjustment actions
 	AdjustableMirrors.updateAdjustmentEvents(self)
 end
@@ -418,7 +422,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:onActionSwitchMirror(actionName, keyStatus)
 	FS_Debug.info("onActionSwitchMirror - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 	
 	--Selected the next mirror or loop around to the first one if the last one was selected
 	if spec.mirror_index == #spec.mirrors then
@@ -436,7 +440,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:updateAdjustmentEvents(state)
 	FS_Debug.info("updateAdjustmentEvents - state: " .. tostring(Utils.getNoNil(state, "Nil")))
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 	--If 'state' was supplied then use that, and if not then act as a toggle
 	spec.mirror_adjustment_enabled = Utils.getNoNil(state, not spec.mirror_adjustment_enabled)
 
@@ -453,7 +457,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:onActionAdjustmentCall(actionName, keyStatus, arg4, arg5, arg6)
 	FS_Debug.info("onActionAdjustmentCall - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self), 4)
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 
 	spec.mirrors_have_been_adjusted = true
 
@@ -476,7 +480,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:setMirror(mirror_idx, new_x0, new_y0)
 	FS_Debug.debug("setMirror" .. FS_Debug.getIdentity(self), 4)
-	local spec = self.spec_AdjustableMirrors
+	local spec = self.spec_adjustableMirrors
 
 	--Just in case that the mirror isn't already present, fx. on the server
 	if spec.mirrors[mirror_idx] == nil then
