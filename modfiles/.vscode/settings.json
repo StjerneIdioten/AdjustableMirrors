@@ -1,0 +1,8 @@
+{
+    "Lua.diagnostics.globals": [
+        "g_currentModDirectory",
+        "getXMLString",
+        "loadXMLFile",
+        "g_currentModName"
+    ]
+}

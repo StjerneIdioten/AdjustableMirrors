@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <texts>
+        <text name="input_AM_AdjustMirrors" text="Réglez Les Rétroviseurs on/off"/>
+        <text name="input_AM_SwitchMirror" text="Changez Rétroviseur"/>
+        <text name="input_AM_TiltUp" text="Déplacez vers le haut"/>
+        <text name="input_AM_TiltDown" text="Déplacez vers le bas"/>
+        <text name="input_AM_TiltLeft" text="Déplacez vers la gauche"/>
+        <text name="input_AM_TiltRight" text="Déplacez vers la droite"/>
+        <text name="info_AM_SelectedMirror" text="Ce rétroviseur"/>
+    </texts>
+</l10n>
