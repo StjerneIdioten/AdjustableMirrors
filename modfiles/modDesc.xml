@@ -7,7 +7,7 @@
 		<de>Einstellbare Spiegel</de>    
 		<fr>Rétroviseurs Réglables</fr>
 		<pt>Retrovisores Ajustáveis</pt>  
-		<dk>Justerbare Spejle</dk> 
+		<br>Retrovisores Ajustáveis</br>  
     </title>
     <description>
         <en><![CDATA[
@@ -25,8 +25,7 @@ Default bindings are as follows:
 Changelog: 1.0.1.0
 - Fix a vehicletype registration bug, which arose in some vehicle mods. The mod should now work in all applicable vehicles.
 - Update registration code to a more "default" approach using built in functionality
-- Add french, italian, portuguese and danish localization
-
+- Add french, italian and portuguese localization
 ]]></en>
 		<de><![CDATA[
 Dieser Mod ermöglicht es Ihnen, die Spiegel Ihrer Fahrzeuge einzustellen und sie für die Verwendung in der Kabinenansicht nützlich zu machen.
@@ -39,6 +38,11 @@ Die Standardbindungen sind wie folgt:
 - "Kippt den Spiegel nach oben" : [Strg-Rechts + Keypad 2]
 - "Kippt den Spiegel nach links" : [Strg-Rechts + Keypad 4]
 - "Kippt den Spiegel nach rechts" : [Strg-Rechts + Keypad 6]
+
+Changelog: 1.0.1.0
+- Fix a vehicletype registration bug, which arose in some vehicle mods. The mod should now work in all applicable vehicles.
+- Update registration code to a more "default" approach using built in functionality
+- Add french, italian and portuguese localization
 ]]></de>
 
 		<fr><![CDATA[
@@ -52,6 +56,11 @@ Les raccourcis sont les suivants:
 - "Déplacez vers le haut" : [rctrl + keypad_2]
 - "Déplacez vers la gauche" : [rctrl + keypad_4]
 - "Déplacez vers la droite" : [rctrl + keypad_6]
+
+Changelog: 1.0.1.0
+- Fix a vehicletype registration bug, which arose in some vehicle mods. The mod should now work in all applicable vehicles.
+- Update registration code to a more "default" approach using built in functionality
+- Add french, italian and portuguese localization
 ]]></fr>
  	</description>
     <multiplayer supported="true"/>   
