@@ -175,7 +175,10 @@ function AdjustableMirrors:onPostLoad(savegame)
 	--If there was a savegame file to load things from
 	if savegame ~= nil then
 		local xmlFile = savegame.xmlFile
-		local key = savegame.key .. ".AdjustableMirrors"
+		FS_Debug.debug("Savegame Key: " .. savegame.key)
+		FS_Debug.debug("Mod name: " .. Utils.getNoNil(AdjustableMirrors.modName, "Nil"))
+		local key = savegame.key .. "." .. AdjustableMirrors.modName .. '.adjustableMirrors'
+		FS_Debug.debug("Full key: " .. key)
 		--Load in the modversion saved in the savegame file
 		local savegameVersion = getXMLString(xmlFile, key .. "#version")
 		if savegameVersion == nil then
