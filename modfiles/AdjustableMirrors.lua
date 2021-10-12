@@ -467,9 +467,9 @@ function AdjustableMirrors:onActionAdjustmentCall(actionName, keyStatus, arg4, a
 	local mirror = spec.mirrors[spec.mirror_index]
 
 	--Adjust the mirror depending on which of the adjustment events was called
-	if actionName == "AM_TiltUp" then
+	if actionName == "AM_TiltDown" then
 		AdjustableMirrors.setMirror(self, spec.mirror_index, mirror.x0 - spec.mirror_adjustment_step_size, mirror.y0)
-	elseif actionName == "AM_TiltDown" then
+	elseif actionName == "AM_TiltUp" then
 		AdjustableMirrors.setMirror(self, spec.mirror_index, mirror.x0 + spec.mirror_adjustment_step_size, mirror.y0)
 	elseif actionName == "AM_TiltLeft" then
 		AdjustableMirrors.setMirror(self, spec.mirror_index, mirror.x0, mirror.y0 - spec.mirror_adjustment_step_size)
