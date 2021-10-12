@@ -24,7 +24,7 @@ Default bindings are as follows:
 Changelog: 1.0.1.0
 - Fix a vehicletype registration bug, which arose in some vehicle mods. The mod should now work in all applicable vehicles.
 - Update registration code to a more "default" approach using built in functionality
-- Add french, italian and portuguese localization
+- Add french, italian and brazilian portuguese localizations
 ]]></en>
 		<de><![CDATA[
 Dieser Mod ermöglicht es Ihnen, die Spiegel Ihrer Fahrzeuge einzustellen und sie für die Verwendung in der Kabinenansicht nützlich zu machen.
@@ -41,7 +41,7 @@ Die Standardbindungen sind wie folgt:
 Changelog: 1.0.1.0
 - Fix a vehicletype registration bug, which arose in some vehicle mods. The mod should now work in all applicable vehicles.
 - Update registration code to a more "default" approach using built in functionality
-- Add french, italian and portuguese localization
+- Add french, italian and brazilian portuguese localizations
 ]]></de>
 
 		<fr><![CDATA[
@@ -59,7 +59,7 @@ Les raccourcis sont les suivants:
 Changelog: 1.0.1.0
 - Fix a vehicletype registration bug, which arose in some vehicle mods. The mod should now work in all applicable vehicles.
 - Update registration code to a more "default" approach using built in functionality
-- Add french, italian and portuguese localization
+- Add french, italian and brazilian portuguese localizations
 ]]></fr>
  	</description>
     <multiplayer supported="true"/>   
