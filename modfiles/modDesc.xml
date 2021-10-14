@@ -28,22 +28,21 @@ Changelog: 1.0.1.0
 ]]></en>
 		<de><![CDATA[
 Dieser Mod ermöglicht es Ihnen, die Spiegel Ihrer Fahrzeuge einzustellen und sie für die Verwendung in der Kabinenansicht nützlich zu machen.
-Alles ist vollständig multiplayerfähig und Spiegel werden zwischen allen Clients synchronisiert und vom Server gespeichert.
+Alles ist vollständig Multiplayerfähig und Spiegel werden zwischen allen Clients synchronisiert und vom Server gespeichert.
 
 Die Standardbindungen sind wie folgt:
 - "Spiegel anpassen ein/aus" : [Strg-Rechts + Keypad 0]
 - "Spiegel ändern" : [Strg-Rechts + Keypad 5]
-- "Kippt den Spiegel nach unten": [Strg-Rechts + Keypad_2]
-- "Kippt den Spiegel nach oben" : [Strg-Rechts + Keypad_8]
-- "Kippt den Spiegel nach links" : [Strg-Rechts + Keypad_4]
-- "Kippt den Spiegel nach rechts" : [Strg-Rechts + Keypad_6]
+- "Kippt den Spiegel nach unten": [Strg-Rechts + Keypad 2]
+- "Kippt den Spiegel nach oben" : [Strg-Rechts + Keypad 8]
+- "Kippt den Spiegel nach links" : [Strg-Rechts + Keypad 4]
+- "Kippt den Spiegel nach rechts" : [Strg-Rechts + Keypad 6]
 
-Changelog: 1.0.1.0
-- Fix a vehicletype registration bug, which arose in some vehicle mods. The mod should now work in all applicable vehicles.
-- Update registration code to a more "default" approach using built in functionality
-- Add french, italian and brazilian portuguese localizations
+Changelog 1.0.1.0:
+- Fehler bei der Registrierung von Fahrzeugtypen, der bei einigen Fahrzeugmods auftrat behoben. Der Mod sollte nun in allen geeigneten Fahrzeugen funktionieren.
+- Aktualisierung des Registrierungscodes auf einen "Standard"-Ansatz unter Verwendung integrierter Funktionen
+- Französische, italienische und brasilianisch-portugiesische Lokalisierung hinzugefügt
 ]]></de>
-
 		<fr><![CDATA[
 Ce mod vous permet de régler les rétroviseurs de vous véhicules pour les utiliser dedans la cabine.
 Toutes les fonctions sont compatibles avec les multijouers et les rétroviseurs seront synchronisés entre tous les clients et enregistrés par le serveur.
