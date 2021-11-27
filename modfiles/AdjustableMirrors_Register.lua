@@ -29,7 +29,7 @@ AdjustableMirrors_Register.title = getXMLString(modDesc, "modDesc.title.en")
 --Set the modname to use when outputting to the log through FS_Debug
 FS_Debug.mod_name = AdjustableMirrors_Register.title
 --Set the max log level for FS_Debug. Error = 0, Warning = 1, Info = 2, Debug = 3 and so on for even more debug info.
-FS_Debug.log_level_max = 1
+FS_Debug.log_level_max = 3
 
 --#######################################################################################
 --### This is responsible for checking if the
@@ -58,7 +58,27 @@ function validateVehicleTypes(vehicleTypeManager)
 	end
 end
 
-VehicleTypeManager.validateVehicleTypes = Utils.prependedFunction(VehicleTypeManager.validateVehicleTypes, validateVehicleTypes)
+function initSpecialization(manager)
+	if manager.typeName == "vehicle" then
+		FS_Debug.info("Running spec function: " .. modName .. " : " .. directory)
+		g_specializationManager:addSpecialization("adjustableMirrors", "AdjustableMirrors", Utils.getFilename("AdjustableMirrors.lua", directory), nil)
+		
+		for typeName, typeDef in pairs(g_vehicleTypeManager:getTypes()) do
+			if typeDef ~= nil and typeName ~= "locomotive" and typeName ~= "conveyorBelt" and typeName ~= "pickupConveyorBelt" then
+				if SpecializationUtil.hasSpecialization(Drivable, typeDef.specializations) and 
+					SpecializationUtil.hasSpecialization(Motorized, typeDef.specializations) and
+					SpecializationUtil.hasSpecialization(Enterable, typeDef.specializations) then
+						FS_Debug.info("Attached specialization '" .. modName .. ".adjustableMirrors" .. "' to vehicleType '" .. tostring(typeName) .. "'")
+						g_vehicleTypeManager:addSpecialization(typeName, modName .. ".adjustableMirrors")
+				end
+			end
+		end
+	end
+end
+
+
+TypeManager.validateTypes = Utils.prependedFunction(TypeManager.validateTypes, initSpecialization)
+
 
 --#######################################################################################
 --### If anything special has to happen after the register of the mod, then this function 
