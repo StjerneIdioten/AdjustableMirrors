@@ -8,18 +8,17 @@
 --### vehichle the specialization is inserted into.
 --#######################################################################################
 
---source is used for telling the giants engine to import these files, it is sort of equivalent to when you would use the lua function "require"
-source(Utils.getFilename("AdjustableMirrors.lua", g_currentModDirectory))
-source(Utils.getFilename("AdjustableMirrors_Event.lua", g_currentModDirectory))
-source(Utils.getFilename("FS_Debug.lua", g_currentModDirectory))
+local modDirectory = g_currentModDirectory or ""
+local modName = g_currentModName or "unknown"
 
-local directory = g_currentModDirectory
-local modName = g_currentModName
+source(Utils.getFilename("AdjustableMirrors.lua", modDirectory))
+source(Utils.getFilename("AdjustableMirrors_Event.lua", modDirectory))
+source(Utils.getFilename("FS_Debug.lua", modDirectory))
 
 AdjustableMirrors_Register = {}
 
 --Fetch some variables from the moddesc file, to be used when writing out load statements
-local modDesc = loadXMLFile("modDesc", g_currentModDirectory .. "modDesc.xml")
+local modDesc = loadXMLFile("modDesc", modDirectory .. "modDesc.xml")
 AdjustableMirrors_Register.version = getXMLString(modDesc, "modDesc.version")
 AdjustableMirrors.version = AdjustableMirrors_Register.version
 AdjustableMirrors.modName = modName
@@ -39,11 +38,11 @@ FS_Debug.log_level_max = 3
 --#######################################################################################
 
 function validateVehicleTypes(vehicleTypeManager)
-	FS_Debug.info("Running spec function: " .. modName .. " : " .. directory)
+	FS_Debug.info("Running spec function: " .. modName .. " : " .. modDirectory)
 	--The specialization manager will register the specialization as "'spec_' .. g_currentModName .. '.' .. <specName argument>" 
 	--meaning that in AM's case it becomes spec_FS19_AdjustableMirrors.adjustableMirrors, which can be hard to access (See "AdjustableMirrors:onLoad" for an example how to)
 	-- Arguments: (specName: What to register as, class: The class in the file which represents the spec, file: What file to find the class in, unknown: idk, but it must be nil)
-	g_specializationManager:addSpecialization("adjustableMirrors", "AdjustableMirrors", Utils.getFilename("AdjustableMirrors.lua", directory), nil)
+	g_specializationManager:addSpecialization("adjustableMirrors", "AdjustableMirrors", Utils.getFilename("AdjustableMirrors.lua", modDirectory), nil)
 	--Go through the different vehicle types and see if they meet the criteria required for adjustable mirrors
 	for typeName, typeDef in pairs(g_vehicleTypeManager:getVehicleTypes()) do
 		--Sort out nil keys and trains, since we don't need to adjust mirrors on trains and conveyor belts
@@ -60,8 +59,8 @@ end
 
 function initSpecialization(manager)
 	if manager.typeName == "vehicle" then
-		FS_Debug.info("Running spec function: " .. modName .. " : " .. directory)
-		g_specializationManager:addSpecialization("adjustableMirrors", "AdjustableMirrors", Utils.getFilename("AdjustableMirrors.lua", directory), nil)
+		FS_Debug.info("Running spec function: " .. modName .. " : " .. modDirectory)
+		g_specializationManager:addSpecialization("adjustableMirrors", "AdjustableMirrors", Utils.getFilename("AdjustableMirrors.lua", modDirectory), nil)
 		
 		for typeName, typeDef in pairs(g_vehicleTypeManager:getTypes()) do
 			if typeDef ~= nil and typeName ~= "locomotive" and typeName ~= "conveyorBelt" and typeName ~= "pickupConveyorBelt" then
