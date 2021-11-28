@@ -180,26 +180,23 @@ function AdjustableMirrors:onPostLoad(savegame)
 		local key = savegame.key .. "." .. AdjustableMirrors.modName .. '.adjustableMirrors'
 		FS_Debug.debug("Full key: " .. key)
 		--Load in the modversion saved in the savegame file
-		local savegameVersion = getXMLString(xmlFile, key .. "#version")
+		local savegameVersion = xmlFile:getString(key .. "#version")
 		if savegameVersion == nil then
 			FS_Debug.info("No savegame data present, defaults are used for mirrors" .. FS_Debug.getIdentity(self))
 		elseif savegameVersion ~= AdjustableMirrors.version then
 			FS_Debug.warning("Savegame data is from mod version " .. savegameVersion .. " while the current mod is version " .. AdjustableMirrors.version .. " therefore mirrors are reset to defaults" .. FS_Debug.getIdentity(self))
 		else
 			FS_Debug.info("Loading savegame mirror settings" .. FS_Debug.getIdentity(self))
-			
 			local idx = 1
 			while true do
-				local x0 = getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#x0")
-				local y0 = getXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#y0")
-
-				if x0 == nil or y0 == nil then
+				local position = xmlFile:getVector(key .. ".mirror" .. idx .. "#position", nil, 2)
+				if position == nil then
 					FS_Debug.info("Found " .. idx - 1 .. " mirrors" .. FS_Debug.getIdentity(self))
 					break
 				else
-					FS_Debug.debug("x0: " .. x0 .. ", y0: " .. y0 .. FS_Debug.getIdentity(self))
+					FS_Debug.debug("x0: " .. position[1] .. ", y0: " .. position[2] .. FS_Debug.getIdentity(self))
 					
-					AdjustableMirrors.setMirror(self, idx, x0, y0)
+					AdjustableMirrors.setMirror(self, idx, unpack(position))
 					idx = idx + 1
 				end
 			end
@@ -217,18 +214,16 @@ end
 --### you try to do more and it will show up properly in the vehicles.xml file.
 --#######################################################################################
 function AdjustableMirrors:saveToXMLFile(xmlFile, key)
-	FS_Debug.info("saveToXMLFile - File: " .. xmlFile .. ", Key: " .. key .. FS_Debug.getIdentity(self))
+	--DebugUtil.printTableRecursively(xmlFile, "  ", 0, 0)
+	FS_Debug.info("saveToXMLFile - File: " .. tostring(xmlFile.filename) .. ", Key: " .. key .. FS_Debug.getIdentity(self))
 	local spec = self.spec_adjustableMirrors
-	setXMLString(xmlFile, key .. "#version", AdjustableMirrors.version)
+	xmlFile:setString(key .. "#version", AdjustableMirrors.version)
 
 	for idx, mirror in ipairs(spec.mirrors) do
-		FS_Debug.info("saving mirror" .. idx)
-		FS_Debug.info("x0:" .. mirror.x0)
-		FS_Debug.info("y0:" .. mirror.y0)
-		setXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#x0", mirror.x0)
-		setXMLFloat(xmlFile, key .. ".mirror" .. idx .. "#y0", mirror.y0)
+		FS_Debug.info("saving mirror" .. idx .. ", x0: " .. mirror.x0 .. ", y0: " .. mirror.y0)
+		xmlFile:setVector(key .. ".mirror" .. idx .. "#position", {mirror.x0, mirror.y0}, 2)
+		FS_Debug.info("saved mirror")
 	end
-
 end
 
 --#######################################################################################
