@@ -1,0 +1,23 @@
+{
+    "Lua.diagnostics.globals": [
+        "source",
+        "getXMLString",
+        "g_AMDebug",
+        "g_dedicatedServerInfo",
+        "getRotation",
+        "getTranslation",
+        "createTransformGroup",
+        "getParent",
+        "link",
+        "setRotation",
+        "setTranslation",
+        "streamReadInt8",
+        "streamReadFloat32",
+        "streamWriteInt8",
+        "streamWriteFloat32",
+        "g_adjustableMirrors"
+    ],
+    "Lua.diagnostics.disable": [
+        "redundant-parameter"
+    ]
+}
