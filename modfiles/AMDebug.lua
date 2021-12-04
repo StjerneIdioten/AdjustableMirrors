@@ -3,10 +3,10 @@
 --### MAX_LOG_LEVEL: Log levels  higher than this value, wont be output
 --### modName: The mod name that gets prepended in console
 --#######################################################################################
-FS_Debug = {}
+g_AMDebug = {}
 
-FS_Debug.log_level_max = 3
-FS_Debug.mod_name = "Unspecified Modname"
+g_AMDebug.log_level_max = 3
+g_AMDebug.mod_name = "Unspecified Modname"
 
 --#######################################################################################
 --### Base function for creating the properly formatted log output in the form of:
@@ -17,58 +17,58 @@ FS_Debug.mod_name = "Unspecified Modname"
 --### prefix: A little prefix to indicate error type f.eks. "info", "warning", "Error"
 --### message: The log message
 --#######################################################################################
-function FS_Debug._log(log_level, log_prefix,...)
+function g_AMDebug._log(log_level, log_prefix,...)
     log_level = log_level or 0 -- default value for log level
-    if  log_level <= FS_Debug.log_level_max then
+    if  log_level <= g_AMDebug.log_level_max then
         local txt = ""
         for idx = 1,select("#", ...) do
             txt = txt .. tostring(select(idx, ...))
         end
-        print(string.format("%7ums [%s]", (g_currentMission ~= nil and g_currentMission.time or 0), FS_Debug.mod_name) .. "[" .. FS_Debug.log_level_max .. "]" .. log_prefix .. " " .. txt)
+        print(string.format("%7ums [%s]", (g_currentMission ~= nil and g_currentMission.time or 0), g_AMDebug.mod_name) .. "[" .. g_AMDebug.log_level_max .. "]" .. log_prefix .. " " .. txt)
     end
 end
 
 --#######################################################################################
 --### Function with prefix=Debug
 --#######################################################################################
-function FS_Debug.debug(message, log_level)
+function g_AMDebug.debug(message, log_level)
     log_level = log_level or 3
-	FS_Debug._log(log_level, "[Debug]", message)
+	g_AMDebug._log(log_level, "[Debug]", message)
 end
 
 --#######################################################################################
 --### Function with prefix=Info
 --#######################################################################################
-function FS_Debug.info(message, log_level)
+function g_AMDebug.info(message, log_level)
     log_level = log_level or 2
-	FS_Debug._log(log_level, "[Info]", message)
+	g_AMDebug._log(log_level, "[Info]", message)
 end
 
 --#######################################################################################
 --### Function with prefix=Warning
 --#######################################################################################
-function FS_Debug.warning(message, log_level)
+function g_AMDebug.warning(message, log_level)
     log_level = log_level or 1
-	FS_Debug._log(log_level, "[Warning]", message)
+	g_AMDebug._log(log_level, "[Warning]", message)
 end
 
 --#######################################################################################
 --### Function with prefix=Error
 --#######################################################################################
-function FS_Debug.error(message, log_level)
+function g_AMDebug.error(message, log_level)
     log_level = log_level or 0
-	FS_Debug._log(log_level, "[Error]", message)
+	g_AMDebug._log(log_level, "[Error]", message)
 end
 
 --#######################################################################################
 --### Function for getting relevant info out of the "self" object, which should be 
 --### supplied
 --#######################################################################################
-function FS_Debug.getIdentity(obj)
+function g_AMDebug.getIdentity(obj)
     return " (name: " .. obj:getFullName() .. ", rootNode: " .. obj.rootNode .. ", typeName: " .. obj.typeName .. ", typeDesc: " .. obj.typeDesc .. ")"
 end
 
-function FS_Debug:args_to_txt(...)
+function g_AMDebug:args_to_txt(...)
     local args = { ... }
     local txt = ""
     local i, v

@@ -3,7 +3,7 @@
 --### to anything created in the table for the AdjustableMirrors_Register.lua file aswell
 --### which is something I suppose the giants engine is doing for us. So if I at any 
 --### point use something without importing/initializing it first. Chances are that has 
---### already happened in the register file. An example is the FS_Debug library.
+--### already happened in the register file. An example is the g_AMDebug library.
 --### And remember that anything in this file is run on a per instance basis. So fx.
 --### onLoad will run for as many times as there are vehicles with the specialization.
 --#######################################################################################
@@ -31,7 +31,7 @@ end
 --### the self.spec_specializationName table
 --#######################################################################################
 function AdjustableMirrors.registerFunctions(vehicleType)
-	FS_Debug.info("registerFunctions")
+	g_AMDebug.info("registerFunctions")
 end
 
 --#######################################################################################
@@ -40,7 +40,7 @@ end
 --### And it looks like this function is run upon each vehicletype getting loaded.
 --#######################################################################################
 function AdjustableMirrors.registerEventListeners(vehicleType)
-	FS_Debug.info("registerEventListeners")
+	g_AMDebug.info("registerEventListeners")
 	--Table holding all the events, makes it a bit easier to read the code
 	local events = { "onLoad", 
 					  "onPostLoad", 
@@ -66,7 +66,7 @@ end
 --### fx. expose something that other mods should be able to use in their own onPostLoad
 --#######################################################################################
 function AdjustableMirrors:onLoad(savegame)
-	FS_Debug.info("onload" .. FS_Debug.getIdentity(self))
+	g_AMDebug.info("onload" .. g_AMDebug.getIdentity(self))
 	--DebugUtil.printTableRecursively(self.controlled, '-', 0, 2) --self["spec_FS19_AdjustableMirrors.adjustableMirrors"]
 	self.spec_adjustableMirrors = self[("spec_%s.adjustableMirrors"):format(AdjustableMirrors.modName)]
 	local spec = self.spec_adjustableMirrors
@@ -76,16 +76,16 @@ function AdjustableMirrors:onLoad(savegame)
 	--This could be reduced into one if statement, but it would look horrible and in this
 	--way it allows me to write several prints depending on the condition that failed
 	if g_dedicatedServerInfo ~= nil then
-		FS_Debug.info("This vehicle is loaded on a dedicated server and therefor does not have mirrors" .. FS_Debug.getIdentity(self))
+		g_AMDebug.info("This vehicle is loaded on a dedicated server and therefor does not have mirrors" .. g_AMDebug.getIdentity(self))
 		spec.has_usable_mirrors = false
 	elseif g_gameSettings:getValue("maxNumMirrors") < 1 then
-		FS_Debug.info("This vehicle is loaded on a client that does not have mirrors enabled" .. FS_Debug.getIdentity(self))
+		g_AMDebug.info("This vehicle is loaded on a client that does not have mirrors enabled" .. g_AMDebug.getIdentity(self))
 		spec.has_usable_mirrors = false
 	elseif not self.spec_enterable.mirrors or not self.spec_enterable.mirrors[1] then
-		FS_Debug.info("This vehicle does not have mirrors" .. FS_Debug.getIdentity(self))
+		g_AMDebug.info("This vehicle does not have mirrors" .. g_AMDebug.getIdentity(self))
 		spec.has_usable_mirrors = false
 	else
-		FS_Debug.info("This vehicle has usable mirrors" .. FS_Debug.getIdentity(self))
+		g_AMDebug.info("This vehicle has usable mirrors" .. g_AMDebug.getIdentity(self))
 		spec.has_usable_mirrors = true
 	end
 end
@@ -96,7 +96,7 @@ end
 --### joining a server and the vehicle is loaded in.
 --#######################################################################################
 function AdjustableMirrors:onPostLoad(savegame)
-	FS_Debug.info("onPostLoad" .. FS_Debug.getIdentity(self))
+	g_AMDebug.info("onPostLoad" .. g_AMDebug.getIdentity(self))
 	--Quick reference to the specialization, where we should keep all of our variables
 	local spec = self.spec_adjustableMirrors
 
@@ -107,17 +107,17 @@ function AdjustableMirrors:onPostLoad(savegame)
 	spec.max_rotation = math.rad(20)
 	if g_server ~= nil then
 		if g_dedicatedServerInfo ~= nil then
-			FS_Debug.info("Dedi server")
+			g_AMDebug.info("Dedi server")
 		else
-			FS_Debug.info("Listen server")
+			g_AMDebug.info("Listen server")
 		end
 	else 
-		FS_Debug.info("This should be a client")
+		g_AMDebug.info("This should be a client")
 	end
 
 	--It is only relevant to setup mirrors, if we are able to use them.
 	if spec.has_usable_mirrors then
-		FS_Debug.info("Initialization stuff, when we have mirrors")
+		g_AMDebug.info("Initialization stuff, when we have mirrors")
 		
 		--Initial camera index
 		spec.mirror_index = 1
@@ -137,7 +137,7 @@ function AdjustableMirrors:onPostLoad(savegame)
 		--#######################################################################################
 		local idx = 1
 		local function addMirror(mirror)
-			FS_Debug.info("Adding adjustable mirror #" .. idx .. FS_Debug.getIdentity(self))
+			g_AMDebug.info("Adding adjustable mirror #" .. idx .. g_AMDebug.getIdentity(self))
 			spec.mirrors[idx] = {}
 			spec.mirrors[idx].mirror_ref = mirror
 			spec.mirrors[idx].rotation_org = {getRotation(spec.mirrors[idx].mirror_ref.node)}
@@ -167,7 +167,7 @@ function AdjustableMirrors:onPostLoad(savegame)
 		end
 
 		--Add the new structure for every mirror
-		for i = 1, table.getn(spec.spec_enterable.mirrors) do
+		for i = 1, #spec.spec_enterable.mirrors do
 			addMirror(spec.spec_enterable.mirrors[i])
 		end
 	end
@@ -175,26 +175,26 @@ function AdjustableMirrors:onPostLoad(savegame)
 	--If there was a savegame file to load things from
 	if savegame ~= nil then
 		local xmlFile = savegame.xmlFile
-		FS_Debug.debug("Savegame Key: " .. savegame.key)
-		FS_Debug.debug("Mod name: " .. Utils.getNoNil(AdjustableMirrors.modName, "Nil"))
+		g_AMDebug.debug("Savegame Key: " .. savegame.key)
+		g_AMDebug.debug("Mod name: " .. Utils.getNoNil(AdjustableMirrors.modName, "Nil"))
 		local key = savegame.key .. "." .. AdjustableMirrors.modName .. '.adjustableMirrors'
-		FS_Debug.debug("Full key: " .. key)
+		g_AMDebug.debug("Full key: " .. key)
 		--Load in the modversion saved in the savegame file
 		local savegameVersion = xmlFile:getString(key .. "#version")
 		if savegameVersion == nil then
-			FS_Debug.info("No savegame data present, defaults are used for mirrors" .. FS_Debug.getIdentity(self))
+			g_AMDebug.info("No savegame data present, defaults are used for mirrors" .. g_AMDebug.getIdentity(self))
 		elseif savegameVersion ~= AdjustableMirrors.version then
-			FS_Debug.warning("Savegame data is from mod version " .. savegameVersion .. " while the current mod is version " .. AdjustableMirrors.version .. " therefore mirrors are reset to defaults" .. FS_Debug.getIdentity(self))
+			g_AMDebug.warning("Savegame data is from mod version " .. savegameVersion .. " while the current mod is version " .. AdjustableMirrors.version .. " therefore mirrors are reset to defaults" .. g_AMDebug.getIdentity(self))
 		else
-			FS_Debug.info("Loading savegame mirror settings" .. FS_Debug.getIdentity(self))
+			g_AMDebug.info("Loading savegame mirror settings" .. g_AMDebug.getIdentity(self))
 			local idx = 1
 			while true do
 				local position = xmlFile:getVector(key .. ".mirror" .. idx .. "#position", nil, 2)
 				if position == nil then
-					FS_Debug.info("Found " .. idx - 1 .. " mirrors" .. FS_Debug.getIdentity(self))
+					g_AMDebug.info("Found " .. idx - 1 .. " mirrors" .. g_AMDebug.getIdentity(self))
 					break
 				else
-					FS_Debug.debug("x0: " .. position[1] .. ", y0: " .. position[2] .. FS_Debug.getIdentity(self))
+					g_AMDebug.debug("x0: " .. position[1] .. ", y0: " .. position[2] .. g_AMDebug.getIdentity(self))
 					
 					AdjustableMirrors.setMirror(self, idx, unpack(position))
 					idx = idx + 1
@@ -215,14 +215,14 @@ end
 --#######################################################################################
 function AdjustableMirrors:saveToXMLFile(xmlFile, key)
 	--DebugUtil.printTableRecursively(xmlFile, "  ", 0, 0)
-	FS_Debug.info("saveToXMLFile - File: " .. tostring(xmlFile.filename) .. ", Key: " .. key .. FS_Debug.getIdentity(self))
+	g_AMDebug.info("saveToXMLFile - File: " .. tostring(xmlFile.filename) .. ", Key: " .. key .. g_AMDebug.getIdentity(self))
 	local spec = self.spec_adjustableMirrors
 	xmlFile:setString(key .. "#version", AdjustableMirrors.version)
 
 	for idx, mirror in ipairs(spec.mirrors) do
-		FS_Debug.info("saving mirror" .. idx .. ", x0: " .. mirror.x0 .. ", y0: " .. mirror.y0)
+		g_AMDebug.info("saving mirror" .. idx .. ", x0: " .. mirror.x0 .. ", y0: " .. mirror.y0)
 		xmlFile:setVector(key .. ".mirror" .. idx .. "#position", {mirror.x0, mirror.y0}, 2)
-		FS_Debug.info("saved mirror")
+		g_AMDebug.info("saved mirror")
 	end
 end
 
@@ -232,21 +232,21 @@ end
 --### last frame. So use this to make your code not be framerate dependent.
 --#######################################################################################
 function AdjustableMirrors:onUpdate(dt, isActiveForInput, isSelected)
-	FS_Debug.debug("onUpdate" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self), 5)
+	g_AMDebug.debug("onUpdate" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. g_AMDebug.getIdentity(self), 5)
 end
 
 --#######################################################################################
 --### Same as onUpdate, but it only updates with the network ticks. 
 --#######################################################################################
 function AdjustableMirrors:onUpdateTick(dt)
-	FS_Debug.debug("onUpdateTick" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self), 5)
+	g_AMDebug.debug("onUpdateTick" .. dt .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. g_AMDebug.getIdentity(self), 5)
 end
 
 --#######################################################################################
 --### Used for updating drawn stuff like GUI elements
 --#######################################################################################
 function AdjustableMirrors:onDraw()
-	FS_Debug.debug("onDraw" .. FS_Debug.getIdentity(self), 5)
+	g_AMDebug.debug("onDraw" .. g_AMDebug.getIdentity(self), 5)
 	local spec = self.spec_adjustableMirrors
 
 	if spec.mirror_adjustment_enabled == true then
@@ -261,7 +261,7 @@ end
 --### get data on the initial join and synch the states between client and server.
 --#######################################################################################
 function AdjustableMirrors:onReadStream(streamID, connection)
-	FS_Debug.info("onReadStream - " .. streamID .. FS_Debug.getIdentity(self))
+	g_AMDebug.info("onReadStream - " .. streamID .. g_AMDebug.getIdentity(self))
 	local spec = self.spec_adjustableMirrors
 
 	--The first value streamed is the number of mirrors, since this is very dynamic from
@@ -271,7 +271,7 @@ function AdjustableMirrors:onReadStream(streamID, connection)
 	--The server does not necessarily have any mirror data, since it does know the existence
 	--of mirrors on the vehicle (mirrors are only ever present clientside)
 	if numbOfMirrors > 0 then
-		FS_Debug.info("Server has mirror data for " .. numbOfMirrors .. " mirrors")
+		g_AMDebug.info("Server has mirror data for " .. numbOfMirrors .. " mirrors")
 
 		local mirrorData = {}
 
@@ -287,7 +287,7 @@ function AdjustableMirrors:onReadStream(streamID, connection)
 		end
 	
 	else
-		FS_Debug.info("No mirror data stored on server for this vehicle")
+		g_AMDebug.info("No mirror data stored on server for this vehicle")
 	end
 end
 
@@ -296,17 +296,17 @@ end
 --### data with the client.
 --#######################################################################################
 function AdjustableMirrors:onWriteStream(streamID, connection)
-	FS_Debug.info("onWriteStream - " .. streamID .. FS_Debug.getIdentity(self))
+	g_AMDebug.info("onWriteStream - " .. streamID .. g_AMDebug.getIdentity(self))
 	local spec = self.spec_adjustableMirrors
 
-	FS_Debug.info("mirrors stored on server: " .. #spec.mirrors)
+	g_AMDebug.info("mirrors stored on server: " .. #spec.mirrors)
 	--Write out the number of mirrors as the first data value to be synched, so the client
 	--knows if it should expect data from the server.
 	streamWriteInt8(streamID, #spec.mirrors)
 
 	--Stream the mirror position data to the client, if any.
 	for idx, mirror in ipairs(spec.mirrors) do
-		FS_Debug.info("mirror" .. idx .. " x0:" .. mirror.x0 .. " y0:" .. mirror.y0)
+		g_AMDebug.info("mirror" .. idx .. " x0:" .. mirror.x0 .. " y0:" .. mirror.y0)
 		streamWriteFloat32(streamID, mirror.x0)
 		streamWriteFloat32(streamID, mirror.y0)
 	end
@@ -316,20 +316,20 @@ end
 --### This is run when someone enters the vehicle.
 --#######################################################################################
 function AdjustableMirrors:onEnterVehicle()
-	FS_Debug.info("onEnterVehicle" .. FS_Debug.getIdentity(self))
+	g_AMDebug.info("onEnterVehicle" .. g_AMDebug.getIdentity(self))
 end
 
 --#######################################################################################
 --### This is run when someone leaves the vehicle.
 --#######################################################################################
 function AdjustableMirrors:onLeaveVehicle()
-	FS_Debug.info("onLeaveVehicle" .. FS_Debug.getIdentity(self))
+	g_AMDebug.info("onLeaveVehicle" .. g_AMDebug.getIdentity(self))
 	local spec = self.spec_adjustableMirrors
 
 	--No need to send an update event unless the mirrors have actually been changed
 	if spec.mirrors_have_been_adjusted then
-		FS_Debug.info("Mirrors have changed, sending update event")
-		AdjustableMirrors_Event:sendEvent(self)
+		g_AMDebug.info("Mirrors have changed, sending update event")
+		--AdjustMirrorsEvent:sendEvent(self)
 		spec.mirrors_have_been_adjusted = false
 	end
 end
@@ -345,7 +345,7 @@ end
 --### the active vehicle.
 --#######################################################################################
 function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
-	FS_Debug.info("onRegisterActionEvents, selected: " .. tostring(isSelected) .. ", activeVehicle: " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. FS_Debug.getIdentity(self))
+	g_AMDebug.info("onRegisterActionEvents, selected: " .. tostring(isSelected) .. ", activeVehicle: " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. g_AMDebug.getIdentity(self))
 	local spec = self.spec_adjustableMirrors
 
 	--Actions are only relevant if the mirrors are available
@@ -384,7 +384,7 @@ end
 --### setActiveCameraIndex function.
 --#######################################################################################
 function AdjustableMirrors:onCameraChanged(activeCamera, camIndex)
-	FS_Debug.info("onCameraChanged - camIndex: " .. camIndex .. FS_Debug.getIdentity(self))
+	g_AMDebug.info("onCameraChanged - camIndex: " .. camIndex .. g_AMDebug.getIdentity(self))
 	local spec = self.spec_adjustableMirrors
 
 	--Only relevant to toggle the action event if we have mirrors
@@ -409,7 +409,7 @@ end
 --### Callback for the AdjustMirrors action
 --#######################################################################################
 function AdjustableMirrors:onActionAdjustMirrors(actionName, keyStatus)
-	FS_Debug.info("onActionAdjustMirrors - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
+	g_AMDebug.info("onActionAdjustMirrors - " .. actionName .. ", keyStatus: " .. keyStatus .. g_AMDebug.getIdentity(self))
 	local spec = self.spec_adjustableMirrors
 	--Toggles the adjustment actions
 	AdjustableMirrors.updateAdjustmentEvents(self)
@@ -419,7 +419,7 @@ end
 --### Callback for the SwitchMirror action
 --#######################################################################################
 function AdjustableMirrors:onActionSwitchMirror(actionName, keyStatus)
-	FS_Debug.info("onActionSwitchMirror - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self))
+	g_AMDebug.info("onActionSwitchMirror - " .. actionName .. ", keyStatus: " .. keyStatus .. g_AMDebug.getIdentity(self))
 	local spec = self.spec_adjustableMirrors
 	
 	--Selected the next mirror or loop around to the first one if the last one was selected
@@ -429,7 +429,7 @@ function AdjustableMirrors:onActionSwitchMirror(actionName, keyStatus)
 		spec.mirror_index = spec.mirror_index + 1
 	end
 
-	FS_Debug.info("new value of mirror_index: " .. spec.mirror_index)
+	g_AMDebug.info("new value of mirror_index: " .. spec.mirror_index)
 end
 
 --#######################################################################################
@@ -437,7 +437,7 @@ end
 --### function just toggles the state. 
 --#######################################################################################
 function AdjustableMirrors:updateAdjustmentEvents(state)
-	FS_Debug.info("updateAdjustmentEvents - state: " .. tostring(Utils.getNoNil(state, "Nil")))
+	g_AMDebug.info("updateAdjustmentEvents - state: " .. tostring(Utils.getNoNil(state, "Nil")))
 	local spec = self.spec_adjustableMirrors
 	--If 'state' was supplied then use that, and if not then act as a toggle
 	spec.mirror_adjustment_enabled = Utils.getNoNil(state, not spec.mirror_adjustment_enabled)
@@ -454,7 +454,7 @@ end
 --### Called when one of the adjustment actions take place
 --#######################################################################################
 function AdjustableMirrors:onActionAdjustmentCall(actionName, keyStatus, arg4, arg5, arg6)
-	FS_Debug.info("onActionAdjustmentCall - " .. actionName .. ", keyStatus: " .. keyStatus .. FS_Debug.getIdentity(self), 4)
+	g_AMDebug.info("onActionAdjustmentCall - " .. actionName .. ", keyStatus: " .. keyStatus .. g_AMDebug.getIdentity(self), 4)
 	local spec = self.spec_adjustableMirrors
 
 	spec.mirrors_have_been_adjusted = true
@@ -477,7 +477,7 @@ end
 --### Used to update the mirror from new values of x0 and y0
 --#######################################################################################
 function AdjustableMirrors:setMirror(mirror_idx, new_x0, new_y0)
-	FS_Debug.debug("setMirror" .. FS_Debug.getIdentity(self), 4)
+	g_AMDebug.debug("setMirror" .. g_AMDebug.getIdentity(self), 4)
 	local spec = self.spec_adjustableMirrors
 
 	--Just in case that the mirror isn't already present, fx. on the server

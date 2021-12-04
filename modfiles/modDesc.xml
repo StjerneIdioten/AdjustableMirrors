@@ -97,7 +97,7 @@ Changelog: 1.0.1.0
 	</inputBinding>
 
 	<extraSourceFiles>
-        <sourceFile filename="AdjustableMirrors_Register.lua" />
+        <sourceFile filename="register.lua" />
     </extraSourceFiles>  
 
 </modDesc>
