@@ -15,7 +15,8 @@
         "streamReadFloat32",
         "streamWriteInt8",
         "streamWriteFloat32",
-        "g_adjustableMirrors"
+        "g_adjustableMirrors",
+        "getWorldTranslation"
     ],
     "Lua.diagnostics.disable": [
         "redundant-parameter"
