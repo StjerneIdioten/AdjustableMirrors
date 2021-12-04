@@ -17,18 +17,13 @@ source(Utils.getFilename("AdjustableMirrors.lua", modDirectory))
 source(Utils.getFilename("AdjustMirrorsEvent.lua", modDirectory))
 source(Utils.getFilename("AMDebug.lua", modDirectory))
 
-g_adjustableMirrors = {}
-
 --Fetch some variables from the moddesc file, to be used when writing out load statements
 local modDesc = loadXMLFile("modDesc", modDirectory .. "modDesc.xml")
-g_adjustableMirrors.version = getXMLString(modDesc, "modDesc.version")
-AdjustableMirrors.version = g_adjustableMirrors.version
-AdjustableMirrors.modName = modName
-g_adjustableMirrors.author = getXMLString(modDesc, "modDesc.author")
-g_adjustableMirrors.title = getXMLString(modDesc, "modDesc.title.en")
+g_AMDebug.mod_name = getXMLString(modDesc, "modDesc.title.en")
+g_AMDebug.log_level_max = 1
 
-g_AMDebug.mod_name = g_adjustableMirrors.title
-g_AMDebug.log_level_max = 3
+AdjustableMirrors.modName = modName
+AdjustableMirrors.version = getXMLString(modDesc, "modDesc.version")
 
 local function initSpecialization(manager)
 	if manager.typeName == "vehicle" then

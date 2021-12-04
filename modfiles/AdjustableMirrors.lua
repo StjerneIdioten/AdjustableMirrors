@@ -11,7 +11,7 @@ AdjustableMirrors = {}
 --Modwide version, should be set in AdjustableMirrors_Register.lua
 AdjustableMirrors.version = "Unspecified Version"
 AdjustableMirrors.modName = "None"
-
+AdjustableMirrors.TEXT_COLOR = {0.5, 1, 0.5, 1}  -- RGBA
 
 --#######################################################################################
 --### Check if certain things are present before going further with the mod, 
@@ -250,9 +250,8 @@ function AdjustableMirrors:onDraw()
 	local spec = self.spec_adjustableMirrors
 
 	if spec.mirror_adjustment_enabled == true then
-		--This is a bit of a crude way to do it, since you aren't really supposed to use debug functions for anything else than debug stuff
-		--I will change this at some point, but for now it works fine for the purpose of showing the currently selected mirror
-		DebugUtil.drawDebugNode(spec.mirrors[spec.mirror_index].mirror_ref.node, g_i18n:getText("info_AM_SelectedMirror"))
+		local x, y, z = getWorldTranslation(spec.mirrors[spec.mirror_index].mirror_ref.node)
+		Utils.renderTextAtWorldPosition(x, y, z, g_i18n:getText("info_AM_SelectedMirror"), getCorrectTextSize(0.012), 0, self.TEXT_COLOR)
 	end
 end
 
