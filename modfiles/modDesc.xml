@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="61">
-	<author>StjerneIdioten - Original 2015 version by Marhu</author>
-	<version>1.0.1.0</version> 
+	<author>StjerneIdioten</author>
+	<version>2.0.0.0</version> 
 	<title>
 		<en>Adjustable Mirrors</en>
 		<de>Einstellbare Spiegel</de>    
@@ -61,10 +61,10 @@ Changelog: 1.0.1.0
 - Add french, italian and brazilian portuguese localizations
 ]]></fr>
  	</description>
-    <multiplayer supported="true"/>   
+    <multiplayer supported="false"/>   
 	<iconFilename>store.dds</iconFilename>
 
-	<l10n filenamePrefix="modDesc_l10n" />
+	<l10n filenamePrefix="localization/modDesc_l10n" />
 
 	<actions>
 		<action name="AM_AdjustMirrors" category="VEHICLE"/>
