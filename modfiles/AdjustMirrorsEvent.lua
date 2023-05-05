@@ -34,9 +34,9 @@ InitEventClass(AdjustMirrorsEvent, "AdjustMirrorsEvent")
 --### This creates an empty event class with nothing but the minimum requirements for a 
 --### class.
 --#######################################################################################
-function AdjustMirrorsEvent:emptyNew()
+function AdjustMirrorsEvent.emptyNew()
     g_AMDebug.info(myName .. ": emptyNew()")
-    local self = Event:new(AdjustMirrorsEvent_mt)
+    local self = Event.new(AdjustMirrorsEvent_mt)
     self.className = "AdjustMirrorsEvent"
     return self
 end
@@ -45,12 +45,12 @@ end
 --### Creates an event class with supplied arguments and a reference to the vehicle 
 --### object so that we can access data from the mod and vehicle in general.
 --#######################################################################################
-function AdjustMirrorsEvent:new(vehicle, ...)
+function AdjustMirrorsEvent.new(vehicle, ...)
     g_AMDebug.info(myName .. ": new()")
     -- Get the arguments into an array
     local args = { ... }
     -- Create a new event
-    local self = AdjustMirrorsEvent:emptyNew()
+    local self = AdjustMirrorsEvent.emptyNew()
     -- Save the reference to the vehicle itself
     self.vehicle = vehicle
     -- Populate a datastructure with the data supplied
@@ -88,14 +88,15 @@ function AdjustMirrorsEvent:readStream(streamID, connection)
     if not connection:getIsServer() then
         g_AMDebug.info(myName .. ": broadcasting event")
         --generate array of mirror data
-        local data = {}
-        data[1] = numbOfMirrors
-        for idx=1,data[1] do
-            data[idx*2] = mirrorData[idx][1]
-            data[idx*2+1] = mirrorData[idx][2]
-        end
+        --local data = {}
+        --data[1] = numbOfMirrors
+        --for idx=1,data[1] do
+        --    data[idx*2] = mirrorData[idx][1]
+        --    data[idx*2+1] = mirrorData[idx][2]
+        --end
         --Broadcast the mirror data to all other clients.
-        g_server:broadcastEvent(AdjustMirrorsEvent:new(self.vehicle, unpack(data)), nil, connection)
+        --g_server:broadcastEvent(AdjustMirrorsEvent.new(self.vehicle, unpack(data)), false, connection, self.vehicle)
+        g_server:broadcastEvent(self, false, connection, self.vehicle)
     end
 
     --Update mirrors, setMirror function handles the difference between server and client
@@ -118,7 +119,7 @@ function AdjustMirrorsEvent:writeStream(streamID, connection)
     NetworkUtil.writeNodeObject(streamID, self.vehicle)
     --Send the number of mirrors as the first data value
     streamWriteInt8(streamID, self.vehicle.data[1])
-
+    
     --Send x0 and y0 for each mirror
     for i=2,self.vehicle.data[1]*2+1 do
         streamWriteFloat32(streamID, self.vehicle.data[i])
@@ -130,7 +131,7 @@ end
 --### this is the function to be used in the main class, when you want to update the 
 --### mirrors serverwide.
 --#######################################################################################
-function AdjustMirrorsEvent:sendEvent(vehicle)
+function AdjustMirrorsEvent.sendEvent(vehicle)
     g_AMDebug.info(myName .. ": sendEvent()")
 
     local spec = vehicle.spec_adjustableMirrors
@@ -147,11 +148,11 @@ function AdjustMirrorsEvent:sendEvent(vehicle)
     --we should just broadcast to the clients directly.
     if g_server ~= nil then
         g_AMDebug.info(myName .. ": g_server:broadcastEvent()")
-        g_server:broadcastEvent(AdjustMirrorsEvent:new(vehicle, unpack(data)), nil, nil, vehicle)
+        g_server:broadcastEvent(AdjustMirrorsEvent.new(vehicle, unpack(data)), nil, nil, vehicle)
     else
         --If it is a client sending the event, then it should just be sent to the server and then it
         --makes sure to broadcast it to the rest of the clients.
         g_AMDebug.info(myName .. ": g_client:getServerConnection():sendEvent()")
-        g_client:getServerConnection():sendEvent(AdjustMirrorsEvent:new(vehicle, unpack(data)))
+        g_client:getServerConnection():sendEvent(AdjustMirrorsEvent.new(vehicle, unpack(data)))
     end
 end

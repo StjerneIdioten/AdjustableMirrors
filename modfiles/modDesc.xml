@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="61">
+<modDesc descVersion="73">
 	<author>StjerneIdioten</author>
 	<version>2.0.0.0</version> 
 	<title>
@@ -61,7 +61,7 @@ Changelog: 1.0.1.0
 - Add french, italian and brazilian portuguese localizations
 ]]></fr>
  	</description>
-    <multiplayer supported="false"/>   
+    <multiplayer supported="true"/>   
 	<iconFilename>store.dds</iconFilename>
 
 	<l10n filenamePrefix="localization/modDesc_l10n" />

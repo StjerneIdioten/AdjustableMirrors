@@ -4,5 +4,6 @@
         "getXMLString",
         "loadXMLFile",
         "g_currentModName"
-    ]
+    ],
+    "Lua.runtime.version": "Lua 5.1"
 }
