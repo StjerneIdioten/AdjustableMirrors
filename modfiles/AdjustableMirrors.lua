@@ -67,7 +67,7 @@ end
 --#######################################################################################
 function AdjustableMirrors:onLoad(savegame)
 	g_AMDebug.info("onload" .. g_AMDebug.getIdentity(self))
-	--DebugUtil.printTableRecursively(self.controlled, '-', 0, 2) --self["spec_FS19_AdjustableMirrors.adjustableMirrors"]
+	--DebugUtil.printTableRecursively(self., '-', 0, 2) --self["spec_FS19_AdjustableMirrors.adjustableMirrors"]
 	self.spec_adjustableMirrors = self[("spec_%s.adjustableMirrors"):format(AdjustableMirrors.modName)]
 	local spec = self.spec_adjustableMirrors
 
@@ -328,7 +328,7 @@ function AdjustableMirrors:onLeaveVehicle()
 	--No need to send an update event unless the mirrors have actually been changed
 	if spec.mirrors_have_been_adjusted then
 		g_AMDebug.info("Mirrors have changed, sending update event")
-		--AdjustMirrorsEvent:sendEvent(self)
+		AdjustMirrorsEvent.sendEvent(self)
 		spec.mirrors_have_been_adjusted = false
 	end
 end
