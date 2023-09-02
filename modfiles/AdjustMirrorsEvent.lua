@@ -24,19 +24,19 @@
 --###   readStream()
 --#######################################################################################
 
-AdjustMirrorsEvent = {}
-local myName = "AdjustMirrorsEvent"
-local AdjustMirrorsEvent_mt = Class(AdjustMirrorsEvent, Event)
+AMAdjustMirrorsEvent = {}
+local myName = "AMAdjustMirrorsEvent"
+local AMAdjustMirrorsEvent_mt = Class(AMAdjustMirrorsEvent, Event)
 
-InitEventClass(AdjustMirrorsEvent, "AdjustMirrorsEvent")
+InitEventClass(AMAdjustMirrorsEvent, myName)
 
 --#######################################################################################
 --### This creates an empty event class with nothing but the minimum requirements for a 
 --### class.
 --#######################################################################################
-function AdjustMirrorsEvent.emptyNew()
+function AMAdjustMirrorsEvent.emptyNew()
     g_AMDebug.info(myName .. ": emptyNew()")
-    local self = Event.new(AdjustMirrorsEvent_mt)
+    local self = Event.new(AMAdjustMirrorsEvent_mt)
     return self
 end
 
@@ -44,10 +44,10 @@ end
 --### Creates an event class with supplied arguments and a reference to the vehicle 
 --### object so that we can access data from the mod and vehicle in general.
 --#######################################################################################
-function AdjustMirrorsEvent.new(vehicle)
+function AMAdjustMirrorsEvent.new(vehicle)
     g_AMDebug.info(myName .. ": new()")
     -- Create a new event
-    local self = AdjustMirrorsEvent.emptyNew()
+    local self = AMAdjustMirrorsEvent.emptyNew()
     -- Save the reference to the vehicle itself
     self.vehicle = vehicle
     return self
@@ -56,7 +56,7 @@ end
 --#######################################################################################
 --### This runs when either the server or a client receives the update event
 --#######################################################################################
-function AdjustMirrorsEvent:readStream(streamID, connection)
+function AMAdjustMirrorsEvent:readStream(streamID, connection)
     g_AMDebug.info(myName .. ": readStream() - " .. streamID)
     --The first object sent in the update event is the vehicle object id
     self.vehicle = NetworkUtil.readNodeObject(streamID)
@@ -97,7 +97,7 @@ end
 --### Used by both server and client to write out the data that should be updated.
 --### It should happen either after a broadcast event or a client->server send event.
 --#######################################################################################
-function AdjustMirrorsEvent:writeStream(streamID, connection)
+function AMAdjustMirrorsEvent:writeStream(streamID, connection)
     g_AMDebug.info(myName .. ": writeStream() - " .. streamID)
     local spec = self.vehicle.spec_adjustableMirrors
     --Synch the vehicle
@@ -116,18 +116,18 @@ end
 --### this is the function to be used in the main class, when you want to update the 
 --### mirrors serverwide.
 --#######################################################################################
-function AdjustMirrorsEvent.sendEvent(vehicle)
+function AMAdjustMirrorsEvent.sendEvent(vehicle)
     g_AMDebug.info(myName .. ": sendEvent()")
 
     --If this is the server itself triggering the event (In the case of a non-dedicated server) then
     --we should just broadcast to the clients directly.
     if g_server ~= nil then
         g_AMDebug.info(myName .. ": g_server:broadcastEvent()")
-        g_server:broadcastEvent(AdjustMirrorsEvent.new(vehicle), nil, nil, vehicle)
+        g_server:broadcastEvent(AMAdjustMirrorsEvent.new(vehicle), nil, nil, vehicle)
     else
         --If it is a client sending the event, then it should just be sent to the server and then it
         --makes sure to broadcast it to the rest of the clients.
         g_AMDebug.info(myName .. ": g_client:getServerConnection():sendEvent()")
-        g_client:getServerConnection():sendEvent(AdjustMirrorsEvent.new(vehicle))
+        g_client:getServerConnection():sendEvent(AMAdjustMirrorsEvent.new(vehicle))
     end
 end

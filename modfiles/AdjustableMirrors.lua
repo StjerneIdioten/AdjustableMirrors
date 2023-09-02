@@ -328,7 +328,7 @@ function AdjustableMirrors:onLeaveVehicle()
 	--No need to send an update event unless the mirrors have actually been changed
 	if spec.mirrors_have_been_adjusted then
 		g_AMDebug.info("Mirrors have changed, sending update event")
-		AdjustMirrorsEvent.sendEvent(self)
+		AMAdjustMirrorsEvent.sendEvent(self)
 		spec.mirrors_have_been_adjusted = false
 	end
 end
