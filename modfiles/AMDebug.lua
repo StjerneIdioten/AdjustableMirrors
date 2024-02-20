@@ -1,8 +1,10 @@
---#######################################################################################
---### Create the table holding all of the debugger.
---### MAX_LOG_LEVEL: Log levels  higher than this value, wont be output
---### modName: The mod name that gets prepended in console
---#######################################################################################
+--
+-- AdjustableMirrors
+--
+-- Description: A quick little debug library
+--
+-- Copyright (c) StjerneIdioten, 2024
+
 g_AMDebug = {}
 
 g_AMDebug.log_level_max = 3
@@ -28,42 +30,31 @@ function g_AMDebug._log(log_level, log_prefix,...)
     end
 end
 
---#######################################################################################
---### Function with prefix=Debug
---#######################################################################################
+
 function g_AMDebug.debug(message, log_level)
     log_level = log_level or 3
 	g_AMDebug._log(log_level, "[Debug]", message)
 end
 
---#######################################################################################
---### Function with prefix=Info
---#######################################################################################
+
 function g_AMDebug.info(message, log_level)
     log_level = log_level or 2
 	g_AMDebug._log(log_level, "[Info]", message)
 end
 
---#######################################################################################
---### Function with prefix=Warning
---#######################################################################################
+
 function g_AMDebug.warning(message, log_level)
     log_level = log_level or 1
 	g_AMDebug._log(log_level, "[Warning]", message)
 end
 
---#######################################################################################
---### Function with prefix=Error
---#######################################################################################
+
 function g_AMDebug.error(message, log_level)
     log_level = log_level or 0
 	g_AMDebug._log(log_level, "[Error]", message)
 end
 
---#######################################################################################
---### Function for getting relevant info out of the "self" object, which should be 
---### supplied
---#######################################################################################
+
 function g_AMDebug.getIdentity(obj)
     return " (name: " .. obj:getFullName() .. ", rootNode: " .. obj.rootNode .. ", typeName: " .. obj.typeName .. ", typeDesc: " .. obj.typeDesc .. ")"
 end
