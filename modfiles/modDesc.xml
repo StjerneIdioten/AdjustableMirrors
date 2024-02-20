@@ -13,6 +13,8 @@
 This mod enables you to adjust the mirrors of you vehicles and actually make them useful when using the in-cab view.
 Everything is fully multiplayer compatible and mirrors will be synched between all clients and saved by the server.
 
+Find the source code <a href="https://github.com/StjerneIdioten/AdjustableMirrors">here</a>.
+
 Default bindings are as follows:
 - "Adjust Mirrors on/off" : [rctrl + keypad_0]
 - "Change mirror" : [rctrl + keypad_5]
@@ -25,6 +27,8 @@ Default bindings are as follows:
 Dieser Mod ermöglicht es Ihnen, die Spiegel Ihrer Fahrzeuge einzustellen und sie für die Verwendung in der Kabinenansicht nützlich zu machen.
 Alles ist vollständig Multiplayerfähig und Spiegel werden zwischen allen Clients synchronisiert und vom Server gespeichert.
 
+Den Quellcode finden Sie <a href="https://github.com/StjerneIdioten/AdjustableMirrors">hier</a>.
+
 Die Standardbindungen sind wie folgt:
 - "Spiegel anpassen ein/aus" : [Strg-Rechts + Keypad 0]
 - "Spiegel ändern" : [Strg-Rechts + Keypad 5]
@@ -36,6 +40,8 @@ Die Standardbindungen sind wie folgt:
 		<fr><![CDATA[
 Ce mod vous permet de régler les rétroviseurs de vous véhicules pour les utiliser dedans la cabine.
 Toutes les fonctions sont compatibles avec les multijouers et les rétroviseurs seront synchronisés entre tous les clients et enregistrés par le serveur.
+
+Trouvez le code source <a href="https://github.com/StjerneIdioten/AdjustableMirrors">ici</a>.
 
 Les raccourcis sont les suivants:
 - "Réglez Les Rétroviseurs on/off" : [rctrl + keypad_0]
