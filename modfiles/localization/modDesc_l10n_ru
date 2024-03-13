@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<translationContributors>nagor</translationContributors>
+    <texts>
+        <text name="input_AM_AdjustMirrors" text="Регулировка зеркал вкл/выкл"/>
+        <text name="input_AM_SwitchMirror" text="Следующее зеркало"/>
+        <text name="input_AM_TiltUp" text="Повернуть зеркало вверх"/>
+        <text name="input_AM_TiltDown" text="Повернуть зеркало вниз"/>
+        <text name="input_AM_TiltLeft" text="Повернуть зеркало влево"/>
+        <text name="input_AM_TiltRight" text="Повернуть зеркало вправо"/>
+        <text name="info_AM_SelectedMirror" text="Выбранное зеркало"/>
+    </texts>
+</l10n>
