@@ -1,7 +1,7 @@
 # AdjustableMirrors
 The mod that allows you to adjust your mirrors, to make your cab-view driving experience that more pleasureable.
 
-Currently there are old builds available for FS17 as well as builds available for FS19.
-
-The mod is now available on the [modhub](https://www.farming-simulator.com/mod.php?lang=en&country=dk&mod_id=135313&title=fs2019)!
-
+Available on modhub:
+- [FS19](https://www.farming-simulator.com/mod.php?mod_id=135313)
+- [FS22](https://www.farming-simulator.com/mod.php?mod_id=287548)
+- [FS25](https://www.farming-simulator.com/mod.php?mod_id=327359)
