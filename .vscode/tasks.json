@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "FS Lua: Fix Linux LuaLS",
+            "type": "shell",
+            "command": "bash scripts/fix-luals-linux.sh",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "detail": "Download the Linux LuaLS build and symlink it over the Windows-only .exe bundled with the Farming Simulator IDE extension. Idempotent - safe to re-run after extension updates. After it succeeds, run 'FS Lua: Restart Language Server' from the command palette."
+        }
+    ]
+}
