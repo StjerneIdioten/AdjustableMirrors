@@ -1,6 +1,7 @@
 {
     "Lua.diagnostics.globals": [
         "source",
+        "SpecializationUtil",
         "getXMLString",
         "g_AMDebug",
         "g_dedicatedServerInfo",
@@ -20,5 +21,6 @@
     ],
     "Lua.diagnostics.disable": [
         "redundant-parameter"
-    ]
+    ],
+    "fsLua.gamePath": "/var/mnt/extra/steam/steamapps/common/Farming Simulator 25"
 }

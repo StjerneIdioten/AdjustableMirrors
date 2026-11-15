@@ -14,6 +14,20 @@
                 "panel": "new"
             },
             "detail": "Download the Linux LuaLS build and symlink it over the Windows-only .exe bundled with the Farming Simulator IDE extension. Idempotent - safe to re-run after extension updates. After it succeeds, run 'FS Lua: Restart Language Server' from the command palette."
+        },
+        {
+            "label": "FS Lua: Remove Mod Link (for playing)",
+            "type": "shell",
+            "command": "bash scripts/fix-luals-linux.sh --remove-mod-link",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "detail": "Remove the FS25_AdjustableMirrors symlink from the game's mods folder so the deployed .zip takes precedence again. Run this before playing online servers that require the mod. Re-run 'FS Lua: Fix Linux LuaLS' to restore the dev link."
         }
     ]
 }
