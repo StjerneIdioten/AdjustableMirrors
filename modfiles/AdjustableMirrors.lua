@@ -50,10 +50,14 @@ function AdjustableMirrors:onLoad(savegame)
 
 	spec.has_usable_mirrors = false
 
+	local maxNumMirrors = g_gameSettings:getValue("maxNumMirrors")
+	local enterableMirrorCount = self.spec_enterable.mirrors and #self.spec_enterable.mirrors or 0
+	g_AMDebug.info("onLoad DIAG: maxNumMirrors=" .. tostring(maxNumMirrors) .. ", spec_enterable.mirrors count=" .. enterableMirrorCount .. g_AMDebug.getIdentity(self))
+
 	if g_dedicatedServerInfo ~= nil then
 		g_AMDebug.info("This vehicle is loaded on a dedicated server and therefor does not have mirrors" .. g_AMDebug.getIdentity(self))
 		spec.has_usable_mirrors = false
-	elseif g_gameSettings:getValue("maxNumMirrors") < 1 then
+	elseif maxNumMirrors < 1 then
 		g_AMDebug.info("This vehicle is loaded on a client that does not have mirrors enabled" .. g_AMDebug.getIdentity(self))
 		spec.has_usable_mirrors = false
 	elseif not self.spec_enterable.mirrors or not self.spec_enterable.mirrors[1] then
@@ -120,9 +124,12 @@ function AdjustableMirrors:onPostLoad(savegame)
 			setRotation(spec.mirrors[idx].mirror_ref.node,0,0,0)
 			idx = idx + 1
 		end
-		for i = 1, #spec.spec_enterable.mirrors do
+		local enterableCount = #spec.spec_enterable.mirrors
+		g_AMDebug.info("onPostLoad DIAG: spec_enterable.mirrors has " .. enterableCount .. " entries, creating that many mirrors" .. g_AMDebug.getIdentity(self))
+		for i = 1, enterableCount do
 			addMirror(spec.spec_enterable.mirrors[i])
 		end
+		g_AMDebug.info("onPostLoad DIAG: Total mirrors created: " .. #spec.mirrors .. g_AMDebug.getIdentity(self))
 	end
 
 	if savegame ~= nil then
@@ -132,10 +139,15 @@ function AdjustableMirrors:onPostLoad(savegame)
 		local key = savegame.key .. "." .. AdjustableMirrors.modName .. '.adjustableMirrors'
 		g_AMDebug.debug("Full key: " .. key)
 		local savegameVersion = xmlFile:getString(key .. "#version")
+		-- Only reset mirror data on a major version change (breaking format change).
+		-- Minor/patch bumps keep the data.
+		local function majorVersion(v)
+			return tonumber((v or ""):match("^%d+")) or 0
+		end
 		if savegameVersion == nil then
 			g_AMDebug.info("No savegame data present, defaults are used for mirrors" .. g_AMDebug.getIdentity(self))
-		elseif savegameVersion ~= AdjustableMirrors.version then
-			g_AMDebug.warning("Savegame data is from mod version " .. savegameVersion .. " while the current mod is version " .. AdjustableMirrors.version .. " therefore mirrors are reset to defaults" .. g_AMDebug.getIdentity(self))
+		elseif majorVersion(savegameVersion) ~= majorVersion(AdjustableMirrors.version) then
+			g_AMDebug.warning("Savegame data is from mod version " .. savegameVersion .. " (major " .. majorVersion(savegameVersion) .. ") while the current mod is version " .. AdjustableMirrors.version .. " (major " .. majorVersion(AdjustableMirrors.version) .. ") - breaking change, mirrors are reset to defaults" .. g_AMDebug.getIdentity(self))
 		else
 			g_AMDebug.info("Loading savegame mirror settings" .. g_AMDebug.getIdentity(self))
 			local idx = 1
@@ -147,6 +159,10 @@ function AdjustableMirrors:onPostLoad(savegame)
 				else
 					g_AMDebug.debug("x0: " .. position[1] .. ", y0: " .. position[2] .. g_AMDebug.getIdentity(self))
 					
+					if spec.mirrors[idx] == nil then
+						g_AMDebug.warning("Savegame has data for mirror " .. idx .. " but only " .. #spec.mirrors .. " mirrors exist, stopping load" .. g_AMDebug.getIdentity(self))
+						break
+					end
 					AdjustableMirrors.setMirror(self, idx, unpack(position))
 					idx = idx + 1
 				end
@@ -193,7 +209,8 @@ end
 function AdjustableMirrors:onReadStream(streamID, connection)
 	g_AMDebug.info("onReadStream - " .. streamID .. g_AMDebug.getIdentity(self))
 	local spec = self.spec_adjustableMirrors
-	local numbOfMirrors = streamReadInt8(streamID) 
+	local numbOfMirrors = streamReadInt8(streamID)
+	g_AMDebug.info("onReadStream DIAG: server sent " .. numbOfMirrors .. " mirrors, local has " .. #spec.mirrors .. " mirrors" .. g_AMDebug.getIdentity(self))
 	if numbOfMirrors > 0 then
 		g_AMDebug.info("Server has mirror data for " .. numbOfMirrors .. " mirrors")
 		local mirrorData = {}
@@ -201,6 +218,10 @@ function AdjustableMirrors:onReadStream(streamID, connection)
 			mirrorData[idx] = {streamReadFloat32(streamID), streamReadFloat32(streamID)}
 		end
 		for idx, mirror in ipairs(spec.mirrors) do
+			if mirrorData[idx] == nil then
+				g_AMDebug.warning("onReadStream DIAG: server sent data for " .. numbOfMirrors .. " mirrors but local only has " .. #spec.mirrors .. ", skipping extra" .. g_AMDebug.getIdentity(self))
+				break
+			end
 			AdjustableMirrors.setMirror(self, idx, mirrorData[idx][1], mirrorData[idx][2])
 		end
 	else
@@ -330,7 +351,8 @@ function AdjustableMirrors:setMirror(mirror_idx, new_x0, new_y0)
 	g_AMDebug.debug("setMirror" .. g_AMDebug.getIdentity(self), 4)
 	local spec = self.spec_adjustableMirrors
 	if spec.mirrors[mirror_idx] == nil then
-		spec.mirrors[mirror_idx] = {}
+		g_AMDebug.warning("setMirror: mirror " .. mirror_idx .. " does not exist (total: " .. #spec.mirrors .. "), skipping" .. g_AMDebug.getIdentity(self))
+		return
 	end
 
 	local mirror = spec.mirrors[mirror_idx]

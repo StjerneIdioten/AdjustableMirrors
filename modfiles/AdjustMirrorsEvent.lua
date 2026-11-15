@@ -30,18 +30,41 @@ function AMAdjustMirrorsEvent:readStream(streamID, connection)
     self.vehicle = NetworkUtil.readNodeObject(streamID)
     local spec = self.vehicle.spec_adjustableMirrors
     local numbOfMirrors = streamReadInt8(streamID) -- Sends number of mirrors, since dedicated servers don't have that information
-    g_AMDebug.info(myName .. ": Number of mirrors received is " .. numbOfMirrors)
-    if #spec.mirrors ~= numbOfMirrors then
-        g_AMDebug.info(myName .. ": Dedicated server does not have mirrors")
-        for idx=1,numbOfMirrors do
-            g_AMDebug.info(myName .. ": Initialising empty mirror " .. idx)
+    g_AMDebug.info(myName .. ": Number of mirrors received is " .. numbOfMirrors .. ", local has " .. #spec.mirrors .. " mirrors" .. g_AMDebug.getIdentity(self.vehicle))
+
+    -- If local has fewer mirrors than the stream (e.g. dedicated server), create entries so we can store the data
+    if #spec.mirrors < numbOfMirrors then
+        g_AMDebug.info(myName .. ": Local has fewer mirrors, extending to " .. numbOfMirrors .. g_AMDebug.getIdentity(self.vehicle))
+        for idx = #spec.mirrors + 1, numbOfMirrors do
             spec.mirrors[idx] = {}
         end
     end
 
-    for idx, mirror in ipairs(spec.mirrors) do
-        g_AMDebug.info(myName .. "Receiving data for mirror " .. idx)
-        AdjustableMirrors.setMirror(self.vehicle, idx, streamReadFloat32(streamID), streamReadFloat32(streamID))
+    -- Always consume all stream data to keep the stream in sync
+    local applyCount = math.min(#spec.mirrors, numbOfMirrors)
+    for idx = 1, numbOfMirrors do
+        local x0 = streamReadFloat32(streamID)
+        local y0 = streamReadFloat32(streamID)
+        if idx <= applyCount then
+            local mirror = spec.mirrors[idx]
+            if mirror ~= nil and mirror.x1 ~= nil then
+                AdjustableMirrors.setMirror(self.vehicle, idx, x0, y0)
+            else
+                g_AMDebug.info(myName .. ": Storing data for mirror " .. idx .. " (no transform groups, server-side)" .. g_AMDebug.getIdentity(self.vehicle))
+                mirror.x0 = x0
+                mirror.y0 = y0
+            end
+        end
+    end
+
+    -- If local has more mirrors than the stream sent, send a full update so the server gets all mirror data
+    if #spec.mirrors > numbOfMirrors then
+        g_AMDebug.info(myName .. ": Local has " .. #spec.mirrors .. " mirrors but stream only had " .. numbOfMirrors .. ", sending full update" .. g_AMDebug.getIdentity(self.vehicle))
+        if g_server ~= nil then
+            g_server:broadcastEvent(AMAdjustMirrorsEvent.new(self.vehicle), nil, nil, self.vehicle)
+        else
+            g_client:getServerConnection():sendEvent(AMAdjustMirrorsEvent.new(self.vehicle))
+        end
     end
 
     if not connection:getIsServer() then
