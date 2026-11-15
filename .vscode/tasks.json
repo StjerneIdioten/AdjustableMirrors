@@ -16,9 +16,9 @@
             "detail": "Download the Linux LuaLS build and symlink it over the Windows-only .exe bundled with the Farming Simulator IDE extension. Idempotent - safe to re-run after extension updates. After it succeeds, run 'FS Lua: Restart Language Server' from the command palette."
         },
         {
-            "label": "FS Lua: Remove Mod Link (for playing)",
+            "label": "Link Mod (dev symlink)",
             "type": "shell",
-            "command": "bash scripts/fix-luals-linux.sh --remove-mod-link",
+            "command": "bash scripts/mod-link.sh",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -27,7 +27,35 @@
                 "reveal": "always",
                 "panel": "new"
             },
-            "detail": "Remove the FS25_AdjustableMirrors symlink from the game's mods folder so the deployed .zip takes precedence again. Run this before playing online servers that require the mod. Re-run 'FS Lua: Fix Linux LuaLS' to restore the dev link."
+            "detail": "Symlink modfiles/ into the game's mods folder for live singleplayer development. Idempotent - safe to re-run."
+        },
+        {
+            "label": "Remove Mod Link (for MP)",
+            "type": "shell",
+            "command": "bash scripts/mod-link.sh --remove",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "detail": "Remove the FS25_AdjustableMirrors dev symlink so the deployed .zip takes precedence. Run before playing online servers that require the mod."
+        },
+        {
+            "label": "Deploy Mod (zip for MP)",
+            "type": "shell",
+            "command": "bash scripts/deploy.sh",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "detail": "Zip modfiles/ into FS25_AdjustableMirrors.zip and copy it to the game's mods folder. Required for multiplayer (only zip mods are supported in MP)."
         }
     ]
 }

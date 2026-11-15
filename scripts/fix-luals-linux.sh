@@ -16,33 +16,19 @@
 #      Proton prefix, so a directory with file symlinks is created to satisfy
 #      the lookup.
 #
-#   3. Mod link: modfiles/ is symlinked into the game's mods folder as
-#      FS25_AdjustableMirrors for live development (an unpacked mod folder
-#      takes precedence over a same-named .zip in-game).
+# The mod development symlink is managed separately by scripts/mod-link.sh.
 #
 # The script is idempotent: run it again after an extension update and it will
 # only do work that is still needed.
 #
 # Usage:
 #   bash scripts/fix-luals-linux.sh               # apply all fixes (idempotent)
-#   bash scripts/fix-luals-linux.sh --remove-mod-link
-#       Remove the FS25_AdjustableMirrors mod symlink so the deployed .zip
-#       takes precedence again (needed for playing online servers that
-#       require the mod).
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LUALS_DIR="${REPO_ROOT}/.luals"
 EXT_GLOB="${HOME}/.vscode/extensions/giantssoftware.farmingsimulator-ide-*"
-
-REMOVE_MOD_LINK=false
-for arg in "$@"; do
-    case "$arg" in
-        --remove-mod-link) REMOVE_MOD_LINK=true ;;
-        *) echo "ERROR: Unknown argument: $arg" >&2; exit 1 ;;
-    esac
-done
 
 echo "==> Locating Farming Simulator IDE extension..."
 ext_dirs=()
@@ -195,34 +181,6 @@ else
         echo "    Linked profile files into ${PROFILE_LINK}"
     else
         echo "    Already linked: ${PROFILE_LINK}"
-    fi
-
-    # --- Mod symlink for live development --------------------------------------
-    # Symlink the repo's modfiles/ into the game's mods folder as
-    # FS25_AdjustableMirrors. An unpacked mod folder takes precedence over a
-    # same-named .zip in-game, so edits to modfiles/ are picked up directly.
-    MODS_DIR="${PROFILE_SRC}/mods"
-    MOD_LINK="${MODS_DIR}/FS25_AdjustableMirrors"
-    MOD_SRC="${REPO_ROOT}/modfiles"
-    if [[ -d "$MODS_DIR" ]]; then
-        if [[ "$REMOVE_MOD_LINK" == true ]]; then
-            if [[ -L "$MOD_LINK" ]]; then
-                rm -f "$MOD_LINK"
-                echo "    Removed mod link: ${MOD_LINK}"
-                echo "    The deployed FS25_AdjustableMirrors.zip now takes precedence."
-            else
-                echo "    Mod link not present; nothing to remove."
-            fi
-        elif [[ -L "$MOD_LINK" ]]; then
-            echo "    Mod already linked: ${MOD_LINK} -> $(readlink "$MOD_LINK")"
-        elif [[ -e "$MOD_LINK" ]]; then
-            echo "    WARNING: ${MOD_LINK} exists and is not a symlink; leaving it alone."
-        else
-            ln -s "$MOD_SRC" "$MOD_LINK"
-            echo "    Linked mod: ${MOD_LINK} -> ${MOD_SRC}"
-        fi
-    else
-        echo "    WARNING: mods folder not found at ${MODS_DIR}; skipping mod link."
     fi
 fi
 
