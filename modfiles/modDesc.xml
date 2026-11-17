@@ -23,6 +23,11 @@ Default bindings are as follows:
 - "Tilt the mirror up" : [rctrl + keypad_8]
 - "Tilt the mirror left" : [rctrl + keypad_4]
 - "Tilt the mirror right" : [rctrl + keypad_6]
+
+Changelog 4.0.1.0:
+- Fixed a crash when loading savegame data with a mismatched mirror count
+- Fixed multiplayer mirror synchronization issues
+- Mirror settings are now preserved across minor version updates (only reset on major version changes)
 ]]></en>
 		<de><![CDATA[
 Dieser Mod ermöglicht es Ihnen, die Spiegel Ihrer Fahrzeuge einzustellen und sie für die Verwendung in der Kabinenansicht nützlich zu machen.
@@ -37,6 +42,11 @@ Die Standardbindungen sind wie folgt:
 - "Kippt den Spiegel nach oben" : [Strg-Rechts + Keypad 8]
 - "Kippt den Spiegel nach links" : [Strg-Rechts + Keypad 4]
 - "Kippt den Spiegel nach rechts" : [Strg-Rechts + Keypad 6]
+
+Changelog 4.0.1.0:
+- Fehler behoben: Absturz beim Laden von Speicherdaten mit unpassender Spiegelanzahl
+- Multiplayer-Synchronisation der Spiegel behoben
+- Spiegel-Einstellungen werden jetzt bei kleineren Versionsupdates beibehalten (nur bei Hauptversionsänderungen zurückgesetzt)
 ]]></de>
 		<fr><![CDATA[
 Ce mod vous permet de régler les rétroviseurs de vous véhicules pour les utiliser dedans la cabine.
@@ -51,9 +61,14 @@ Les raccourcis sont les suivants:
 - "Déplacez vers le haut" : [rctrl + keypad_8]
 - "Déplacez vers la gauche" : [rctrl + keypad_4]
 - "Déplacez vers la droite" : [rctrl + keypad_6]
+
+Changelog 4.0.1.0:
+- Correction d'un plantage lors du chargement des données de sauvegarde avec un nombre de rétroviseurs non correspondant
+- Correction des problèmes de synchronisation des rétroviseurs en multijoueur
+- Les réglages des rétroviseurs sont maintenant conservés lors des mises à jour mineures (réinitialisés uniquement lors des changements de version majeure)
 ]]></fr>
  	</description>
-    <multiplayer supported="true"/>   
+ 	 	  <multiplayer supported="true"/>
 	<iconFilename>icon_AdjustableMirrors.dds</iconFilename>
 
 	<l10n filenamePrefix="localization/modDesc_l10n" />

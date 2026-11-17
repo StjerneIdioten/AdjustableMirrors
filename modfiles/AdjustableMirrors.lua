@@ -147,7 +147,12 @@ function AdjustableMirrors:onPostLoad(savegame)
 		if savegameVersion == nil then
 			g_AMDebug.info("No savegame data present, defaults are used for mirrors" .. g_AMDebug.getIdentity(self))
 		elseif majorVersion(savegameVersion) ~= majorVersion(AdjustableMirrors.version) then
-			g_AMDebug.warning("Savegame data is from mod version " .. savegameVersion .. " (major " .. majorVersion(savegameVersion) .. ") while the current mod is version " .. AdjustableMirrors.version .. " (major " .. majorVersion(AdjustableMirrors.version) .. ") - breaking change, mirrors are reset to defaults" .. g_AMDebug.getIdentity(self))
+			local msg = "Savegame data is from mod version " .. savegameVersion
+				.. " (major " .. majorVersion(savegameVersion) .. ")"
+				.. " while the current mod is version " .. AdjustableMirrors.version
+				.. " (major " .. majorVersion(AdjustableMirrors.version) .. ")"
+				.. " - breaking change, mirrors are reset to defaults"
+			g_AMDebug.warning(msg .. g_AMDebug.getIdentity(self))
 		else
 			g_AMDebug.info("Loading savegame mirror settings" .. g_AMDebug.getIdentity(self))
 			local idx = 1
@@ -260,7 +265,10 @@ end
 
 
 function AdjustableMirrors:onRegisterActionEvents(isSelected, isOnActiveVehicle)
-	g_AMDebug.info("onRegisterActionEvents, selected: " .. tostring(isSelected) .. ", activeVehicle: " .. tostring(isOnActiveVehicle) .. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient) .. g_AMDebug.getIdentity(self))
+	local msg = "onRegisterActionEvents, selected: " .. tostring(isSelected)
+		.. ", activeVehicle: " .. tostring(isOnActiveVehicle)
+		.. ", S: " .. tostring(self.isServer) .. ", C: " .. tostring(self.isClient)
+	g_AMDebug.info(msg .. g_AMDebug.getIdentity(self))
 	local spec = self.spec_adjustableMirrors
 	if spec.has_usable_mirrors then
 		if isOnActiveVehicle and self:getIsControlled() then

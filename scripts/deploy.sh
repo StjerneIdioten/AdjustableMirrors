@@ -58,3 +58,12 @@ zip -r "${REPO_ROOT}/${ZIP_NAME}" . -x '.vscode/*' -x '*.git*'
 cp -f "${REPO_ROOT}/${ZIP_NAME}" "${MODS_DIR}/${ZIP_NAME}"
 echo "==> Deployed: ${MODS_DIR}/${ZIP_NAME}"
 echo "==> Also available at: ${REPO_ROOT}/${ZIP_NAME}"
+
+# --- Unpack a clean copy for the Giants Testrunner ----------------------------
+# The Testrunner needs an unpacked mod with no extra files (e.g. .vscode/),
+# so we unzip the freshly built zip into a gitignored .verify/ folder.
+VERIFY_DIR="${REPO_ROOT}/.verify/${MOD_NAME}"
+rm -rf "${VERIFY_DIR}"
+mkdir -p "${VERIFY_DIR}"
+unzip -q "${REPO_ROOT}/${ZIP_NAME}" -d "${VERIFY_DIR}"
+echo "==> Unpacked for Testrunner: ${VERIFY_DIR}"
